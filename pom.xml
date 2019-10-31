@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.yoxel.aurinko</groupId>
+	<artifactId>aurinko-service</artifactId>
+	<packaging>pom</packaging>
+	<version>3.1-SNAPSHOT</version>
+
+	<parent>
+		<groupId>com.yoxel</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.6.1</version>
+	</parent>
+
+	<!-- mvn -e exec:java -Dexec.mainClass=com.yoxel.rest2.core.Server -->
+
+	<dependencies>
+		<dependency>
+			<groupId>com.yoxel</groupId>
+			<artifactId>model2</artifactId>
+			<version>3.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.yoxel</groupId>
+			<artifactId>oauth-flow</artifactId>
+			<version>1.5.5-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+    </dependencies>
+</project>
