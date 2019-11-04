@@ -1,4 +1,4 @@
-package com.yoxel.rest2.aurinko;
+package com.yoxel.aurinko;
 
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.BasicAuthentication;
@@ -8,6 +8,8 @@ import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
+import com.yoxel.aurinko.dto.AurAccountDto;
+import com.yoxel.aurinko.dto.AurTokenDto;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package com.yoxel.rest2.aurinko;
+package com.yoxel.aurinko;
 
 import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpRequest;

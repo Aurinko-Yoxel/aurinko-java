@@ -1,17 +1,16 @@
-package com.yoxel.rest2.aurinko;
+package com.yoxel.aurinko;
 
+import com.google.api.client.googleapis.util.Utils;
+import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
-
+import com.yoxel.aurinko.dto.AurAccountDto;
+import com.yoxel.aurinko.dto.AurTokenDto;
 import com.yoxel.model2.ServiceTemplate;
 import com.yoxel.model2.user.AbsService;
 import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
 import com.yoxel.models.UserModel;
-import com.yoxel.oauth.gmail.ServiceAccountUtil;
-import com.yoxel.persist.util.Strings;
-import com.yoxel.rest2.aurinko.AurAccountDto;
-import com.yoxel.rest2.aurinko.AurTokenDto;
-import com.yoxel.rest2.aurinko.AurinkoService;
+import com.yoxel.oauth.common.SecurityUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class ServiceUtils {
     return accDto;
   }
 
-  private static AurAccountDto fromTemplate(ServiceTemplate templ) {
+  private static AurAccountDto fromTemplate(ServiceTemplate templ, AuthAccess authAccess) throws IOException {
 
     final List<String> scopes = new ArrayList<>();
     if (templ.isScanEmail()) {
@@ -99,26 +98,35 @@ public class ServiceUtils {
     accDto.setActive(true);
     accDto.setServerUrl(templ.getInstUrl());
     accDto.setAuthScopes(scopes.toArray(new String[0]));
-    accDto.setAuthString1(templ.getUsername());
 //        authObtainedAt;
 //        authExpiresAt;
 
     if (templ.getProtocol() == AbsService.Protocol.GMAIL) {
-      final ServiceAccountUtil.ServiceAccountData saData =
-          ServiceAccountUtil.extractServiceAccountData(templ.getPassword());
-
       accDto.setServiceType("GOOGLE");
       accDto.setAuthString2(templ.getPassword());
-      accDto.setAuthOrgId(Strings.splitByComma(templ.getAuthDomains())[0].trim());
-      //accDto.setLoginString(saData.getClientId());
-      accDto.setEmail(saData.getClientEmail());
+
+      // Strings.splitByComma(templ.getAuthDomains())[0].trim()
+
+      try {
+        final GenericJson sdData = Utils.getDefaultJsonFactory().createJsonParser(templ.getPassword()).parse(GenericJson.class);
+
+        accDto.setAuthUserId((String) sdData.get("client_id"));
+        accDto.setAuthOrgId((String) sdData.get("project_id"));
+        accDto.setEmail((String) sdData.get("client_email"));
+        accDto.setLoginString((String) sdData.get("private_key_id"));
+        accDto.setAuthString1(SecurityUtils.extractContentsFromPkFile((String) sdData.get("private_key")));
+      } catch (IOException e) {
+        throw new IllegalArgumentException("Bad json");
+      }
     } else if (templ.getProtocol() == AbsService.Protocol.OFFICE365) {
       accDto.setServiceType("EWS365");
       accDto.setOauthClientId("83f46668-ec23-405f-a0be-21ec17d475b3");
       accDto.setAuthOrgId(templ.getExtId());
       //accDto.setLoginString(templ.getExtId());
+      accDto.setAuthString1(authAccess.getAuthString(Long.parseLong(templ.getPassword())));
     } else if (templ.getProtocol() == AbsService.Protocol.EWS) {
       accDto.setServiceType("EWS");
+      accDto.setAuthString1(templ.getUsername());
       accDto.setAuthString2(templ.getPassword());
       accDto.setLoginString(templ.getUsername());
     }
@@ -138,11 +146,7 @@ public class ServiceUtils {
       return null;
     }
 
-    final AurAccountDto aurAcc = fromTemplate(svcTempl);
-
-    if (svcTempl.getProtocol() == AbsService.Protocol.OFFICE365) {
-      aurAcc.setAuthString1(authAccess.getAuthString(Long.parseLong(svcTempl.getPassword())));
-    }
+    final AurAccountDto aurAcc = fromTemplate(svcTempl, authAccess);
 
     System.out.println("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName());
 
