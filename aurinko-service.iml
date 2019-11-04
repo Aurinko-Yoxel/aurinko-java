@@ -9,7 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-RECUR-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:dbutils:1.7.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:persist:1.5-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:config:1.7" level="project" />
@@ -41,6 +41,8 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.1.3" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.1.2" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.1.3" level="project" />
+    <orderEntry type="library" name="Maven: org.mnode.ical4j:ical4j:2.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.threeten:threetenbp:1.3.6" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:oauth-flow:1.5.6-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client:1.21.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client:1.21.0" level="project" />
