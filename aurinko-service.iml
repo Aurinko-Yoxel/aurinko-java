@@ -10,6 +10,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:dbutils:1.7.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:persist:1.5-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:config:1.7" level="project" />

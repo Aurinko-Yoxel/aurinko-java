@@ -11,13 +11,13 @@ import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
 import com.yoxel.models.UserModel;
 import com.yoxel.oauth.common.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.yoxel.model2.ScanFilterBase.log;
-
+@Slf4j
 public class ServiceUtils {
 
   public interface SecretAccess {
@@ -57,7 +57,8 @@ public class ServiceUtils {
 
       accDto.setAuthString1(sd.getAccessToken());
       accDto.setAuthString2(sd.getRefreshToken());
-      accDto.setAuthExpiresAt(new DateTime(sd.getTokenExpireAt()));
+      if (sd.getTokenExpireAt() != null)
+        accDto.setAuthExpiresAt(new DateTime(sd.getTokenExpireAt()));
     }
 
     if (acc.getProtocol() == AbsService.Protocol.GMAIL) {
