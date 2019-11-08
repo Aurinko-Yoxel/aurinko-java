@@ -5,6 +5,8 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.aurinko.dto.AurTokenDto;
+import com.yoxel.model2.ClientCompany;
+import com.yoxel.model2.ClientUser;
 import com.yoxel.model2.ServiceTemplate;
 import com.yoxel.model2.user.AbsService;
 import com.yoxel.model2.user.Account;
@@ -25,8 +27,18 @@ public class ServiceUtils {
     String getSecret(String alias);
   }
 
-  private static AurAccountDto fromAccount(Account acc, String userName, SyncData sd,
-                                           SecretAccess sa) {
+  public interface UserModelAccess {
+
+    ClientCompany getClientCompany();
+
+    ClientUser getClientUser();
+
+    ServiceTemplate getServiceTemplate(long templId);
+
+    SyncData getSyncData(Account acc);
+  }
+
+  private static AurAccountDto fromAccount(Account acc, String userName, SyncData sd, SecretAccess sa) {
     final List<String> scopes = new ArrayList<>();
     if (acc.isScanEmail()) {
       scopes.add("Mail.Read");
@@ -135,6 +147,51 @@ public class ServiceUtils {
     return accDto;
   }
 
+  public static AurTokenDto syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
+                                        SyncData sd, SecretAccess acsec) {
+    if (!acc.getProtocol().isReadEmail()) {
+      return null;
+    }
+
+    if (sd == null) {
+      sd = uma.getSyncData(acc);
+    }
+
+    final AurAccountDto
+            aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, acsec);
+
+    AurTokenDto aurToken = null;
+    if (acc.isTrustServer() && acc.getTemplId() > 0) {
+      ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
+
+      if (svcTempl.getAurinkoToken() != null) {
+        System.out.println(
+                "Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc
+                        .getEmailAddress());
+
+        try {
+          aurToken =
+                  aurinko.upsertDaemonFlowAccount(aurAcc, svcTempl.getAurinkoToken(),
+                          uma.getClientCompany().getExtId());
+        } catch (IOException e) {
+          log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
+        }
+      }
+    } else {
+      System.out.println(
+              "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress());
+
+      try {
+        aurToken =
+                aurinko.upsertAccountByEmail(aurAcc, uma.getClientCompany().getExtId());
+      } catch (IOException e) {
+        log.warn("Failed to upsert Aurinko account " + e.getMessage());
+      }
+    }
+
+    return aurToken;
+  }
+
   public interface AuthAccess {
 
     String getAuthString(long sid) throws IOException;
@@ -164,48 +221,4 @@ public class ServiceUtils {
     return null;
   }
 
-  public static AurTokenDto syncAccount(AurinkoService aurinko, UserModel um, Account acc,
-                                        SyncData sd, SecretAccess acsec) {
-    if (!acc.getProtocol().isReadEmail()) {
-      return null;
-    }
-
-    if (sd == null) {
-      sd = um.getSyncData(acc);
-    }
-
-    final AurAccountDto
-        aurAcc = fromAccount(acc, um.getClientUser().getName(), sd, acsec);
-
-    AurTokenDto aurToken = null;
-    if (acc.isTrustServer() && acc.getTemplId() > 0) {
-      ServiceTemplate svcTempl = um.getServiceTemplate(acc.getTemplId());
-
-      if (svcTempl.getAurinkoToken() != null) {
-        System.out.println(
-            "Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc
-                .getEmailAddress());
-
-        try {
-          aurToken =
-              aurinko.upsertDaemonFlowAccount(aurAcc, svcTempl.getAurinkoToken(),
-                                              um.getClientCompany().getExtId());
-        } catch (IOException e) {
-          log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
-        }
-      }
-    } else {
-      System.out.println(
-          "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress());
-
-      try {
-        aurToken =
-            aurinko.upsertAccountByEmail(aurAcc, um.getClientCompany().getExtId());
-      } catch (IOException e) {
-        log.warn("Failed to upsert Aurinko account " + e.getMessage());
-      }
-    }
-
-    return aurToken;
-  }
 }
