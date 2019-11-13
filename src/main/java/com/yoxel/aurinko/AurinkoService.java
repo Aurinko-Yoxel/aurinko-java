@@ -79,7 +79,7 @@ public class AurinkoService {
                 .execute().parseAs(AurTokenDto.class);
     }
 
-    public AurEventsPage calendarSync(String deltaToken, String nextPageToken) throws IOException {
+    private String tokenParams(String deltaToken, String nextPageToken) {
         StringBuilder sb = new StringBuilder();
         if (deltaToken != null) {
             sb.append("deltaToken=" + deltaToken);
@@ -91,12 +91,27 @@ public class AurinkoService {
 
             sb.append("nextPageToken=" + nextPageToken);
         }
-        return createRequest("GET", "/calendar/sync" + (sb.length() > 0 ? "?" + sb.toString() : ""))
+
+        return sb.length() > 0 ? "?" + sb.toString() : "";
+    }
+
+    public AurEventsPage calendarSync(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/calendar/sync" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
-    public AurEmailsPage mailSync() throws IOException {
-        return createRequest("GET", "/mailbox/sync")
+    public AurEventsPage calendarDeleted(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/calendar/syncDeleted" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurEventsPage.class);
+    }
+
+    public AurEmailsPage mailSync(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/mailbox/sync" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurEmailsPage.class);
+    }
+
+    public AurEmailsPage mailDeleted(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/mailbox/syncDeleted" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEmailsPage.class);
     }
 }
