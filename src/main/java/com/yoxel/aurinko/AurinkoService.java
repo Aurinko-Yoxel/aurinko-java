@@ -4,12 +4,12 @@ import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
-import com.yoxel.aurinko.dto.AurAccountDto;
-import com.yoxel.aurinko.dto.AurEmailsPage;
-import com.yoxel.aurinko.dto.AurEventsPage;
-import com.yoxel.aurinko.dto.AurTokenDto;
+import com.yoxel.aurinko.dto.*;
+import com.yoxel.commons.xstream.IOXStream;
+import com.yoxel.commons.xstream.XStream;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class AurinkoService {
 
@@ -113,5 +113,27 @@ public class AurinkoService {
     public AurEmailsPage mailDeleted(String deltaToken, String nextPageToken) throws IOException {
         return createRequest("GET", "/mailbox/syncDeleted" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEmailsPage.class);
+    }
+
+    public XStream<AurEvent, IOException>
+    pagedCalendarSync(boolean deleted, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
+
+        if (onPage == null) {
+            onPage = v -> {
+            };
+        }
+
+        AurEventsPage firstPage = deleted ? calendarDeleted(deltaToken, null) : calendarSync(deltaToken, null);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> deleted ? calendarDeleted(deltaToken, qr.getNextPageToken()) : calendarSync(deltaToken, qr.getNextPageToken()),
+                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .peek(onPage) // execute action on each page
+                .map(AurEventsPage::getRecords)
+                .flatMap(IOXStream::of);
     }
 }
