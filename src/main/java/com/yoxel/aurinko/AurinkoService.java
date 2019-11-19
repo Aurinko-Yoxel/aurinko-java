@@ -4,7 +4,8 @@ import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
-import com.yoxel.aurinko.dto.*;
+import com.yoxel.aurinko.bean.*;
+import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
 
@@ -52,31 +53,31 @@ public class AurinkoService {
         //httpRequest.getHeaders().setUserAgent(SForceAuthorizationCodeFlow.USER_AGENT);
     }
 
-    public AurAccountDto getAccount() throws IOException {
+    public AurAccount getAccount() throws IOException {
         return createRequest("GET", "/account")
-                .execute().parseAs(AurAccountDto.class);
+                .execute().parseAs(AurAccount.class);
     }
 
-    public AurTokenDto upsertSvcAccount(AurAccountDto svcAcc, String clientOrgId, String svcToken)
+    public AurToken upsertSvcAccount(AurAccountDto svcAcc, String clientOrgId, String svcToken)
             throws IOException {
         return createRequest("POST", "/svc_accounts" + "?clientOrgId=" + clientOrgId + (svcToken == null ? "" : "&svcToken=" + svcToken))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
-                .execute().parseAs(AurTokenDto.class);
+                .execute().parseAs(AurToken.class);
     }
 
-    public AurTokenDto upsertDaemonFlowAccount(AurAccountDto acc, String svcToken, String clientOrgId)
+    public AurToken upsertDaemonFlowAccount(AurAccountDto acc, String svcToken, String clientOrgId)
             throws IOException {
         return createRequest("POST",
                 "/svc_accounts/" + svcToken + "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-                .execute().parseAs(AurTokenDto.class);
+                .execute().parseAs(AurToken.class);
     }
 
-    public AurTokenDto upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
+    public AurToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
             throws IOException {
         return createRequest("POST", "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-                .execute().parseAs(AurTokenDto.class);
+                .execute().parseAs(AurToken.class);
     }
 
     private String tokenParams(String deltaToken, String nextPageToken) {

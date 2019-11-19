@@ -1,12 +1,11 @@
-package com.yoxel.aurinko.dto;
+package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
-
 import lombok.Data;
 
 @Data
-public class AurAccountDto {
+public class AurAccount {
 
   @Key
   private Long id;
@@ -18,6 +17,9 @@ public class AurAccountDto {
   private String serviceType;
 
   @Key
+  private String status;
+
+  @Key
   private Boolean daemon;
 
   @Key
@@ -27,7 +29,10 @@ public class AurAccountDto {
   private String name;
 
   @Key
-  private String[] authScopes;
+  private String clientOrgId;
+
+  @Key
+  private String serverUrl;
 
   @Key
   private String authOrgId;
@@ -36,30 +41,12 @@ public class AurAccountDto {
   private String authUserId;
 
   @Key
-  private String clientOrgId;
-
-  @Key
-  private String serverUrl;
-
-  @Key
-  private String loginString;
-
-  @Key
-  private String oauthClientId;
-
-  @Key
-  private String authString1;
-
-  @Key
-  private String authString2;
+  private String[] authScopes;
 
   @Key
   private DateTime authObtainedAt;
 
   @Key
   private DateTime authExpiresAt;
-
-  @Key
-  boolean active;
 
 }

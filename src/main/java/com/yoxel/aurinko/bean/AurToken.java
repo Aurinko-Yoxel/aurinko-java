@@ -1,11 +1,11 @@
-package com.yoxel.aurinko.dto;
+package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.Key;
 
 import lombok.Data;
 
 @Data
-public class AurTokenDto {
+public class AurToken {
 
   @Key
   private String accessToken;

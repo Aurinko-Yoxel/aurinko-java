@@ -1,4 +1,4 @@
-package com.yoxel.aurinko.dto;
+package com.yoxel.aurinko.bean;
 
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
