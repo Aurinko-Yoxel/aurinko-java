@@ -3,15 +3,15 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
+import com.yoxel.aurinko.AurinkoService;
+import com.yoxel.aurinko.bean.AurToken;
 import com.yoxel.aurinko.dto.AurAccountDto;
-import com.yoxel.aurinko.dto.AurTokenDto;
 import com.yoxel.model2.ClientCompany;
 import com.yoxel.model2.ClientUser;
 import com.yoxel.model2.ServiceTemplate;
 import com.yoxel.model2.user.AbsService;
 import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
-import com.yoxel.models.UserModel;
 import com.yoxel.oauth.common.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,6 +39,7 @@ public class ServiceUtils {
   }
 
   private static AurAccountDto fromAccount(Account acc, String userName, SyncData sd, SecretAccess sa) {
+
     final List<String> scopes = new ArrayList<>();
     if (acc.isScanEmail()) {
       scopes.add("Mail.Read");
@@ -147,8 +148,8 @@ public class ServiceUtils {
     return accDto;
   }
 
-  public static AurTokenDto syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
-                                        SyncData sd, SecretAccess acsec) {
+  public static AurToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
+                                     SyncData sd, SecretAccess acsec) {
     if (!acc.getProtocol().isReadEmail()) {
       return null;
     }
@@ -160,7 +161,7 @@ public class ServiceUtils {
     final AurAccountDto
             aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, acsec);
 
-    AurTokenDto aurToken = null;
+    AurToken aurToken = null;
     if (acc.isTrustServer() && acc.getTemplId() > 0) {
       ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
 
@@ -197,8 +198,8 @@ public class ServiceUtils {
     String getAuthString(long sid) throws IOException;
   }
 
-  public static AurTokenDto syncTemplate(AurinkoService aurinko, String clientOrgId,
-                                         ServiceTemplate svcTempl, AuthAccess authAccess)
+  public static AurToken syncTemplate(AurinkoService aurinko, String clientOrgId,
+                                      ServiceTemplate svcTempl, AuthAccess authAccess)
       throws IOException {
     if (!svcTempl.getProtocol().isReadEmail()) {
       return null;
@@ -208,7 +209,7 @@ public class ServiceUtils {
 
     System.out.println("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName());
 
-    AurTokenDto aurToken = null;
+    AurToken aurToken = null;
     try {
       return aurinko
           .upsertSvcAccount(aurAcc, clientOrgId,
