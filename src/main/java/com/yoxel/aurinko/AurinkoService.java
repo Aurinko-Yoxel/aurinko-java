@@ -58,26 +58,34 @@ public class AurinkoService {
                 .execute().parseAs(AurAccount.class);
     }
 
-    public AurToken upsertSvcAccount(AurAccountDto svcAcc, String clientOrgId, String svcToken)
+    public AurAccountToken upsertSvcAccount(AurAccountDto svcAcc, String clientOrgId, String svcToken)
             throws IOException {
         return createRequest("POST", "/svc_accounts" + "?clientOrgId=" + clientOrgId + (svcToken == null ? "" : "&svcToken=" + svcToken))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
-                .execute().parseAs(AurToken.class);
+                .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurToken upsertDaemonFlowAccount(AurAccountDto acc, String svcToken, String clientOrgId)
+    public AurAccountToken upsertDaemonFlowAccount(AurAccountDto acc, String svcToken, String clientOrgId)
             throws IOException {
         return createRequest("POST",
                 "/svc_accounts/" + svcToken + "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-                .execute().parseAs(AurToken.class);
+                .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
+    public AurAccountToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
             throws IOException {
         return createRequest("POST", "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-                .execute().parseAs(AurToken.class);
+                .execute().parseAs(AurAccountToken.class);
+    }
+
+    public AurSyncStatus calendarSyncStart(String calendarId) throws IOException {
+        return createRequest("POST", "/calendar/sync/start" + (calendarId == null ? "" : "?calendarId=" + calendarId)).execute().parseAs(AurSyncStatus.class);
+    }
+
+    public AurSyncStatus mailSyncStart() throws IOException {
+        return createRequest("POST", "/mailbox/sync/start").execute().parseAs(AurSyncStatus.class);
     }
 
     private String tokenParams(String deltaToken, String nextPageToken) {

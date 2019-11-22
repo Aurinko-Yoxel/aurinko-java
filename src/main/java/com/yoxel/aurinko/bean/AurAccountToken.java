@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public class AurToken {
+public class AurAccountToken {
 
   @Key
   private String accessToken;
