@@ -41,6 +41,9 @@ public class AurAccount {
   private String authUserId;
 
   @Key
+  private DateTime tokenIssuedAt;
+
+  @Key
   private String[] authScopes;
 
   @Key

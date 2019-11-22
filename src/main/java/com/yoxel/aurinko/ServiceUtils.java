@@ -3,8 +3,7 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
-import com.yoxel.aurinko.AurinkoService;
-import com.yoxel.aurinko.bean.AurToken;
+import com.yoxel.aurinko.bean.AurAccountToken;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.model2.ClientCompany;
 import com.yoxel.model2.ClientUser;
@@ -79,6 +78,19 @@ public class ServiceUtils {
       if (sd != null && sd.getAppKeyPrefix() == null) {
         accDto.setOauthClientId(sa.getSecret("google.oauth2.client"));
       }
+
+      if (sd.getAccessToken() == null) {
+        if (acc.isImportEvents()) {
+          accDto.setAuthString1(sd.getCalAccessToken());
+          accDto.setAuthString2(sd.getCalRefreshToken());
+        } else if (acc.isImportContacts()) {
+          accDto.setAuthString1(sd.getContAccessToken());
+          accDto.setAuthString2(sd.getContRefreshToken());
+        } else if (acc.isScanEmail()) {
+          accDto.setAuthString1(sd.getMailAccessToken());
+          accDto.setAuthString2(sd.getMailRefreshToken());
+        }
+      }
     } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
       accDto.setServiceType("EWS365");
       if (sd != null && sd.getAppKeyPrefix() == null) {
@@ -148,8 +160,8 @@ public class ServiceUtils {
     return accDto;
   }
 
-  public static AurToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
-                                     SyncData sd, SecretAccess acsec) {
+  public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
+                                            SyncData sd, SecretAccess acsec) {
     if (!acc.getProtocol().isReadEmail()) {
       return null;
     }
@@ -161,7 +173,7 @@ public class ServiceUtils {
     final AurAccountDto
             aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, acsec);
 
-    AurToken aurToken = null;
+    AurAccountToken aurToken = null;
     if (acc.isTrustServer() && acc.getTemplId() > 0) {
       ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
 
@@ -198,8 +210,8 @@ public class ServiceUtils {
     String getAuthString(long sid) throws IOException;
   }
 
-  public static AurToken syncTemplate(AurinkoService aurinko, String clientOrgId,
-                                      ServiceTemplate svcTempl, AuthAccess authAccess)
+  public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
+                                             ServiceTemplate svcTempl, AuthAccess authAccess)
       throws IOException {
     if (!svcTempl.getProtocol().isReadEmail()) {
       return null;
@@ -209,7 +221,7 @@ public class ServiceUtils {
 
     System.out.println("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName());
 
-    AurToken aurToken = null;
+    AurAccountToken aurToken = null;
     try {
       return aurinko
           .upsertSvcAccount(aurAcc, clientOrgId,
