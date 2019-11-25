@@ -89,19 +89,16 @@ public class AurinkoService {
     }
 
     private String tokenParams(String deltaToken, String nextPageToken) {
-        StringBuilder sb = new StringBuilder();
-        if (deltaToken != null) {
-            sb.append("deltaToken=" + deltaToken);
-        }
 
         if (nextPageToken != null) {
-            if (sb.length() > 0)
-                sb.append("&");
-
-            sb.append("nextPageToken=" + nextPageToken);
+            return "?nextPageToken=" + nextPageToken;
         }
 
-        return sb.length() > 0 ? "?" + sb.toString() : "";
+        if (deltaToken != null) {
+            return "?deltaToken=" + deltaToken;
+        }
+
+        return "";
     }
 
     public AurEventsPage calendarSync(String deltaToken, String nextPageToken) throws IOException {
