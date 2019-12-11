@@ -80,12 +80,33 @@ public class AurinkoService {
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurCalendarPage getCalendars() throws IOException {
-        return createRequest("GET", "/calendars").execute().parseAs(AurCalendarPage.class);
+    public AurCalendarsPage getCalendars(String nextPageToken) throws IOException {
+        return createRequest("GET", "/calendars" + tokenParams(null, nextPageToken)).execute().parseAs(AurCalendarsPage.class);
     }
 
     public AurCalendar getCalendar(String id) throws IOException {
         return createRequest("GET", "/calendars/" + id).execute().parseAs(AurCalendar.class);
+    }
+
+    public XStream<AurCalendar, IOException> pagedCalendars(Consumer<? super AurCalendarsPage> onPage) throws IOException {
+
+        if (onPage == null) {
+            onPage = v -> {
+            };
+        }
+
+        AurCalendarsPage firstPage = getCalendars(null);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> getCalendars(qr.getNextPageToken()),
+                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .peek(onPage) // execute action on each page
+                .map(AurCalendarsPage::getRecords)
+                .flatMap(IOXStream::of);
     }
 
     public AurSyncStatus calendarSyncStart(String calendarId) throws IOException {
