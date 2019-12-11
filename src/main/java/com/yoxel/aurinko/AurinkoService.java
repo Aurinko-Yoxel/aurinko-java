@@ -80,12 +80,20 @@ public class AurinkoService {
                 .execute().parseAs(AurAccountToken.class);
     }
 
+    public AurCalendarPage getCalendars() throws IOException {
+        return createRequest("GET", "/calendars").execute().parseAs(AurCalendarPage.class);
+    }
+
+    public AurCalendar getCalendar(String id) throws IOException {
+        return createRequest("GET", "/calendars/" + id).execute().parseAs(AurCalendar.class);
+    }
+
     public AurSyncStatus calendarSyncStart(String calendarId) throws IOException {
-        return createRequest("POST", "/calendar/sync/start" + (calendarId == null ? "" : "?calendarId=" + calendarId)).execute().parseAs(AurSyncStatus.class);
+        return createRequest("POST", "/calendar/sync" + (calendarId == null ? "" : "?calendarId=" + calendarId)).execute().parseAs(AurSyncStatus.class);
     }
 
     public AurSyncStatus mailSyncStart() throws IOException {
-        return createRequest("POST", "/mailbox/sync/start").execute().parseAs(AurSyncStatus.class);
+        return createRequest("POST", "/mailbox/sync").execute().parseAs(AurSyncStatus.class);
     }
 
     private String tokenParams(String deltaToken, String nextPageToken) {
