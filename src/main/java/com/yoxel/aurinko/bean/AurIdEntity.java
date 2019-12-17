@@ -12,5 +12,8 @@ public abstract class AurIdEntity extends GenericJson {
     String id;
 
     @Key
+    String etag;
+
+    @Key
     DateTime lastModifiedTime;
 }

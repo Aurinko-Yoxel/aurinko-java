@@ -2,7 +2,6 @@ package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
-import com.yoxel.aurinko.bean.AurIdEntity;
 import lombok.Data;
 
 
@@ -16,6 +15,9 @@ public class AurEvent extends AurIdEntity {
 
     @Key
     DateTime end;
+
+    @Key
+    String location;
 
     @Key
     boolean allDay;
