@@ -8,6 +8,7 @@ import com.yoxel.aurinko.bean.*;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
+import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -109,12 +110,13 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurSyncStatus startCalendarSync(String calendarId) throws IOException {
-        return createRequest("POST", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/sync").execute().parseAs(AurSyncStatus.class);
+    public AurSyncStatus startCalendarSync(String calendarId, DateTime timeMin, DateTime timeMax) throws IOException {
+        return createRequest("POST", "/calendars/" + (calendarId == null ? "primary" : calendarId)
+                + "/sync?timeMin=" + timeMin.toDateTimeISO() + "&timeMax=" + timeMax.toDateTimeISO()).execute().parseAs(AurSyncStatus.class);
     }
 
-    public AurSyncStatus startMailSync() throws IOException {
-        return createRequest("POST", "/mailbox/sync").execute().parseAs(AurSyncStatus.class);
+    public AurSyncStatus startMailSync(DateTime timeMin) throws IOException {
+        return createRequest("POST", "/mailbox/sync?timeMin=" + timeMin.toDateTimeISO()).execute().parseAs(AurSyncStatus.class);
     }
 
     private String tokenParams(String deltaToken, String nextPageToken) {
@@ -130,13 +132,13 @@ public class AurinkoService {
         return "";
     }
 
-    public AurEventsPage calSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/calendar/sync/updated" + tokenParams(deltaToken, nextPageToken))
+    public AurEventsPage calSyncUpdated(String calendarId, String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/sync/updated" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
-    public AurEventsPage calSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/calendar/sync/deleted" + tokenParams(deltaToken, nextPageToken))
+    public AurEventsPage calSyncDeleted(String calendarId, String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/sync/deleted" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
@@ -150,28 +152,28 @@ public class AurinkoService {
                 .execute().parseAs(AurEmailsPage.class);
     }
 
-    public XStream<AurEvent, IOException> streamDeletedEvents(String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
-        return streamCalendarSync(true, deltaToken, onPage);
+    public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
+        return streamCalendarSync(true, calendarId, deltaToken, onPage);
     }
 
-    public XStream<AurEvent, IOException> streamUpdatedEvents(String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
-        return streamCalendarSync(false, deltaToken, onPage);
+    public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
+        return streamCalendarSync(false, calendarId, deltaToken, onPage);
     }
 
     private XStream<AurEvent, IOException>
-    streamCalendarSync(boolean deleted, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
+    streamCalendarSync(boolean deleted, String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
             };
         }
 
-        AurEventsPage firstPage = deleted ? calSyncDeleted(deltaToken, null) : calSyncUpdated(deltaToken, null);
+        AurEventsPage firstPage = deleted ? calSyncDeleted(calendarId, deltaToken, null) : calSyncUpdated(calendarId, deltaToken, null);
 
         // query pages, until we get a page with done=true | totalSize=0
         return IOXStream.iterateUntil(
                 firstPage,
-                qr -> deleted ? calSyncDeleted(deltaToken, qr.getNextPageToken()) : calSyncUpdated(deltaToken, qr.getNextPageToken()),
+                qr -> deleted ? calSyncDeleted(calendarId, deltaToken, qr.getNextPageToken()) : calSyncUpdated(calendarId, deltaToken, qr.getNextPageToken()),
                 qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
         )
                 .filter(qr -> qr.getRecords() != null) // this can happen

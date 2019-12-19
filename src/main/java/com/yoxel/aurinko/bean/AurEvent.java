@@ -1,39 +1,62 @@
 package com.yoxel.aurinko.bean;
 
-import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
+import com.yoxel.aurinko.bean.sub.*;
 import lombok.Data;
 
 
 @Data
 public class AurEvent extends AurIdEntity {
-    @Key
-    String subject;
+    @Key("folderId")
+    String calendarId;
 
     @Key
-    DateTime start;
+    private String subject;
 
     @Key
-    DateTime end;
+    private EventDateTime start;
 
     @Key
-    String location;
+    private EventDateTime end;
 
     @Key
-    boolean allDay;
+    private String location;
 
     @Key
-    boolean cancelled;
+    private boolean meeting;
 
     @Key
-    boolean responseRequested;
+    private boolean cancelled;
 
     @Key
-    String recurrenceType;
+    private String response;
 
     @Key
-    String globalId;
+    private EmailAddress organizer;
+
+    private Attendee[] attendees;
 
     @Key
-    String showAs;
+    private boolean attendeesOmitted;
+
+    @Key
+    private String recurrenceType;
+
+    @Key
+    private Recurrence recurrence;
+
+    @Key
+    private OccurrenceInfo occurrenceInfo;
+
+    @Key
+    private String globalId;
+
+    @Key
+    private String showAs;
+
+    @Key
+    private String sensitivity;
+
+    @Key
+    private String[] categories;
 }
