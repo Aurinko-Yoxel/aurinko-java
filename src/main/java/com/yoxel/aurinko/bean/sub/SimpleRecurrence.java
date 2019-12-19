@@ -5,13 +5,11 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public final class Recurrence extends GenericJson {
-    @Key
-    private String original;
+public final class SimpleRecurrence extends GenericJson {
 
     @Key
-    private ICalRecurrence ical;
+    private RecurrencePattern pattern;
 
     @Key
-    private SimpleRecurrence simple;
+    private RecurrenceRange range;
 }

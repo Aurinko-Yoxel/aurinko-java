@@ -39,8 +39,8 @@ public class AurEvent extends AurIdEntity {
     @Key
     private boolean attendeesOmitted;
 
-    @Key
-    private String recurrenceType;
+//    @Key
+//    private String recurrenceType;
 
     @Key
     private Recurrence recurrence;
