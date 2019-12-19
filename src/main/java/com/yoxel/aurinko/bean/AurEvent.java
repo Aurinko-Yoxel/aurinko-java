@@ -14,13 +14,16 @@ public class AurEvent extends AurIdEntity {
     private String subject;
 
     @Key
+    private boolean descriptionOmitted;
+
+    @Key
     private String description;
 
     @Key
-    private EventDateTime start;
+    private DateTimeZone start;
 
     @Key
-    private EventDateTime end;
+    private DateTimeZone end;
 
     @Key
     private String location;
