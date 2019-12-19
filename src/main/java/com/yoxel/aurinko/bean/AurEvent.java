@@ -49,6 +49,9 @@ public class AurEvent extends AurIdEntity {
     private OccurrenceInfo occurrenceInfo;
 
     @Key
+    private String iCalUId;
+
+    @Key
     private String globalId;
 
     @Key
