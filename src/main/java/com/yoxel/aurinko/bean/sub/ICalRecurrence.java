@@ -12,7 +12,7 @@ public final class ICalRecurrence extends GenericJson {
     private String[] rules;
 
     @Key
-    private DateTime recurrenceStart;
+    private String recurrenceStart;
 
     @Key
     private String timezone;

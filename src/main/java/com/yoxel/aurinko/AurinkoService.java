@@ -142,6 +142,11 @@ public class AurinkoService {
                 .execute().parseAs(AurEventsPage.class);
     }
 
+    public AurEvent getCalendarEvent(String calendarId, String eventId) throws IOException {
+        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/events/" + eventId)
+                .execute().parseAs(AurEvent.class);
+    }
+
     public AurEmailsPage mailSync(String deltaToken, String nextPageToken) throws IOException {
         return createRequest("GET", "/mailbox/sync/updated" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEmailsPage.class);

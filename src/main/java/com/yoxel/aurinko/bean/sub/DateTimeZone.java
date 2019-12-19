@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public final class EventDateTime extends GenericJson {
+public final class DateTimeZone extends GenericJson {
 
     @Key
     private com.google.api.client.util.DateTime date;
