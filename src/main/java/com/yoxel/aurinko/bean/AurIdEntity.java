@@ -9,8 +9,14 @@ import lombok.Data;
 public abstract class AurIdEntity extends GenericJson {
 
     @Key
-    String id;
+    private String id;
 
     @Key
-    DateTime lastModifiedTime;
+    private String etag;
+
+    @Key
+    private DateTime createdTime;
+
+    @Key
+    private DateTime lastModifiedTime;
 }
