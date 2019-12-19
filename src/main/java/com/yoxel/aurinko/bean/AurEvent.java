@@ -14,6 +14,9 @@ public class AurEvent extends AurIdEntity {
     private String subject;
 
     @Key
+    private String description;
+
+    @Key
     private EventDateTime start;
 
     @Key
