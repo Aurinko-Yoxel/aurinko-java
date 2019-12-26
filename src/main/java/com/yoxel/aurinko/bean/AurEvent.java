@@ -29,21 +29,10 @@ public class AurEvent extends AurIdEntity {
     private String location;
 
     @Key
-    private boolean meeting;
+    private Organizer organizer;
 
     @Key
-    private boolean cancelled;
-
-    @Key
-    private String response;
-
-    @Key
-    private EmailAddress organizer;
-
-    private Attendee[] attendees;
-
-    @Key
-    private boolean attendeesOmitted;
+    private MeetingInfo meetingInfo;
 
 //    @Key
 //    private String recurrenceType;
