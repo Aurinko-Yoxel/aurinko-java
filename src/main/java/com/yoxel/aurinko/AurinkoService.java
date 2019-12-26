@@ -54,29 +54,33 @@ public class AurinkoService {
         //httpRequest.getHeaders().setUserAgent(SForceAuthorizationCodeFlow.USER_AGENT);
     }
 
+    public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
+        return createRequest("GET", "/oauth_regs").execute().parseAs(AurOAuthClientRegsPage.class);
+    }
+
     public AurAccount getAccount() throws IOException {
         return createRequest("GET", "/account")
                 .execute().parseAs(AurAccount.class);
     }
 
-    public AurAccountToken upsertSvcAccount(AurAccountDto svcAcc, String clientOrgId, String svcToken)
+    public AurAccountToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
             throws IOException {
-        return createRequest("POST", "/svc_accounts" + "?clientOrgId=" + clientOrgId + (svcToken == null ? "" : "&svcToken=" + svcToken))
-                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
-                .execute().parseAs(AurAccountToken.class);
-    }
-
-    public AurAccountToken upsertDaemonFlowAccount(AurAccountDto acc, String svcToken, String clientOrgId)
-            throws IOException {
-        return createRequest("POST",
-                "/svc_accounts/" + svcToken + "/accounts?clientOrgId=" + clientOrgId)
+        return createRequest("POST", "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurAccountToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
+    public AurAccountToken upsertSvcAccountByType(AurAccountDto svcAcc, String clientOrgId)
             throws IOException {
-        return createRequest("POST", "/accounts?clientOrgId=" + clientOrgId)
+        return createRequest("POST", "/svc_accounts" + "?clientOrgId=" + clientOrgId)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
+                .execute().parseAs(AurAccountToken.class);
+    }
+
+    public AurAccountToken upsertManagedAccountByEmail(AurAccountDto acc, String svcToken, String clientOrgId)
+            throws IOException {
+        return createRequest("POST",
+                "/svc_accounts/" + svcToken + "/accounts?clientOrgId=" + clientOrgId)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
