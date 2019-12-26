@@ -18,8 +18,9 @@ public final class OccurrenceInfo extends GenericJson {
     private String type;
 
     @Key
-    private DateTime originalStart;
+    private DateTimeZone originalStart;
 
-//    start: Option[Timepoint] = None,
+    @Key
+    private DateTimeZone start;
 
 }
