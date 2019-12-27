@@ -1,7 +1,6 @@
 package com.yoxel.aurinko.bean.sub;
 
 import com.google.api.client.json.GenericJson;
-import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
@@ -18,9 +17,9 @@ public final class OccurrenceInfo extends GenericJson {
     private String type;
 
     @Key
-    private DateTimeZone originalStart;
+    private EventDateTime originalStart;
 
     @Key
-    private DateTimeZone start;
+    private EventDateTime start;
 
 }

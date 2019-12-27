@@ -20,10 +20,10 @@ public class AurEvent extends AurIdEntity {
     private String description;
 
     @Key
-    private DateTimeZone start;
+    private EventDateTime start;
 
     @Key
-    private DateTimeZone end;
+    private EventDateTime end;
 
     @Key
     private String location;
