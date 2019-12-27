@@ -12,8 +12,5 @@ public final class ICalRecurrence extends GenericJson {
     private String[] rules;
 
     @Key
-    private String recurrenceStart;
-
-    @Key
-    private String timezone;
+    private EventDateTime recurrenceStart;
 }
