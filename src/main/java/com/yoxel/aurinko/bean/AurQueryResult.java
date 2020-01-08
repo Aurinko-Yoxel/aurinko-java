@@ -6,17 +6,17 @@ import com.yoxel.aurinko.bean.AurIdEntity;
 import lombok.Data;
 
 @Data
-public abstract class AurRecords<T extends AurIdEntity> extends GenericJson {
+public abstract class AurQueryResult<T extends AurIdEntity> extends GenericJson {
 
     @Key
-    long length;
+    private long length;
 
     @Key
-    T[] records;
+    private T[] records;
 
     @Key
-    String nextPageToken;
+    private String nextPageToken;
 
     @Key
-    String deltaToken;
+    private String deltaToken;
 }

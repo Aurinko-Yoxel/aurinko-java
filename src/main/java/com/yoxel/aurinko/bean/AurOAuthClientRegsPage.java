@@ -1,4 +1,4 @@
 package com.yoxel.aurinko.bean;
 
-public class AurOAuthClientRegsPage extends AurRecords<AurOAuthClientReg> {
+public class AurOAuthClientRegsPage extends AurPlural<AurOAuthClientReg> {
 }
