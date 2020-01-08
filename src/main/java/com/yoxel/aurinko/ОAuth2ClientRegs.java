@@ -22,6 +22,7 @@ public final class ОAuth2ClientRegs {
     }
 
     private ОAuth2ClientRegs(String partner, SecretStoreAccess syncStore) {
+        this.partner = partner;
         this.syncStore = syncStore;
     }
 
@@ -30,7 +31,7 @@ public final class ОAuth2ClientRegs {
     private SecretStoreAccess syncStore;
 
     public static synchronized ОAuth2ClientRegs forPartner(AurinkoPartnerToken partnerToken, SecretStoreAccess syncStore) {
-        if (partnerToken != null) {
+        if (partnerToken != null && partnerToken.getAurinkoClientId() != null) {
             List<AurOAuthClientReg> rl = appRegs.get(partnerToken.getSyncPartner());
             if (rl == null) {
                 try {
@@ -54,7 +55,8 @@ public final class ОAuth2ClientRegs {
     public String getOAuthClientReg(String key) {
         if (!key.startsWith("daemon.office365.oauth2.")
                 && (partner == null || "yoxel".equals(partner) || "teamworkpm".equals(partner)
-                || !key.startsWith("google.oauth2.") && !key.startsWith("office365.oauth2."))) {
+                || !key.startsWith("google.oauth2.") && !key.startsWith("office365.oauth2.")
+                && !key.startsWith("office.oauth2."))) {
             return syncStore.getSecret(key);
         }
 
@@ -73,20 +75,20 @@ public final class ОAuth2ClientRegs {
                 if ("google.oauth2.secret".equals(key)) {
                     return reg.getClientSecret();
                 }
-            } else if (key.startsWith("office365.oauth2.") || key.startsWith("daemon.office365.oauth2.")) {
+            } else if (key.startsWith("office365.oauth2.") || key.startsWith("office.oauth2.") || key.startsWith("daemon.office365.oauth2.")) {
                 final boolean daemon = key.startsWith("daemon.");
+                final String svcType = key.startsWith("office.oauth2.") ? "Office365" : "EWS365";
 
-                // TODO: At some point EWS365 >>> Office365
                 AurOAuthClientReg
                         reg =
-                        rl.stream().filter(r -> "EWS365".equalsIgnoreCase(r.getServiceType())
+                        rl.stream().filter(r -> svcType.equalsIgnoreCase(r.getServiceType())
                                 && r.isDaemon() == daemon).findFirst().get();
 
-                if (key.endsWith("office365.oauth2.client")) {
+                if (key.endsWith("oauth2.client")) {
                     return reg.getClientId();
                 }
 
-                if (key.endsWith("office365.oauth2.secret")) {
+                if (key.endsWith("oauth2.secret")) {
                     return reg.getClientSecret();
                 }
             }
