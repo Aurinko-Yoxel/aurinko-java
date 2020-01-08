@@ -5,14 +5,14 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public final class DateTimeZone extends GenericJson {
+public final class EventDateTime extends GenericJson {
 
     @Key
-    private com.google.api.client.util.DateTime date;
+    private com.google.api.client.util.DateTime dateOnly;
 
     @Key
     private com.google.api.client.util.DateTime dateTime;
 
     @Key
-    private java.lang.String timeZone;
+    private java.lang.String timezone;
 }

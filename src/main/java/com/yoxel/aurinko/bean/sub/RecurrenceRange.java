@@ -12,10 +12,7 @@ public final class RecurrenceRange extends GenericJson {
     private String type;
 
     @Key
-    private String recurrenceStart;
-
-    @Key
-    private String timezone;
+    private EventDateTime recurrenceStart;
 
     @Key
     private DateTime recurrenceEnd;
