@@ -156,7 +156,7 @@ public class ServiceUtils {
     }
 
     public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
-                                              SyncData sd, ОAuth2ClientRegs appRegs) {
+                                              SyncData sd, ОAuth2ClientRegs appRegs, ServiceTemplate forceManagedBy) {
         if (!acc.getProtocol().isReadEmail()) {
             return null;
         }
@@ -169,8 +169,8 @@ public class ServiceUtils {
                 aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
 
         AurAccountToken aurToken = null;
-        if (acc.isTrustServer() && acc.getTemplId() > 0) {
-            ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
+        if (acc.isTrustServer() && acc.getTemplId() > 0 || forceManagedBy != null) {
+            ServiceTemplate svcTempl = forceManagedBy == null ? uma.getServiceTemplate(acc.getTemplId()) : forceManagedBy;
 
             if (svcTempl.getAurinkoToken() != null) {
                 System.out.println(
