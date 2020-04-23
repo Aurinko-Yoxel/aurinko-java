@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class AurinkoService {
 
@@ -191,29 +192,34 @@ public class AurinkoService {
                 .execute().parseAs(AurEmailsPage.class);
     }
 
-    public XStream<AurEmail, IOException> streamDeletedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
-        return streamEmailSync(true, deltaToken, onPage);
+    public XStream<AurEmail, IOException> streamDeletedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+        return streamEmailSync(true, deltaToken, onPage, stopWhen);
     }
 
-    public XStream<AurEmail, IOException> streamUpdatedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
-        return streamEmailSync(false, deltaToken, onPage);
+    public XStream<AurEmail, IOException> streamUpdatedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+        return streamEmailSync(false, deltaToken, onPage, stopWhen);
     }
 
     private XStream<AurEmail, IOException>
-    streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
+    streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
             };
         }
 
+        if(stopWhen == null) {
+            stopWhen = v -> false;
+        }
+
         AurEmailsPage firstPage = deleted ? mailSyncDeleted(deltaToken, null) : mailSyncUpdated(deltaToken, null);
 
         // query pages, until we get a page with done=true | totalSize=0
+        Predicate<? super AurEmailsPage> finalStopWhen = stopWhen;
         return IOXStream.iterateUntil(
                 firstPage,
                 qr -> deleted ? mailSyncDeleted(deltaToken, qr.getNextPageToken()) : mailSyncUpdated(deltaToken, qr.getNextPageToken()),
-                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
+                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null || finalStopWhen.test(qr)
         )
                 .filter(qr -> qr.getRecords() != null) // this can happen
                 .peek(onPage) // execute action on each page
