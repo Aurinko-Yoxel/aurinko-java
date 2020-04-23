@@ -5,13 +5,10 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public class MeetingInfo extends GenericJson {
+public final class InetHeader extends GenericJson {
+    @Key
+    private String name;
 
     @Key
-    private boolean cancelled;
-
-    private Attendee[] attendees;
-
-    @Key
-    private String response;
+    private String value;
 }

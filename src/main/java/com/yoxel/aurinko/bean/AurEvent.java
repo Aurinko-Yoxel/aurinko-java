@@ -14,10 +14,10 @@ public class AurEvent extends AurIdEntity {
     private String subject;
 
     @Key
-    private boolean descriptionOmitted;
+    private String description;
 
     @Key
-    private String description;
+    private String location;
 
     @Key
     private EventDateTime start;
@@ -26,16 +26,13 @@ public class AurEvent extends AurIdEntity {
     private EventDateTime end;
 
     @Key
-    private String location;
-
-    @Key
     private Organizer organizer;
 
     @Key
     private MeetingInfo meetingInfo;
 
-//    @Key
-//    private String recurrenceType;
+    @Key
+    private String recurrenceType;
 
     @Key
     private Recurrence recurrence;
@@ -57,4 +54,7 @@ public class AurEvent extends AurIdEntity {
 
     @Key
     private String[] categories;
+
+    @Key
+    private String[] omitted;
 }

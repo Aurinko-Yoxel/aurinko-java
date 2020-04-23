@@ -10,10 +10,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: com.yoxel.api:api-hash:1.3.7" level="project" />
+    <orderEntry type="library" name="Maven: com.yoxel:model2:3.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:dbutils:1.7.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:persist:1.5-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.yoxel:config:1.7" level="project" />
-    <orderEntry type="library" name="Maven: com.yoxel.api:api-hash:1.3.7" level="project" />
+    <orderEntry type="library" name="Maven: com.yoxel.api:api-hash:1.3.8-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:3.1.0" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.6" level="project" />
     <orderEntry type="library" name="Maven: no.priv.garshol.duke:duke:1.2" level="project" />

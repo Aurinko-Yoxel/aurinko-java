@@ -119,10 +119,6 @@ public class AurinkoService {
                 + "/sync?timeMin=" + timeMin.toDateTimeISO() + "&timeMax=" + timeMax.toDateTimeISO()).execute().parseAs(AurSyncStatus.class);
     }
 
-    public AurSyncStatus startMailSync(DateTime timeMin) throws IOException {
-        return createRequest("POST", "/mailbox/sync?timeMin=" + timeMin.toDateTimeISO()).execute().parseAs(AurSyncStatus.class);
-    }
-
     private String tokenParams(String deltaToken, String nextPageToken) {
 
         if (nextPageToken != null) {
@@ -137,28 +133,18 @@ public class AurinkoService {
     }
 
     public AurEventsPage calSyncUpdated(String calendarId, String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/sync/updated" + tokenParams(deltaToken, nextPageToken))
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/sync/updated" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
     public AurEventsPage calSyncDeleted(String calendarId, String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/sync/deleted" + tokenParams(deltaToken, nextPageToken))
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/sync/deleted" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
     public AurEvent getCalendarEvent(String calendarId, String eventId) throws IOException {
-        return createRequest("GET", "/calendars/"+ (calendarId == null ? "primary" : calendarId)+"/events/" + eventId)
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + eventId)
                 .execute().parseAs(AurEvent.class);
-    }
-
-    public AurEmailsPage mailSync(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/mailbox/sync/updated" + tokenParams(deltaToken, nextPageToken))
-                .execute().parseAs(AurEmailsPage.class);
-    }
-
-    public AurEmailsPage mailDeleted(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/mailbox/sync/deleted" + tokenParams(deltaToken, nextPageToken))
-                .execute().parseAs(AurEmailsPage.class);
     }
 
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
@@ -188,6 +174,50 @@ public class AurinkoService {
                 .filter(qr -> qr.getRecords() != null) // this can happen
                 .peek(onPage) // execute action on each page
                 .map(AurEventsPage::getRecords)
+                .flatMap(IOXStream::of);
+    }
+
+    public AurSyncStatus startMailSync(Integer days) throws IOException {
+        return createRequest("POST", "/mailbox/sync" + (days == null ? "" : "?daysWithin" + days)).execute().parseAs(AurSyncStatus.class);
+    }
+
+    public AurEmailsPage mailSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/mailbox/sync/updated" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurEmailsPage.class);
+    }
+
+    public AurEmailsPage mailSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/mailbox/sync/deleted" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurEmailsPage.class);
+    }
+
+    public XStream<AurEmail, IOException> streamDeletedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
+        return streamEmailSync(true, deltaToken, onPage);
+    }
+
+    public XStream<AurEmail, IOException> streamUpdatedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
+        return streamEmailSync(false, deltaToken, onPage);
+    }
+
+    private XStream<AurEmail, IOException>
+    streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage) throws IOException {
+
+        if (onPage == null) {
+            onPage = v -> {
+            };
+        }
+
+        AurEmailsPage firstPage = deleted ? mailSyncDeleted(deltaToken, null) : mailSyncUpdated(deltaToken, null);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> deleted ? mailSyncDeleted(deltaToken, qr.getNextPageToken()) : mailSyncUpdated(deltaToken, qr.getNextPageToken()),
+                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .peek(onPage) // execute action on each page
+                .map(AurEmailsPage::getRecords)
                 .flatMap(IOXStream::of);
     }
 }
