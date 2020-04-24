@@ -11,6 +11,7 @@ import com.yoxel.commons.xstream.XStream;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -178,17 +179,26 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
+    public AurEmail getEmailMessage(String id) throws IOException {
+        return createRequest("GET", "/email/messages/" + id).execute().parseAs(AurEmail.class);
+    }
+
+    public AurEmailsPage getEmailMessages(String query) throws IOException {
+        return createRequest("GET", "/email/messages" + (query == null ? "" : "?q=" + URLEncoder.encode(query, "utf8")))
+                .execute().parseAs(AurEmailsPage.class);
+    }
+
     public AurSyncStatus startMailSync(Integer days) throws IOException {
-        return createRequest("POST", "/mailbox/sync" + (days == null ? "" : "?daysWithin" + days)).execute().parseAs(AurSyncStatus.class);
+        return createRequest("POST", "/email/sync" + (days == null ? "" : "?daysWithin" + days)).execute().parseAs(AurSyncStatus.class);
     }
 
     public AurEmailsPage mailSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/mailbox/sync/updated" + tokenParams(deltaToken, nextPageToken))
+        return createRequest("GET", "/email/sync/updated" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEmailsPage.class);
     }
 
     public AurEmailsPage mailSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
-        return createRequest("GET", "/mailbox/sync/deleted" + tokenParams(deltaToken, nextPageToken))
+        return createRequest("GET", "/email/sync/deleted" + tokenParams(deltaToken, nextPageToken))
                 .execute().parseAs(AurEmailsPage.class);
     }
 
@@ -208,7 +218,7 @@ public class AurinkoService {
             };
         }
 
-        if(stopWhen == null) {
+        if (stopWhen == null) {
             stopWhen = v -> false;
         }
 
