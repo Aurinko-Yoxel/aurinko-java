@@ -10,6 +10,7 @@ import lombok.Data;
 
 @Data
 public class AurEmail extends AurIdEntity {
+    
     @Key
     private String subject;
 
@@ -26,6 +27,12 @@ public class AurEmail extends AurIdEntity {
     private String internetMessageId;
 
     @Key
+    private String[] sysLabels;
+
+    @Key
+    private String[] sysClassifications;
+
+    @Key
     private EmailAddress from;
 
     @Key
@@ -39,21 +46,6 @@ public class AurEmail extends AurIdEntity {
 
     @Key
     private EmailAddress[] replyTo;
-
-    @Key
-    private boolean flagged;
-
-    @Key
-    private boolean read;
-
-    @Key
-    private boolean draft;
-
-    @Key
-    private boolean junk;
-
-    @Key
-    private boolean trash;
 
     @Key
     private boolean hasAttachments;
