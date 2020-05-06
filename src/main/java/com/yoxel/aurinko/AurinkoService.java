@@ -149,29 +149,34 @@ public class AurinkoService {
                 .execute().parseAs(AurEvent.class);
     }
 
-    public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
-        return streamCalendarSync(true, calendarId, deltaToken, onPage);
+    public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
+        return streamCalendarSync(true, calendarId, deltaToken, onPage, stopWhen);
     }
 
-    public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
-        return streamCalendarSync(false, calendarId, deltaToken, onPage);
+    public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
+        return streamCalendarSync(false, calendarId, deltaToken, onPage, stopWhen);
     }
 
     private XStream<AurEvent, IOException>
-    streamCalendarSync(boolean deleted, String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage) throws IOException {
+    streamCalendarSync(boolean deleted, String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
             };
         }
 
+        if (stopWhen == null) {
+            stopWhen = v -> false;
+        }
+
         AurEventsPage firstPage = deleted ? calSyncDeleted(calendarId, deltaToken, null) : calSyncUpdated(calendarId, deltaToken, null);
 
         // query pages, until we get a page with done=true | totalSize=0
+        Predicate<? super AurEventsPage> finalStopWhen = stopWhen;
         return IOXStream.iterateUntil(
                 firstPage,
                 qr -> deleted ? calSyncDeleted(calendarId, deltaToken, qr.getNextPageToken()) : calSyncUpdated(calendarId, deltaToken, qr.getNextPageToken()),
-                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null
+                qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
         )
                 .filter(qr -> qr.getRecords() != null) // this can happen
                 .peek(onPage) // execute action on each page
@@ -179,13 +184,43 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurEmail getEmailMessage(String id) throws IOException {
-        return createRequest("GET", "/email/messages/" + id).execute().parseAs(AurEmail.class);
+    public AurEmail getEmailMessage(String id, String bodyType) throws IOException {
+        return createRequest("GET", "/email/messages/" + id + (bodyType == null ? "" : "?bodyType=" + bodyType)).execute().parseAs(AurEmail.class);
     }
 
-    public AurEmailsPage getEmailMessages(String query) throws IOException {
-        return createRequest("GET", "/email/messages" + (query == null ? "" : "?q=" + URLEncoder.encode(query, "utf8")))
+    public AurEmailsPage getEmailMessages(String query, String bodyType, String pageToken) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        if (query != null)
+            sb.append("q=" + URLEncoder.encode(query, "utf8"));
+
+        if (bodyType != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("bodyType=" + bodyType);
+        }
+
+        if (pageToken != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("pageToken=" + pageToken);
+        }
+        return createRequest("GET", "/email/messages" + (sb.length() > 0 ? "?" + sb.toString() : ""))
                 .execute().parseAs(AurEmailsPage.class);
+    }
+
+    private XStream<AurEmail, IOException> streamEmailQuery(String query, String bodyType) throws IOException {
+
+        AurEmailsPage firstPage = getEmailMessages(query, bodyType, null);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> getEmailMessages(query, bodyType, qr.getNextPageToken()),
+                qr -> qr.getNextPageToken() == null
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .map(AurEmailsPage::getRecords)
+                .flatMap(IOXStream::of);
     }
 
     public AurSyncStatus startMailSync(Integer days) throws IOException {
@@ -210,8 +245,7 @@ public class AurinkoService {
         return streamEmailSync(false, deltaToken, onPage, stopWhen);
     }
 
-    private XStream<AurEmail, IOException>
-    streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+    private XStream<AurEmail, IOException> streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
@@ -229,7 +263,7 @@ public class AurinkoService {
         return IOXStream.iterateUntil(
                 firstPage,
                 qr -> deleted ? mailSyncDeleted(deltaToken, qr.getNextPageToken()) : mailSyncUpdated(deltaToken, qr.getNextPageToken()),
-                qr -> qr.getLength() == 0 || qr.getNextPageToken() == null || finalStopWhen.test(qr)
+                qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
         )
                 .filter(qr -> qr.getRecords() != null) // this can happen
                 .peek(onPage) // execute action on each page
