@@ -208,7 +208,7 @@ public class AurinkoService {
                 .execute().parseAs(AurEmailsPage.class);
     }
 
-    private XStream<AurEmail, IOException> streamEmailQuery(String query, String bodyType) throws IOException {
+    public XStream<AurEmail, IOException> streamEmailQuery(String query, String bodyType) throws IOException {
 
         AurEmailsPage firstPage = getEmailMessages(query, bodyType, null);
 
