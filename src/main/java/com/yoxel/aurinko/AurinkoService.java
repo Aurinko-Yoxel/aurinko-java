@@ -188,6 +188,38 @@ public class AurinkoService {
         return createRequest("GET", "/email/messages/" + id + (bodyType == null ? "" : "?bodyType=" + bodyType)).execute().parseAs(AurEmail.class);
     }
 
+    public AurEmailsPage getEmailThread(String id, String bodyType, String pageToken) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        if (bodyType != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("bodyType=" + bodyType);
+        }
+
+        if (pageToken != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("pageToken=" + pageToken);
+        }
+
+        return createRequest("GET", "/email/conversations/" + id + (sb.length() > 0 ? "?" + sb.toString() : "")).execute().parseAs(AurEmailsPage.class);
+    }
+
+    public XStream<AurEmail, IOException> streamEmailThread(String threadId, String bodyType) throws IOException {
+
+        AurEmailsPage firstPage = getEmailThread(threadId, bodyType, null);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> getEmailThread(threadId, bodyType, qr.getNextPageToken()),
+                qr -> qr.getNextPageToken() == null
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .map(AurEmailsPage::getRecords)
+                .flatMap(IOXStream::of);
+    }
+
     public AurEmailsPage getEmailMessages(String query, String bodyType, String pageToken) throws IOException {
         StringBuilder sb = new StringBuilder();
         if (query != null)
