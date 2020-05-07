@@ -5,6 +5,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public abstract class AurIdEntity extends GenericJson {
 
@@ -19,4 +21,5 @@ public abstract class AurIdEntity extends GenericJson {
 
     @Key
     private DateTime lastModifiedTime;
+
 }

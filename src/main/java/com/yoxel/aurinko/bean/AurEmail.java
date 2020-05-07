@@ -8,6 +8,8 @@ import com.yoxel.aurinko.bean.sub.EmailAddress;
 import com.yoxel.aurinko.bean.sub.InetHeader;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class AurEmail extends AurIdEntity {
     
@@ -27,25 +29,25 @@ public class AurEmail extends AurIdEntity {
     private String internetMessageId;
 
     @Key
-    private String[] sysLabels;
+    private List<String> sysLabels;
 
     @Key
-    private String[] sysClassifications;
+    private List<String> sysClassifications;
 
     @Key
     private EmailAddress from;
 
     @Key
-    private EmailAddress[] to;
+    private List<EmailAddress> to;
 
     @Key
-    private EmailAddress[] cc;
+    private List<EmailAddress> cc;
 
     @Key
-    private EmailAddress[] bcc;
+    private List<EmailAddress> bcc;
 
     @Key
-    private EmailAddress[] replyTo;
+    private List<EmailAddress> replyTo;
 
     @Key
     private boolean hasAttachments;
@@ -63,12 +65,12 @@ public class AurEmail extends AurIdEntity {
     private String threadIndex;
 
     @Key
-    private InetHeader[] internetHeaders;
+    private List<InetHeader> internetHeaders;
 
     @Key
-    private Attachment[] attachments;
+    private List<Attachment> attachments;
 
     @Key
-    private String[] omitted;
+    private List<String> omitted;
 
 }
