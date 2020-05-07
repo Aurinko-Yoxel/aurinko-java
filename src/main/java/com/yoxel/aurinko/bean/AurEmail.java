@@ -35,6 +35,9 @@ public class AurEmail extends AurIdEntity {
     private List<String> sysClassifications;
 
     @Key
+    private String sensitivity;
+
+    @Key
     private EmailAddress from;
 
     @Key
