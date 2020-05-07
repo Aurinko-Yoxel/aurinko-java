@@ -4,6 +4,8 @@ import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.*;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Data
 public class AurEvent extends AurIdEntity {
@@ -53,8 +55,8 @@ public class AurEvent extends AurIdEntity {
     private String sensitivity;
 
     @Key
-    private String[] categories;
+    private List<String> categories;
 
     @Key
-    private String[] omitted;
+    private List<String> omitted;
 }
