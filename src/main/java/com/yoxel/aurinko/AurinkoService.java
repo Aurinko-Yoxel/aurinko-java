@@ -34,6 +34,8 @@ public class AurinkoService {
         return supportsRetry;
     };
 
+    public enum BodyType {html, text}
+
     private AurinkoService(HttpRequestInitializer requestInitializer) {
         this.requestInitializer = requestInitializer;
     }
@@ -184,16 +186,16 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurEmail getEmailMessage(String id, String bodyType) throws IOException {
-        return createRequest("GET", "/email/messages/" + id + (bodyType == null ? "" : "?bodyType=" + bodyType)).execute().parseAs(AurEmail.class);
+    public AurEmail getEmailMessage(String id, BodyType bodyType) throws IOException {
+        return createRequest("GET", "/email/messages/" + id + (bodyType == null ? "" : "?bodyType=" + bodyType.name())).execute().parseAs(AurEmail.class);
     }
 
-    public AurEmailsPage getEmailThread(String id, String bodyType, String pageToken) throws IOException {
+    public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
         StringBuilder sb = new StringBuilder();
         if (bodyType != null) {
             if (sb.length() > 0)
                 sb.append("&");
-            sb.append("bodyType=" + bodyType);
+            sb.append("bodyType=" + bodyType.name());
         }
 
         if (pageToken != null) {
@@ -205,7 +207,7 @@ public class AurinkoService {
         return createRequest("GET", "/email/conversations/" + id + (sb.length() > 0 ? "?" + sb.toString() : "")).execute().parseAs(AurEmailsPage.class);
     }
 
-    public XStream<AurEmail, IOException> streamEmailThread(String threadId, String bodyType) throws IOException {
+    public XStream<AurEmail, IOException> streamEmailThread(String threadId, BodyType bodyType) throws IOException {
 
         AurEmailsPage firstPage = getEmailThread(threadId, bodyType, null);
 
@@ -220,7 +222,7 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurEmailsPage getEmailMessages(String query, String bodyType, String pageToken) throws IOException {
+    public AurEmailsPage getEmailMessages(String query, BodyType bodyType, String pageToken) throws IOException {
         StringBuilder sb = new StringBuilder();
         if (query != null)
             sb.append("q=" + URLEncoder.encode(query, "utf8"));
@@ -228,7 +230,7 @@ public class AurinkoService {
         if (bodyType != null) {
             if (sb.length() > 0)
                 sb.append("&");
-            sb.append("bodyType=" + bodyType);
+            sb.append("bodyType=" + bodyType.name());
         }
 
         if (pageToken != null) {
@@ -240,7 +242,7 @@ public class AurinkoService {
                 .execute().parseAs(AurEmailsPage.class);
     }
 
-    public XStream<AurEmail, IOException> streamEmailQuery(String query, String bodyType) throws IOException {
+    public XStream<AurEmail, IOException> streamEmailQuery(String query, BodyType bodyType) throws IOException {
 
         AurEmailsPage firstPage = getEmailMessages(query, bodyType, null);
 
@@ -255,8 +257,18 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurSyncStatus startMailSync(Integer days) throws IOException {
-        return createRequest("POST", "/email/sync" + (days == null ? "" : "?daysWithin" + days)).execute().parseAs(AurSyncStatus.class);
+    public AurSyncStatus startMailSync(Integer days, BodyType bodyType) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        if (days != null)
+            sb.append("daysWithin=" + days);
+
+        if (bodyType != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("bodyType=" + bodyType.name());
+        }
+
+        return createRequest("POST", "/email/sync" + (sb.length() > 0 ? "?" + sb.toString() : "")).execute().parseAs(AurSyncStatus.class);
     }
 
     public AurEmailsPage mailSyncUpdated(String deltaToken, String nextPageToken) throws IOException {

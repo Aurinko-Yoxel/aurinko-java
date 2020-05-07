@@ -8,14 +8,23 @@ import lombok.Data;
 @Data
 public class Attachment extends GenericJson {
     @Key
-    private String attachmentId;
+    private String id;
+
+    @Key
+    private boolean inline;
 
     @Key
     private String fileName;
 
     @Key
+    private int size;
+
+    @Key
     private String mimeType;
 
     @Key
-    private int size;
+    private String contentId;
+
+    @Key
+    private String content;
 }
