@@ -156,6 +156,11 @@ public class AurinkoService {
                 .execute().parseAs(AurEvent.class);
     }
 
+    public AurEventsPage getCalendarSeries(String calendarId, String masterId, String origStart) throws IOException {
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series")
+                .execute().parseAs(AurEventsPage.class);
+    }
+
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
         return streamCalendarSync(true, calendarId, deltaToken, onPage, stopWhen);
     }
