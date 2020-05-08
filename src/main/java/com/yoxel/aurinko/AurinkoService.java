@@ -187,8 +187,22 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurEmail getEmailMessage(String id, BodyType bodyType) throws IOException {
-        return createRequest("GET", "/email/messages/" + id + (bodyType == null ? "" : "?bodyType=" + bodyType.name())).execute().parseAs(AurEmail.class);
+    public AurEmail getEmailMessage(String id, BodyType bodyType, boolean loadInlines) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+
+        if (bodyType != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("bodyType=" + bodyType.name());
+        }
+
+        if(loadInlines){
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("loadInlines=true");
+        }
+
+        return createRequest("GET", "/email/messages/" + id + (sb.length()>0 ? sb.toString() : "")).execute().parseAs(AurEmail.class);
     }
 
     public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
