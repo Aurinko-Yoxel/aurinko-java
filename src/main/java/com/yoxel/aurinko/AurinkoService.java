@@ -89,8 +89,8 @@ public class AurinkoService {
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurCalendarsPage getCalendars(String nextPageToken) throws IOException {
-        return createRequest("GET", "/calendars" + tokenParams(null, nextPageToken)).execute().parseAs(AurCalendarsPage.class);
+    public AurCalendarsPage getCalendars(String pageToken) throws IOException {
+        return createRequest("GET", "/calendars" + tokenParams(null, pageToken)).execute().parseAs(AurCalendarsPage.class);
     }
 
     public AurCalendar getCalendar(String id) throws IOException {
@@ -156,8 +156,8 @@ public class AurinkoService {
                 .execute().parseAs(AurEvent.class);
     }
 
-    public AurEventsPage getCalendarSeries(String calendarId, String masterId, String origStart) throws IOException {
-        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series")
+    public AurEventsPage getCalendarSeries(String calendarId, String masterId, String pageToken) throws IOException {
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series"+ tokenParams(null, pageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
