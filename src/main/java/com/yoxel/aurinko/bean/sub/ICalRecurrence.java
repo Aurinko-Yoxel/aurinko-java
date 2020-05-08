@@ -5,11 +5,13 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public final class ICalRecurrence extends GenericJson {
 
     @Key
-    private String[] rules;
+    private List<String> rules;
 
     @Key
     private EventDateTime recurrenceStart;
