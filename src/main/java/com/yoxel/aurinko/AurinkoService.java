@@ -5,7 +5,6 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 import com.yoxel.aurinko.bean.*;
-import com.yoxel.aurinko.bean.AurContent;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
@@ -152,6 +151,11 @@ public class AurinkoService {
                 .execute().parseAs(AurEvent.class);
     }
 
+    public AurEvent getCalendarOccurrence(String calendarId, String masterId, String origStart) throws IOException {
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/occurrences/" + origStart)
+                .execute().parseAs(AurEvent.class);
+    }
+
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
         return streamCalendarSync(true, calendarId, deltaToken, onPage, stopWhen);
     }
@@ -196,13 +200,13 @@ public class AurinkoService {
             sb.append("bodyType=" + bodyType.name());
         }
 
-        if(loadInlines){
+        if (loadInlines) {
             if (sb.length() > 0)
                 sb.append("&");
             sb.append("loadInlines=true");
         }
 
-        return createRequest("GET", "/email/messages/" + id + (sb.length()>0 ? sb.toString() : "")).execute().parseAs(AurEmail.class);
+        return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? sb.toString() : "")).execute().parseAs(AurEmail.class);
     }
 
     public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
@@ -331,6 +335,6 @@ public class AurinkoService {
     }
 
     public AurContent getEmailAttachment(String msgId, String attachmentId) throws IOException {
-        return createRequest("GET", "/email/messages/" + msgId + "/attachments/"+attachmentId).execute().parseAs(AurContent.class);
+        return createRequest("GET", "/email/messages/" + msgId + "/attachments/" + attachmentId).execute().parseAs(AurContent.class);
     }
 }
