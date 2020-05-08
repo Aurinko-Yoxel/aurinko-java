@@ -5,6 +5,7 @@ import com.google.api.client.http.*;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 import com.yoxel.aurinko.bean.*;
+import com.yoxel.aurinko.bean.AurContent;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
@@ -313,5 +314,9 @@ public class AurinkoService {
                 .peek(onPage) // execute action on each page
                 .map(AurEmailsPage::getRecords)
                 .flatMap(IOXStream::of);
+    }
+
+    public AurContent getEmailAttachment(String msgId, String attachmentId) throws IOException {
+        return createRequest("GET", "/email/messages/" + msgId + "/attachments/"+attachmentId).execute().parseAs(AurContent.class);
     }
 }
