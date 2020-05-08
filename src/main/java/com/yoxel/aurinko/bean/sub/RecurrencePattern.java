@@ -4,6 +4,8 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public final class RecurrencePattern extends GenericJson {
 
@@ -14,7 +16,7 @@ public final class RecurrencePattern extends GenericJson {
     private Integer interval;
 
     @Key
-    private String[] daysOfWeek;
+    private List<String> daysOfWeek;
 
     @Key
     private String weekStart;
