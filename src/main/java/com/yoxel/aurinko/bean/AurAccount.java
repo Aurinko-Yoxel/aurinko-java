@@ -17,10 +17,16 @@ public class AurAccount {
   private String serviceType;
 
   @Key
-  private String status;
+  private boolean active;
+
+  @Key
+  private String tokenStatus;
 
   @Key
   private Boolean daemon;
+
+  @Key
+  private String loginString;
 
   @Key
   private String email;
