@@ -123,10 +123,10 @@ public class AurinkoService {
                 + "/sync?timeMin=" + timeMin.toDateTimeISO() + "&timeMax=" + timeMax.toDateTimeISO()).execute().parseAs(AurSyncStatus.class);
     }
 
-    private String tokenParams(String deltaToken, String nextPageToken) {
+    private String tokenParams(String deltaToken, String pageToken) {
 
-        if (nextPageToken != null) {
-            return "?nextPageToken=" + nextPageToken;
+        if (pageToken != null) {
+            return "?pageToken=" + pageToken;
         }
 
         if (deltaToken != null) {
@@ -157,7 +157,7 @@ public class AurinkoService {
     }
 
     public AurEventsPage getCalendarSeries(String calendarId, String masterId, String pageToken) throws IOException {
-        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series"+ tokenParams(null, pageToken))
+        return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series" + tokenParams(null, pageToken))
                 .execute().parseAs(AurEventsPage.class);
     }
 
@@ -211,7 +211,7 @@ public class AurinkoService {
             sb.append("loadInlines=true");
         }
 
-        return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? "?" +  sb.toString() : "")).execute().parseAs(AurEmail.class);
+        return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? "?" + sb.toString() : "")).execute().parseAs(AurEmail.class);
     }
 
     public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
@@ -305,15 +305,15 @@ public class AurinkoService {
                 .execute().parseAs(AurEmailsPage.class);
     }
 
-    public XStream<AurEmail, IOException> streamDeletedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
-        return streamEmailSync(true, deltaToken, onPage, stopWhen);
+    public XStream<AurEmail, IOException> streamDeletedEmails(String pageOrDelta, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+        return streamEmailSync(true, pageOrDelta, onPage, stopWhen);
     }
 
-    public XStream<AurEmail, IOException> streamUpdatedEmails(String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
-        return streamEmailSync(false, deltaToken, onPage, stopWhen);
+    public XStream<AurEmail, IOException> streamUpdatedEmails(String pageOrDelta, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+        return streamEmailSync(false, pageOrDelta, onPage, stopWhen);
     }
 
-    private XStream<AurEmail, IOException> streamEmailSync(boolean deleted, String deltaToken, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
+    private XStream<AurEmail, IOException> streamEmailSync(boolean deleted, String pageOrDelta, Consumer<? super AurEmailsPage> onPage, Predicate<? super AurEmailsPage> stopWhen) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
@@ -324,7 +324,16 @@ public class AurinkoService {
             stopWhen = v -> false;
         }
 
-        AurEmailsPage firstPage = deleted ? mailSyncDeleted(deltaToken, null) : mailSyncUpdated(deltaToken, null);
+        final String deltaToken, pageToken;
+        if (pageOrDelta.startsWith("page:")) {
+            deltaToken = null;
+            pageToken = pageOrDelta.substring(5);
+        } else {
+            deltaToken = pageOrDelta;
+            pageToken = null;
+        }
+
+        AurEmailsPage firstPage = deleted ? mailSyncDeleted(deltaToken, pageToken) : mailSyncUpdated(deltaToken, pageToken);
 
         // query pages, until we get a page with done=true | totalSize=0
         Predicate<? super AurEmailsPage> finalStopWhen = stopWhen;
