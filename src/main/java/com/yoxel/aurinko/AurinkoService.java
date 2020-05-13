@@ -211,7 +211,7 @@ public class AurinkoService {
             sb.append("loadInlines=true");
         }
 
-        return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? sb.toString() : "")).execute().parseAs(AurEmail.class);
+        return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? "?" +  sb.toString() : "")).execute().parseAs(AurEmail.class);
     }
 
     public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
