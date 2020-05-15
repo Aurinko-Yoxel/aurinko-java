@@ -42,6 +42,9 @@ public class AurAccountDto {
   private String serverUrl;
 
   @Key
+  private String serverInfo;
+
+  @Key
   private String loginString;
 
   @Key
