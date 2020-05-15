@@ -12,6 +12,7 @@ import com.yoxel.model2.user.AbsService;
 import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
 import com.yoxel.oauth.common.SecurityUtils;
+import com.yoxel.persist.util.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -114,11 +115,14 @@ public class ServiceUtils {
             scopes.add("Tasks.ReadWrite");
         }
 
+        final String authDomain = Strings.splitByComma(templ.getAuthDomains())[0].trim();
+
         final AurAccountDto accDto = new AurAccountDto();
 
         accDto.setActive(true);
         accDto.setServerUrl(templ.getInstUrl());
         accDto.setAuthScopes(scopes.toArray(new String[0]));
+        accDto.setName(authDomain);
 //        authObtainedAt;
 //        authExpiresAt;
 
@@ -126,13 +130,12 @@ public class ServiceUtils {
             accDto.setServiceType("GOOGLE");
             accDto.setAuthString2(templ.getPassword());
 
-            // Strings.splitByComma(templ.getAuthDomains())[0].trim()
-
             try {
                 final GenericJson sdData = Utils.getDefaultJsonFactory().createJsonParser(templ.getPassword()).parse(GenericJson.class);
 
                 accDto.setAuthUserId((String) sdData.get("client_id"));
-                accDto.setAuthOrgId((String) sdData.get("project_id"));
+                accDto.setAuthOrgId(authDomain);
+                accDto.setServerInfo((String) sdData.get("project_id"));
                 accDto.setEmail((String) sdData.get("client_email"));
                 accDto.setLoginString((String) sdData.get("private_key_id"));
                 accDto.setAuthString1(SecurityUtils.extractContentsFromPkFile((String) sdData.get("private_key")));
