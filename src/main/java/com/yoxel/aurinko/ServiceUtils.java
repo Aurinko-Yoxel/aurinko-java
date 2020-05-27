@@ -3,6 +3,7 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
+import com.yoxel.aurinko.bean.AurAccount;
 import com.yoxel.aurinko.bean.AurAccountToken;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.model2.ClientCompany;
@@ -171,17 +172,20 @@ public class ServiceUtils {
         final AurAccountDto
                 aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
 
+        aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
+
         AurAccountToken aurToken = null;
         if (acc.isTrustServer() && acc.getTemplId() > 0 ) { // || forceManagedBy != null
+
             final ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
             if (svcTempl.getAurinkoToken() != null) {
-                System.out.println(
-                        "Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
                 try {
-                    aurToken =
-                            aurinko.upsertManagedAccountByEmail(aurAcc, svcTempl.getAurinkoToken(),
-                                    uma.getClientCompany().getExtId());
+                    AurAccount svcAcc = AurinkoService.createWithAccountAuth(svcTempl.getAurinkoToken()).getAccount();
+                    System.out.println(
+                            "Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
+
+                    aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
                 } catch (IOException e) {
                     log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
                 }
@@ -191,8 +195,7 @@ public class ServiceUtils {
                     "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
             try {
-                aurToken =
-                        aurinko.upsertAccountByEmail(aurAcc, uma.getClientCompany().getExtId());
+                aurToken = aurinko.upsertUserAccount(aurAcc);
             } catch (IOException e) {
                 log.warn("Failed to upsert Aurinko account " + e.getMessage());
             }
@@ -214,12 +217,13 @@ public class ServiceUtils {
 
         final AurAccountDto aurAcc = fromTemplate(svcTempl, appRegs, authAccess);
 
+        aurAcc.setClientOrgId(clientOrgId + "/" + svcTempl.getGroupId());
+
         System.out.println("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName() + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
 
         AurAccountToken aurToken = null;
         try {
-            return aurinko
-                    .upsertSvcAccountByType(aurAcc, clientOrgId + "/" + svcTempl.getGroupId());
+            return aurinko.upsertServiceAccount(aurAcc);
         } catch (IOException e) {
             log.warn("Failed to upsert Aurinko service account " + e.getMessage());
         }
