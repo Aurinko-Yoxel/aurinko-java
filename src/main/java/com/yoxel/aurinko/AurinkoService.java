@@ -67,24 +67,22 @@ public class AurinkoService {
                 .execute().parseAs(AurAccount.class);
     }
 
-    public AurAccountToken upsertAccountByEmail(AurAccountDto acc, String clientOrgId)
-            throws IOException {
-        return createRequest("POST", "/accounts?clientOrgId=" + clientOrgId)
+    public AurAccountToken upsertUserAccount(AurAccountDto acc) throws IOException {
+        return createRequest("PATCH", "/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurAccountToken upsertSvcAccountByType(AurAccountDto svcAcc, String clientOrgId)
-            throws IOException {
-        return createRequest("POST", "/svc_accounts" + "?clientOrgId=" + clientOrgId)
+    public AurAccountToken upsertServiceAccount(AurAccountDto svcAcc) throws IOException {
+        return createRequest("PATCH", "/svc_accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurAccountToken upsertManagedAccountByEmail(AurAccountDto acc, String svcToken, String clientOrgId)
+    public AurAccountToken upsertManagedAccount(AurAccountDto acc, long svcAccountId)
             throws IOException {
-        return createRequest("POST",
-                "/svc_accounts/" + svcToken + "/accounts?clientOrgId=" + clientOrgId)
+        return createRequest("PATCH",
+                "/svc_accounts/" + svcAccountId + "/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
