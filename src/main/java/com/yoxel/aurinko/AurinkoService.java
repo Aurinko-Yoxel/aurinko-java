@@ -58,31 +58,29 @@ public class AurinkoService {
         //httpRequest.getHeaders().setUserAgent(SForceAuthorizationCodeFlow.USER_AGENT);
     }
 
-    public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
-        return createRequest("GET", "/oauth_regs").execute().parseAs(AurOAuthClientRegsPage.class);
+    public AurAccount getAccount() throws IOException {
+        return createRequest("GET", "/account").execute().parseAs(AurAccount.class);
     }
 
-    public AurAccount getAccount() throws IOException {
-        return createRequest("GET", "/account")
-                .execute().parseAs(AurAccount.class);
+    public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
+        return createRequest("GET", "/am/oauth_regs").execute().parseAs(AurOAuthClientRegsPage.class);
     }
 
     public AurAccountToken upsertUserAccount(AurAccountDto acc) throws IOException {
-        return createRequest("PATCH", "/accounts")
+        return createRequest("PATCH", "/am/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertServiceAccount(AurAccountDto svcAcc) throws IOException {
-        return createRequest("PATCH", "/svc_accounts")
+        return createRequest("PATCH", "/am/svc_accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertManagedAccount(AurAccountDto acc, long svcAccountId)
             throws IOException {
-        return createRequest("PATCH",
-                "/svc_accounts/" + svcAccountId + "/accounts")
+        return createRequest("PATCH", "/am/svc_accounts/" + svcAccountId + "/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
