@@ -14,7 +14,6 @@ public class AurCalendar extends AurIdEntity {
 
     @Key
     String accessRole;
-
-    @Key("default")
+    
     boolean primary;
 }
