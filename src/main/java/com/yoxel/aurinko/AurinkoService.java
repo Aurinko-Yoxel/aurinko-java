@@ -85,12 +85,29 @@ public class AurinkoService {
                 .execute().parseAs(AurAccountToken.class);
     }
 
-    public AurCalendarsPage getCalendars(String pageToken) throws IOException {
-        return createRequest("GET", "/calendars" + tokenParams(null, pageToken)).execute().parseAs(AurCalendarsPage.class);
-    }
-
     public AurCalendar getCalendar(String id) throws IOException {
         return createRequest("GET", "/calendars/" + id).execute().parseAs(AurCalendar.class);
+    }
+
+    public AurCalendar updateCalendar(String id, String name) throws IOException {
+        final AurCalendar cal = new AurCalendar();
+        cal.setName(name);
+        return createRequest("PATCH", "/calendars/" + id)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), cal))
+                .execute().parseAs(AurCalendar.class);
+    }
+
+    public AurCalendar createCalendar(String id, String name, String color) throws IOException {
+        final AurCalendar cal = new AurCalendar();
+        cal.setName(name);
+        cal.setColor(color);
+        return createRequest("POST", "/calendars")
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), cal))
+                .execute().parseAs(AurCalendar.class);
+    }
+
+    public AurCalendarsPage getCalendars(String pageToken) throws IOException {
+        return createRequest("GET", "/calendars" + tokenParams(null, pageToken)).execute().parseAs(AurCalendarsPage.class);
     }
 
     public XStream<AurCalendar, IOException> streamCalendars(Consumer<? super AurCalendarsPage> onPage) throws IOException {
@@ -155,6 +172,18 @@ public class AurinkoService {
     public AurEventsPage getCalendarSeries(String calendarId, String masterId, String pageToken) throws IOException {
         return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId + "/series" + tokenParams(null, pageToken))
                 .execute().parseAs(AurEventsPage.class);
+    }
+
+    public AurEvent updateCalendarEvent(String calendarId, String eventId, AurEvent event) throws IOException {
+        return createRequest("PATCH", "/calendars/" + calendarId + "/" + eventId)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
+                .execute().parseAs(AurEvent.class);
+    }
+
+    public AurEvent createCalendarEvent(String calendarId, AurEvent event) throws IOException {
+        return createRequest("POST", "/calendars/" + calendarId)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
+                .execute().parseAs(AurEvent.class);
     }
 
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
