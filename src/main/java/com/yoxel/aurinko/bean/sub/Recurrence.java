@@ -9,8 +9,8 @@ public final class Recurrence extends GenericJson {
     @Key
     private String original;
 
-    @Key
-    private ICalRecurrence ical;
+    @Key("ical")
+    private ICalRecurrence iCal;
 
     @Key
     private SimpleRecurrence simple;
