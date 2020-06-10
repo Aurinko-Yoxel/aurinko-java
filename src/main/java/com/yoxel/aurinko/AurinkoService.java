@@ -58,6 +58,16 @@ public class AurinkoService {
         return false;
     }
 
+    public static boolean isGone410(IOException e) {
+        if (HttpResponseException.class.isInstance(e)) {
+            if (((HttpResponseException) e).getStatusCode() == 410) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private HttpRequest createRequest(String method, String path) throws IOException {
         return Utils.getDefaultTransport()
                 .createRequestFactory(requestInitializer)
@@ -194,6 +204,10 @@ public class AurinkoService {
         return createRequest("POST", "/calendars/" + calendarId + (notifyAttendees ? "?notifyAttendees=true" : ""))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEvent.class);
+    }
+
+    public void deleteCalendarEvent(String calendarId, String eventId, boolean notifyAttendees) throws IOException {
+        createRequest("DELETE", "/calendars/" + calendarId + "/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : "")).execute();
     }
 
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
