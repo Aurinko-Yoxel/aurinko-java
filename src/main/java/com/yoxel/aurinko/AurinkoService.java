@@ -157,16 +157,16 @@ public class AurinkoService {
                 .execute().parseAs(AurEventsPage.class);
     }
 
-    public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
-        return streamCalendarSync(true, calendarId, deltaToken, onPage, stopWhen);
+    public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
+        return streamCalendarSync(true, calendarId, pageOrDelta, onPage, stopWhen);
     }
 
-    public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
-        return streamCalendarSync(false, calendarId, deltaToken, onPage, stopWhen);
+    public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
+        return streamCalendarSync(false, calendarId, pageOrDelta, onPage, stopWhen);
     }
 
     private XStream<AurEvent, IOException>
-    streamCalendarSync(boolean deleted, String calendarId, String deltaToken, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
+    streamCalendarSync(boolean deleted, String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
 
         if (onPage == null) {
             onPage = v -> {
@@ -177,7 +177,16 @@ public class AurinkoService {
             stopWhen = v -> false;
         }
 
-        AurEventsPage firstPage = deleted ? calSyncDeleted(calendarId, deltaToken, null) : calSyncUpdated(calendarId, deltaToken, null);
+        final String deltaToken, pageToken;
+        if (pageOrDelta.startsWith("page:")) {
+            deltaToken = null;
+            pageToken = pageOrDelta.substring(5);
+        } else {
+            deltaToken = pageOrDelta;
+            pageToken = null;
+        }
+
+        AurEventsPage firstPage = deleted ? calSyncDeleted(calendarId, deltaToken, pageToken) : calSyncUpdated(calendarId, deltaToken, pageToken);
 
         // query pages, until we get a page with done=true | totalSize=0
         Predicate<? super AurEventsPage> finalStopWhen = stopWhen;
