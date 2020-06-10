@@ -4,13 +4,16 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class MeetingInfo extends GenericJson {
 
     @Key
     private boolean cancelled;
 
-    private Attendee[] attendees;
+    @Key
+    private List<Attendee> attendees;
 
     @Key
     private String response;
