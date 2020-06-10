@@ -174,14 +174,14 @@ public class AurinkoService {
                 .execute().parseAs(AurEventsPage.class);
     }
 
-    public AurEvent updateCalendarEvent(String calendarId, String eventId, AurEvent event) throws IOException {
-        return createRequest("PATCH", "/calendars/" + calendarId + "/" + eventId)
+    public AurEvent updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees) throws IOException {
+        return createRequest("PATCH", "/calendars/" + calendarId + "/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : ""))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEvent.class);
     }
 
-    public AurEvent createCalendarEvent(String calendarId, AurEvent event) throws IOException {
-        return createRequest("POST", "/calendars/" + calendarId)
+    public AurEvent createCalendarEvent(String calendarId, AurEvent event, boolean notifyAttendees) throws IOException {
+        return createRequest("POST", "/calendars/" + calendarId + (notifyAttendees ? "?notifyAttendees=true" : ""))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEvent.class);
     }
