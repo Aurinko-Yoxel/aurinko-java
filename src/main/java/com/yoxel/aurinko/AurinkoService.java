@@ -97,7 +97,7 @@ public class AurinkoService {
                 .execute().parseAs(AurCalendar.class);
     }
 
-    public AurCalendar createCalendar(String id, String name, String color) throws IOException {
+    public AurCalendar createCalendar(String name, String color) throws IOException {
         final AurCalendar cal = new AurCalendar();
         cal.setName(name);
         cal.setColor(color);
