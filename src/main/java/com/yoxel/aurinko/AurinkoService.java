@@ -195,19 +195,19 @@ public class AurinkoService {
     }
 
     public AurEvent updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees) throws IOException {
-        return createRequest("PATCH", "/calendars/" + calendarId + "/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : ""))
+        return createRequest("PATCH", "/calendars/" + calendarId + "/events/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : ""))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEvent.class);
     }
 
     public AurEvent createCalendarEvent(String calendarId, AurEvent event, boolean notifyAttendees) throws IOException {
-        return createRequest("POST", "/calendars/" + calendarId + (notifyAttendees ? "?notifyAttendees=true" : ""))
+        return createRequest("POST", "/calendars/" + calendarId + "/events" + (notifyAttendees ? "?notifyAttendees=true" : ""))
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEvent.class);
     }
 
     public void deleteCalendarEvent(String calendarId, String eventId, boolean notifyAttendees) throws IOException {
-        createRequest("DELETE", "/calendars/" + calendarId + "/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : "")).execute();
+        createRequest("DELETE", "/calendars/" + calendarId + "/events/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : "")).execute();
     }
 
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
