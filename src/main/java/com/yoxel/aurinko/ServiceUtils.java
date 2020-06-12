@@ -17,6 +17,7 @@ import com.yoxel.persist.util.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -185,7 +186,7 @@ public class ServiceUtils {
                     log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
                     aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
-                } catch (IOException e) {
+                } catch (IOException | GeneralSecurityException e) {
                     log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
                 }
             }

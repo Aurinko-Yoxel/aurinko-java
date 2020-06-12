@@ -1,8 +1,8 @@
 package com.yoxel.aurinko;
 
+import com.google.api.client.googleapis.apache.GoogleApacheHttpTransport;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.*;
-import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 import com.yoxel.aurinko.bean.*;
@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -20,7 +21,7 @@ public class AurinkoService {
 
     private static final String BASE_URL = "https://api.aurinko.io/v1";
 
-    private static final HttpTransport HTTP_TRANSPORT = new ApacheHttpTransport();
+    private final HttpTransport httpTransport;
 
     private static final JsonObjectParser JSON_PARSER =
             new JsonObjectParser(Utils.getDefaultJsonFactory());
@@ -39,16 +40,17 @@ public class AurinkoService {
 
     public enum BodyType {html, text}
 
-    private AurinkoService(HttpRequestInitializer requestInitializer) {
+    private AurinkoService(HttpTransport httpTransport, HttpRequestInitializer requestInitializer) {
+        this.httpTransport = httpTransport;
         this.requestInitializer = requestInitializer;
     }
 
-    public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
-        return new AurinkoService(new BasicAuthentication(clientId, clientSecret));
+    public static AurinkoService createWithAppAuth(String clientId, String clientSecret) throws GeneralSecurityException, IOException {
+        return new AurinkoService(GoogleApacheHttpTransport.newTrustedTransport(), new BasicAuthentication(clientId, clientSecret));
     }
 
-    public static AurinkoService createWithAccountAuth(String accessToken) {
-        return new AurinkoService(new BearerAuthorization(accessToken));
+    public static AurinkoService createWithAccountAuth(String accessToken) throws GeneralSecurityException, IOException {
+        return new AurinkoService(GoogleApacheHttpTransport.newTrustedTransport(), new BearerAuthorization(accessToken));
     }
 
     public static boolean isNotFound404(IOException e) {
@@ -72,7 +74,7 @@ public class AurinkoService {
     }
 
     private HttpRequest createRequest(String method, String path) throws IOException {
-        HttpRequest httpRequest = HTTP_TRANSPORT.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
+        HttpRequest httpRequest = httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
                 .buildRequest(method, new GenericUrl(BASE_URL + path), null)
                 .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler).setNumberOfRetries(3)
                 .setConnectTimeout(120 * 1000).setReadTimeout(180 * 1000);
