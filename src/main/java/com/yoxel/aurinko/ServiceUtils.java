@@ -182,8 +182,7 @@ public class ServiceUtils {
 
                 try {
                     AurAccount svcAcc = AurinkoService.createWithAccountAuth(svcTempl.getAurinkoToken()).getAccount();
-                    System.out.println(
-                            "Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
+                    log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
                     aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
                 } catch (IOException e) {
@@ -191,8 +190,7 @@ public class ServiceUtils {
                 }
             }
         } else {
-            System.out.println(
-                    "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
+            log.info("Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
             try {
                 aurToken = aurinko.upsertUserAccount(aurAcc);
@@ -219,7 +217,7 @@ public class ServiceUtils {
 
         aurAcc.setClientOrgId(clientOrgId + "/" + svcTempl.getGroupId());
 
-        System.out.println("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName() + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
+        log.info("Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName() + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
 
         AurAccountToken aurToken = null;
         try {
