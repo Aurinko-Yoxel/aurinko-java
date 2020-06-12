@@ -93,20 +93,20 @@ public class AurinkoService {
     }
 
     public AurAccountToken upsertUserAccount(AurAccountDto acc) throws IOException {
-        return createRequest("PATCH", "/am/accounts")
+        return createRequest("POST", "/am/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertServiceAccount(AurAccountDto svcAcc) throws IOException {
-        return createRequest("PATCH", "/am/svc_accounts")
+        return createRequest("POST", "/am/svc_accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
                 .execute().parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertManagedAccount(AurAccountDto acc, long svcAccountId)
             throws IOException {
-        return createRequest("PATCH", "/am/svc_accounts/" + svcAccountId + "/accounts")
+        return createRequest("POST", "/am/svc_accounts/" + svcAccountId + "/accounts")
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
                 .execute().parseAs(AurAccountToken.class);
     }
