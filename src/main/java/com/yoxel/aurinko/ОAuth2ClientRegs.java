@@ -6,6 +6,7 @@ import com.yoxel.model2.AurinkoPartnerToken;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public final class ОAuth2ClientRegs {
                                             partnerToken
                                                     .getAurinkoClientSecret())
                                     .getOAuthClientRegs().getRecords()));
-                } catch (IOException e) {
+                } catch (IOException | GeneralSecurityException e) {
                     log.error(e.getMessage());
                     appRegs.put(partnerToken.getSyncPartner(), null);
                 }
