@@ -45,11 +45,11 @@ public class AurinkoService {
         this.requestInitializer = requestInitializer;
     }
 
-    public static AurinkoService createWithAppAuth(String clientId, String clientSecret) throws GeneralSecurityException, IOException {
+    public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
         return new AurinkoService(new BasicAuthentication(clientId, clientSecret));
     }
 
-    public static AurinkoService createWithAccountAuth(String accessToken) throws GeneralSecurityException, IOException {
+    public static AurinkoService createWithAccountAuth(String accessToken) {
         return new AurinkoService(new BearerAuthorization(accessToken));
     }
 

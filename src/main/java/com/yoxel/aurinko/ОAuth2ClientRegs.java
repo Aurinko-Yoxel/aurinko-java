@@ -43,7 +43,7 @@ public final class ОAuth2ClientRegs {
                                             partnerToken
                                                     .getAurinkoClientSecret())
                                     .getOAuthClientRegs().getRecords()));
-                } catch (IOException | GeneralSecurityException e) {
+                } catch (IOException e) {
                     log.error(e.getMessage());
                     appRegs.put(partnerToken.getSyncPartner(), null);
                 }
