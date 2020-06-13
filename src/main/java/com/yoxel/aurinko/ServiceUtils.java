@@ -186,7 +186,7 @@ public class ServiceUtils {
                     log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
                     aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
-                } catch (IOException | GeneralSecurityException e) {
+                } catch (IOException e) {
                     log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
                 }
             }
