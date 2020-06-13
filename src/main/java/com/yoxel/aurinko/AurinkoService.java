@@ -1,8 +1,8 @@
 package com.yoxel.aurinko;
 
-import com.google.api.client.googleapis.apache.GoogleApacheHttpTransport;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.*;
+import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 import com.yoxel.aurinko.bean.*;
@@ -40,17 +40,17 @@ public class AurinkoService {
 
     public enum BodyType {html, text}
 
-    private AurinkoService(HttpTransport httpTransport, HttpRequestInitializer requestInitializer) {
-        this.httpTransport = httpTransport;
+    private AurinkoService(HttpRequestInitializer requestInitializer) {
+        this.httpTransport = new ApacheHttpTransport();
         this.requestInitializer = requestInitializer;
     }
 
     public static AurinkoService createWithAppAuth(String clientId, String clientSecret) throws GeneralSecurityException, IOException {
-        return new AurinkoService(GoogleApacheHttpTransport.newTrustedTransport(), new BasicAuthentication(clientId, clientSecret));
+        return new AurinkoService(new BasicAuthentication(clientId, clientSecret));
     }
 
     public static AurinkoService createWithAccountAuth(String accessToken) throws GeneralSecurityException, IOException {
-        return new AurinkoService(GoogleApacheHttpTransport.newTrustedTransport(), new BearerAuthorization(accessToken));
+        return new AurinkoService(new BearerAuthorization(accessToken));
     }
 
     public static boolean isNotFound404(IOException e) {
