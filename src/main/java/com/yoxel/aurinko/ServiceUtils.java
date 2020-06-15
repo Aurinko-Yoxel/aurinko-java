@@ -131,6 +131,8 @@ public class ServiceUtils {
             accDto.setServiceType("Google");
             accDto.setAuthString2(templ.getPassword());
 
+            scopes.replaceAll(s -> "Mail.Read".equalsIgnoreCase(s) ? "Mail.All" : s);
+
             try {
                 final GenericJson sdData = Utils.getDefaultJsonFactory().createJsonParser(templ.getPassword()).parse(GenericJson.class);
 
