@@ -17,7 +17,6 @@ import com.yoxel.persist.util.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,20 +175,22 @@ public class ServiceUtils {
         aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
 
         AurAccountToken aurToken = null;
-        if (acc.isTrustServer() && acc.getTemplId() > 0 ) { // || forceManagedBy != null
+        if (acc.isTrustServer() && acc.getTemplId() > 0) { // || forceManagedBy != null
 
             final ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
-            if (svcTempl.getAurinkoToken() != null) {
-
-                try {
-                    AurAccount svcAcc = AurinkoService.createWithAccountAuth(svcTempl.getAurinkoToken()).getAccount();
-                    log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
-
-                    aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
-                } catch (IOException e) {
-                    log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
-                }
+            if (svcTempl.getAurinkoToken() == null) {
+                log.warn("No service account token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
             }
+
+            try {
+                AurAccount svcAcc = AurinkoService.createWithAccountAuth(svcTempl.getAurinkoToken()).getAccount();
+                log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
+
+                aurToken = aurinko.upsertManagedAccount(aurAcc, svcAcc.getId());
+            } catch (IOException e) {
+                log.warn("Failed to upsert Aurinko managed account " + e.getMessage());
+            }
+
         } else {
             log.info("Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
