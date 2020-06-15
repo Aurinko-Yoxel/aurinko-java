@@ -179,7 +179,8 @@ public class ServiceUtils {
 
             final ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
             if (svcTempl.getAurinkoToken() == null) {
-                log.warn("No service account token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
+                log.warn("No Aurinko token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
+                return null;
             }
 
             try {
