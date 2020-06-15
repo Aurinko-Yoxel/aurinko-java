@@ -8,10 +8,10 @@ import lombok.Data;
 public class AurAccount {
 
   @Key
-  private Long id;
+  private long id;
 
   @Key
-  private Long parentId;
+  private long parentId;
 
   @Key
   private String serviceType;
@@ -23,7 +23,7 @@ public class AurAccount {
   private String tokenStatus;
 
   @Key
-  private Boolean daemon;
+  private boolean daemon;
 
   @Key
   private String loginString;
