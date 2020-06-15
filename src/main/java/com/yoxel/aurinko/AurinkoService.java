@@ -53,6 +53,16 @@ public class AurinkoService {
         return new AurinkoService(new BearerAuthorization(accessToken));
     }
 
+    public static boolean isBadRequest400(IOException e) {
+        if (HttpResponseException.class.isInstance(e)) {
+            if (((HttpResponseException) e).getStatusCode() == 400) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isNotFound404(IOException e) {
         if (HttpResponseException.class.isInstance(e)) {
             if (((HttpResponseException) e).getStatusCode() == 404) {
