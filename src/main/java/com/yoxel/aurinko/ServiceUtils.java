@@ -128,7 +128,7 @@ public class ServiceUtils {
 //        authExpiresAt;
 
         if (templ.getProtocol() == AbsService.Protocol.GMAIL) {
-            accDto.setServiceType("GOOGLE");
+            accDto.setServiceType("Google");
             accDto.setAuthString2(templ.getPassword());
 
             try {
