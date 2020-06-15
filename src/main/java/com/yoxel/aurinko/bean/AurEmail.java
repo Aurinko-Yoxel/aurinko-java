@@ -29,6 +29,9 @@ public class AurEmail extends AurIdEntity {
     private String internetMessageId;
 
     @Key
+    private String meetingMessageMethod;
+
+    @Key
     private List<String> sysLabels;
 
     @Key
