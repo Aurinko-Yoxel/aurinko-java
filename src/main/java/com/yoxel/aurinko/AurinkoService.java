@@ -13,7 +13,6 @@ import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.security.GeneralSecurityException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -213,19 +212,19 @@ public class AurinkoService {
     }
 
     public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees) throws IOException {
-        return createRequest("PATCH", "/calendars/" + calendarId + "/events/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : ""))
+        return createRequest("PATCH", "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEventSaveResult.class);
     }
 
     public AurEventSaveResult createCalendarEvent(String calendarId, AurEvent event, boolean notifyAttendees) throws IOException {
-        return createRequest("POST", "/calendars/" + calendarId + "/events" + (notifyAttendees ? "?notifyAttendees=true" : ""))
+        return createRequest("POST", "/calendars/" + calendarId + "/events" + "?notifyAttendees=" + notifyAttendees)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEventSaveResult.class);
     }
 
     public void deleteCalendarEvent(String calendarId, String eventId, boolean notifyAttendees) throws IOException {
-        createRequest("DELETE", "/calendars/" + calendarId + "/events/" + eventId + (notifyAttendees ? "?notifyAttendees=true" : "")).execute();
+        createRequest("DELETE", "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees).execute();
     }
 
     public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage, Predicate<? super AurEventsPage> stopWhen) throws IOException {
