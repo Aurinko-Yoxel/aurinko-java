@@ -53,7 +53,7 @@ public class ServiceUtils {
         final AurAccountDto accDto = new AurAccountDto();
 
         accDto.setActive(!acc.isOffline());
-        accDto.setAuthScopes(scopes.toArray(new String[0]));
+        accDto.setAuthScopes(scopes.toArray(new String[scopes.size()]));
         accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
         accDto.setEmail(acc.getEmailAddress());
         accDto.setName(userName);
@@ -95,6 +95,8 @@ public class ServiceUtils {
             }
         } else if (acc.getProtocol() == AbsService.Protocol.EWS) {
             accDto.setServiceType("EWS");
+            accDto.setAuthString1(acc.getUsername());
+            accDto.setAuthString2(acc.getPassword());
         }
 
         return accDto;
@@ -173,6 +175,9 @@ public class ServiceUtils {
 
         final AurAccountDto
                 aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
+        if (aurAcc.getAuthString1() == null || aurAcc.getAuthString2() == null) {
+            return null;
+        }
 
         aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
 
@@ -214,7 +219,7 @@ public class ServiceUtils {
 
     public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId, ServiceTemplate svcTempl,
                                                ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess) throws IOException {
-        if (!svcTempl.getProtocol().isReadEmail()) {
+        if (!svcTempl.getProtocol().isReadEmail() || svcTempl.getPassword() == null) {
             return null;
         }
 
