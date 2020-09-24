@@ -175,7 +175,7 @@ public class ServiceUtils {
 
         final AurAccountDto
                 aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
-        if (aurAcc.getAuthString1() == null || aurAcc.getAuthString2() == null) {
+        if (aurAcc.getAuthString1() == null && aurAcc.getAuthString2() == null) {
             return null;
         }
 
