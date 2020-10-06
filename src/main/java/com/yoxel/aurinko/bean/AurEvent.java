@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class AurEvent extends AurIdEntity {
     @Key("folderId")
-    String calendarId;
+    private String calendarId;
 
     @Key
     private String subject;
