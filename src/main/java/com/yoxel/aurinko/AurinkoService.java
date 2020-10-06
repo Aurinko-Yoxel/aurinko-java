@@ -211,16 +211,21 @@ public class AurinkoService {
                 .execute().parseAs(AurEventsPage.class);
     }
 
-    public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees) throws IOException {
-        return createRequest("PATCH", "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees)
-                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
-                .execute().parseAs(AurEventSaveResult.class);
-    }
-
     public AurEventSaveResult createCalendarEvent(String calendarId, AurEvent event, boolean notifyAttendees) throws IOException {
         return createRequest("POST", "/calendars/" + calendarId + "/events" + "?notifyAttendees=" + notifyAttendees)
                 .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
                 .execute().parseAs(AurEventSaveResult.class);
+    }
+
+    public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees) throws IOException {
+        return updateCalendarEvent(calendarId, eventId, event, notifyAttendees, null);
+    }
+
+    public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event, boolean notifyAttendees, String etag) throws IOException {
+        HttpRequest httpRequest = createRequest("PATCH", "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event));
+        if (etag != null) httpRequest.getHeaders().setIfMatch(etag);
+        return httpRequest.execute().parseAs(AurEventSaveResult.class);
     }
 
     public void deleteCalendarEvent(String calendarId, String eventId, boolean notifyAttendees) throws IOException {
@@ -268,6 +273,93 @@ public class AurinkoService {
                 .filter(qr -> qr.getRecords() != null) // this can happen
                 .peek(onPage) // execute action on each page
                 .map(AurEventsPage::getRecords)
+                .flatMap(IOXStream::of);
+    }
+
+    public AurContact getContact(String contId, BodyType bodyType) throws IOException {
+        final StringBuilder sb = new StringBuilder();
+
+        if (bodyType != null) {
+            if (sb.length() > 0)
+                sb.append("&");
+            sb.append("bodyType=" + bodyType.name());
+        }
+
+        return createRequest("GET", "/contacts/" + contId + (sb.length() > 0 ? "?" + sb.toString() : ""))
+                .execute().parseAs(AurContact.class);
+    }
+
+    public AurContactSaveResult createContact(AurContact contact) throws IOException {
+        return createRequest("POST", "/contacts")
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), contact))
+                .execute().parseAs(AurContactSaveResult.class);
+    }
+
+    public AurContactSaveResult updateContact(String contId, AurContact contact, String etag) throws IOException {
+        HttpRequest httpRequest = createRequest("PATCH", "/contacts/" + contId)
+                .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), contact));
+        if (etag != null) httpRequest.getHeaders().setIfMatch(etag);
+        return httpRequest.execute().parseAs(AurContactSaveResult.class);
+    }
+
+    public void deleteContact(String contId) throws IOException {
+        createRequest("DELETE", "/contacts/" + contId).execute();
+    }
+
+    public AurSyncStatus startContactsSync() throws IOException {
+        return createRequest("POST", "/contacts/sync").execute().parseAs(AurSyncStatus.class);
+    }
+
+    public AurContactsPage contSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/contacts/sync/updated" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurContactsPage.class);
+    }
+
+    public AurContactsPage contSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
+        return createRequest("GET", "/contacts/sync/deleted" + tokenParams(deltaToken, nextPageToken))
+                .execute().parseAs(AurContactsPage.class);
+    }
+
+    public XStream<AurContact, IOException> streamDeletedContacts(String pageOrDelta, Consumer<? super AurContactsPage> onPage, Predicate<? super AurContactsPage> stopWhen) throws IOException {
+        return streamContactsSync(true, pageOrDelta, onPage, stopWhen);
+    }
+
+    public XStream<AurContact, IOException> streamUpdatedContacts(String pageOrDelta, Consumer<? super AurContactsPage> onPage, Predicate<? super AurContactsPage> stopWhen) throws IOException {
+        return streamContactsSync(false, pageOrDelta, onPage, stopWhen);
+    }
+
+    private XStream<AurContact, IOException> streamContactsSync(boolean deleted, String pageOrDelta, Consumer<? super AurContactsPage> onPage, Predicate<? super AurContactsPage> stopWhen) throws IOException {
+
+        if (onPage == null) {
+            onPage = v -> {
+            };
+        }
+
+        if (stopWhen == null) {
+            stopWhen = v -> false;
+        }
+
+        final String deltaToken, pageToken;
+        if (pageOrDelta.startsWith("page:")) {
+            deltaToken = null;
+            pageToken = pageOrDelta.substring(5);
+        } else {
+            deltaToken = pageOrDelta;
+            pageToken = null;
+        }
+
+        AurContactsPage firstPage = deleted ? contSyncDeleted(deltaToken, pageToken) : contSyncUpdated(deltaToken, pageToken);
+
+        // query pages, until we get a page with done=true | totalSize=0
+        Predicate<? super AurContactsPage> finalStopWhen = stopWhen;
+        return IOXStream.iterateUntil(
+                firstPage,
+                qr -> deleted ? contSyncDeleted(deltaToken, qr.getNextPageToken()) : contSyncUpdated(deltaToken, qr.getNextPageToken()),
+                qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
+        )
+                .filter(qr -> qr.getRecords() != null) // this can happen
+                .peek(onPage) // execute action on each page
+                .map(AurContactsPage::getRecords)
                 .flatMap(IOXStream::of);
     }
 
@@ -356,16 +448,16 @@ public class AurinkoService {
                 .flatMap(IOXStream::of);
     }
 
-    public AurSyncStatus startMailSync(Integer days, BodyType bodyType) throws IOException {
+    public AurSyncStatus startMailSync(Integer days) throws IOException {
         StringBuilder sb = new StringBuilder();
         if (days != null)
             sb.append("daysWithin=" + days);
 
-        if (bodyType != null) {
-            if (sb.length() > 0)
-                sb.append("&");
-            sb.append("bodyType=" + bodyType.name());
-        }
+//        if (bodyType != null) {
+//            if (sb.length() > 0)
+//                sb.append("&");
+//            sb.append("bodyType=" + bodyType.name());
+//        }
 
         return createRequest("POST", "/email/sync" + (sb.length() > 0 ? "?" + sb.toString() : "")).execute().parseAs(AurSyncStatus.class);
     }
