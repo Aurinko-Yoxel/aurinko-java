@@ -89,9 +89,13 @@ public class ServiceUtils {
                 }
             }
         } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
-            accDto.setServiceType("EWS365");
-            if (sd != null && sd.getAppKeyPrefix() == null) {
-                accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
+            if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())) {
+                accDto.setServiceType("Office365");
+            } else {
+                accDto.setServiceType("EWS365");
+                if (sd == null || sd.getAppKeyPrefix() == null) {
+                    accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
+                }
             }
         } else if (acc.getProtocol() == AbsService.Protocol.EWS) {
             accDto.setServiceType("EWS");
