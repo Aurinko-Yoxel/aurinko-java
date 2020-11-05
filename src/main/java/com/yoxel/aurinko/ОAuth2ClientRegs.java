@@ -6,7 +6,6 @@ import com.yoxel.model2.AurinkoPartnerToken;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -76,14 +75,14 @@ public final class ОAuth2ClientRegs {
                 if ("google.oauth2.secret".equals(key)) {
                     return reg.getClientSecret();
                 }
-            } else if (key.startsWith("office365.oauth2.") || key.startsWith("office.oauth2.") || key.startsWith("daemon.office365.oauth2.")) {
-                final boolean daemon = key.startsWith("daemon.");
-                final String svcType = key.startsWith("office.oauth2.") ? "Office365" : "EWS365";
+            } else if (key.startsWith("office365.oauth2.") || key.startsWith("daemon.office365.oauth2.")
+                    || key.startsWith("office.oauth2.") || key.startsWith("daemon.office.oauth2.")) {
+                final String svcType = key.contains("office365.oauth2.") ? "EWS365" : "Office365";
 
                 AurOAuthClientReg
                         reg =
                         rl.stream().filter(r -> svcType.equalsIgnoreCase(r.getServiceType())
-                                && r.isDaemon() == daemon).findFirst().get();
+                                && r.isDaemon() == key.startsWith("daemon.")).findFirst().get();
 
                 if (key.endsWith("oauth2.client")) {
                     return reg.getClientId();
