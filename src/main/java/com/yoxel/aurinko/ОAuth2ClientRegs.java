@@ -53,30 +53,32 @@ public final class ОAuth2ClientRegs {
     }
 
     public String getOAuthClientReg(String key) {
-        if (!key.startsWith("daemon.office365.oauth2.")
-                && (partner == null || "yoxel".equals(partner) || "teamworkpm".equals(partner)
-                || !key.startsWith("google.oauth2.") && !key.startsWith("office365.oauth2.")
-                && !key.startsWith("office.oauth2."))) {
-            return syncStore.getSecret(key);
-        }
+//        if (!key.startsWith("daemon.office365.oauth2.")
+//                && (partner == null || "yoxel".equals(partner) || "teamworkpm".equals(partner)
+//                || !key.startsWith("google.oauth2.") && !key.startsWith("office365.oauth2.")
+//                && !key.startsWith("office.oauth2."))) {
+//            return syncStore.getSecret(key);
+//        }
 
-        // for daemon.office365.oauth2.* or partners with google.*, office365.*
+        String value = null;
+
         List<AurOAuthClientReg> rl = appRegs.get(partner == null ? "yoxel" : partner);
         if (rl != null) {
             if (key.startsWith("google.oauth2.")) {
+
                 AurOAuthClientReg
                         reg =
                         rl.stream().filter(r -> "Google".equalsIgnoreCase(r.getServiceType())).findFirst()
                                 .get();
-                if ("google.oauth2.client".equals(key)) {
-                    return reg.getClientId();
-                }
 
-                if ("google.oauth2.secret".equals(key)) {
-                    return reg.getClientSecret();
+                if ("google.oauth2.client".equals(key)) {
+                    value = reg.getClientId();
+                } else if ("google.oauth2.secret".equals(key)) {
+                    value = reg.getClientSecret();
                 }
             } else if (key.startsWith("office365.oauth2.") || key.startsWith("daemon.office365.oauth2.")
                     || key.startsWith("office.oauth2.") || key.startsWith("daemon.office.oauth2.")) {
+
                 final String svcType = key.contains("office365.oauth2.") ? "EWS365" : "Office365";
 
                 AurOAuthClientReg
@@ -85,15 +87,20 @@ public final class ОAuth2ClientRegs {
                                 && r.isDaemon() == key.startsWith("daemon.")).findFirst().get();
 
                 if (key.endsWith("oauth2.client")) {
-                    return reg.getClientId();
-                }
-
-                if (key.endsWith("oauth2.secret")) {
-                    return reg.getClientSecret();
+                    value = reg.getClientId();
+                } else if (key.endsWith("oauth2.secret")) {
+                    value = reg.getClientSecret();
                 }
             }
         }
 
-        throw new IllegalArgumentException("partner: " + partner + ", key: " + key);
+        if (value == null) {
+            value = syncStore.getSecret(key);
+        }
+
+        if (value == null)
+            throw new IllegalArgumentException("partner: " + partner + ", key: " + key);
+
+        return value;
     }
 }
