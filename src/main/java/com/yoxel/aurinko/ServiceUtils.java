@@ -122,14 +122,16 @@ public class ServiceUtils {
             scopes.add("Tasks.ReadWrite");
         }
 
-        final String authDomain = Strings.splitByComma(templ.getAuthDomains())[0].trim();
+        String[] ss = Strings.splitByComma(templ.getAuthDomains());
+
+        final String authDomain = ss.length > 0 ? ss[0].trim() : null;
 
         final AurAccountDto accDto = new AurAccountDto();
 
         accDto.setActive(true);
         accDto.setServerUrl(templ.getInstUrl());
         accDto.setAuthScopes(scopes.toArray(new String[0]));
-        accDto.setName(authDomain);
+        accDto.setName(authDomain == null ? templ.getName() : authDomain);
 //        authObtainedAt;
 //        authExpiresAt;
 
@@ -159,6 +161,7 @@ public class ServiceUtils {
             accDto.setAuthString1(authAccess.getAuthString(Long.parseLong(templ.getPassword())));
         } else if (templ.getProtocol() == AbsService.Protocol.EWS) {
             accDto.setServiceType("EWS");
+            accDto.setAuthOrgId(authDomain);
             accDto.setAuthString1(templ.getUsername());
             accDto.setAuthString2(templ.getPassword());
             accDto.setLoginString(templ.getUsername());
