@@ -28,7 +28,7 @@ public interface UpdateSupport<Entity extends AurIdEntity, SaveResult>
 
   default SaveResult update(String id, Entity entity, QueryParams params, String etag) throws IOException {
     final HttpRequest request = httpPostPrepare(
-        entityRoot() + "/" + id,
+        entityRoot() + "/" + normalizeId(id),
         params,
         new JsonHttpContent(Utils.getDefaultJsonFactory(), entity)
     );
