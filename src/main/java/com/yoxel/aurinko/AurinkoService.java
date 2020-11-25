@@ -1,26 +1,47 @@
 package com.yoxel.aurinko;
 
 import com.google.api.client.googleapis.util.Utils;
-import com.google.api.client.http.*;
+import com.google.api.client.http.BasicAuthentication;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpIOExceptionHandler;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 
-import com.yoxel.aurinko.bean.*;
+import com.yoxel.aurinko.apis.CrudAndListSupport;
+import com.yoxel.aurinko.apis.HttpApi;
+import com.yoxel.aurinko.apis.ListSupport;
+import com.yoxel.aurinko.apis.QueryParams;
+import com.yoxel.aurinko.apis.SyncSupport;
+import com.yoxel.aurinko.bean.AurAccount;
+import com.yoxel.aurinko.bean.AurAccountToken;
+import com.yoxel.aurinko.bean.AurCalendar;
+import com.yoxel.aurinko.bean.AurCalendarsPage;
+import com.yoxel.aurinko.bean.AurContact;
+import com.yoxel.aurinko.bean.AurContactSaveResult;
+import com.yoxel.aurinko.bean.AurContactsPage;
+import com.yoxel.aurinko.bean.AurContent;
+import com.yoxel.aurinko.bean.AurEmail;
+import com.yoxel.aurinko.bean.AurEmailsPage;
+import com.yoxel.aurinko.bean.AurEvent;
+import com.yoxel.aurinko.bean.AurEventSaveResult;
+import com.yoxel.aurinko.bean.AurEventsPage;
+import com.yoxel.aurinko.bean.AurIdEntity;
+import com.yoxel.aurinko.bean.AurOAuthClientRegsPage;
+import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.dto.AurAccountDto;
-import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
-import com.yoxel.commons.xstream.functions.XFunction;
-
-import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+
+import static com.yoxel.aurinko.apis.QueryParams.qp;
 
 public class AurinkoService {
 
@@ -58,45 +79,6 @@ public class AurinkoService {
     return new AurinkoService(new BearerAuthorization(accessToken));
   }
 
-  public static boolean isBadRequest400(IOException e) {
-    if (HttpResponseException.class.isInstance(e)) {
-      if (((HttpResponseException) e).getStatusCode() == 400) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static boolean isForbidden403(IOException e) {
-    if (HttpResponseException.class.isInstance(e)) {
-      if (((HttpResponseException) e).getStatusCode() == 403) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static boolean isNotFound404(IOException e) {
-    if (HttpResponseException.class.isInstance(e)) {
-      if (((HttpResponseException) e).getStatusCode() == 404) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static boolean isGone410(IOException e) {
-    if (HttpResponseException.class.isInstance(e)) {
-      if (((HttpResponseException) e).getStatusCode() == 410) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 
   private HttpRequest createRequest(String method, String path) throws IOException {
     HttpRequest httpRequest = httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
@@ -111,504 +93,184 @@ public class AurinkoService {
     return httpRequest;
   }
 
-  public AurAccount getAccount() throws IOException {
-    return createRequest("GET", "/account").execute().parseAs(AurAccount.class);
+
+  public Accounts accounts = new Accounts();
+  public Calendars calendars = new Calendars();
+  public Emails emails = new Emails();
+  public Contacts contacts = new Contacts();
+
+  abstract class HttpApiSupport implements HttpApi {
+
+    @Override
+    public HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams) throws IOException {
+      return createRequest(method, path + queryParams.toUrlString());
+    }
   }
 
-  public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
-    return createRequest("GET", "/am/oauth_regs").execute().parseAs(AurOAuthClientRegsPage.class);
-  }
+  @RequiredArgsConstructor
+  abstract class BasicEntitySupport<
+      Entity extends AurIdEntity,
+      Page extends AurQueryResult<Entity>,
+      SaveResult
+      > extends HttpApiSupport implements CrudAndListSupport<Entity, Page, SaveResult> {
 
-  public AurAccountToken upsertUserAccount(AurAccountDto acc) throws IOException {
-    return createRequest("POST", "/am/accounts")
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-        .execute().parseAs(AurAccountToken.class);
-  }
+    private final String root;
+    private final Class<Entity> eClass;
+    private final Class<Page> pClass;
+    private final Class<SaveResult> sClass;
 
-  public AurAccountToken upsertServiceAccount(AurAccountDto svcAcc) throws IOException {
-    return createRequest("POST", "/am/svc_accounts")
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
-        .execute().parseAs(AurAccountToken.class);
-  }
 
-  public AurAccountToken upsertManagedAccount(AurAccountDto acc, long svcAccountId)
-      throws IOException {
-    return createRequest("POST", "/am/svc_accounts/" + svcAccountId + "/accounts")
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-        .execute().parseAs(AurAccountToken.class);
-  }
-
-  public AurCalendar getCalendar(String id) throws IOException {
-    return createRequest("GET", "/calendars/" + id).execute().parseAs(AurCalendar.class);
-  }
-
-  public AurCalendar updateCalendar(String id, String name) throws IOException {
-    final AurCalendar cal = new AurCalendar();
-    cal.setName(name);
-    return createRequest("PATCH", "/calendars/" + id)
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), cal))
-        .execute().parseAs(AurCalendar.class);
-  }
-
-  public AurCalendar createCalendar(String name, String color) throws IOException {
-    final AurCalendar cal = new AurCalendar();
-    cal.setName(name);
-    cal.setColor(color);
-    return createRequest("POST", "/calendars")
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), cal))
-        .execute().parseAs(AurCalendar.class);
-  }
-
-  public AurCalendarsPage getCalendars(String pageToken) throws IOException {
-    return createRequest("GET", "/calendars" + tokenParams(null, pageToken)).execute().parseAs(AurCalendarsPage.class);
-  }
-
-  public XStream<AurCalendar, IOException> streamCalendars(Consumer<? super AurCalendarsPage> onPage)
-      throws IOException {
-    return streamPaged(this::getCalendars, onPage);
-  }
-
-  public AurSyncStatus startCalendarSync(String calendarId, DateTime timeMin, DateTime timeMax) throws IOException {
-    return createRequest("POST", "/calendars/" + (calendarId == null ? "primary" : calendarId)
-                                 + "/sync?timeMin=" + timeMin.toDateTimeISO() + "&timeMax=" + timeMax.toDateTimeISO())
-        .execute().parseAs(AurSyncStatus.class);
-  }
-
-  private String tokenParams(String deltaToken, String pageToken) {
-
-    if (pageToken != null) {
-      return "?pageToken=" + pageToken;
+    @Override
+    public String entityRoot() {
+      return root;
     }
 
-    if (deltaToken != null) {
-      return "?deltaToken=" + deltaToken;
+    @Override
+    public Class<Entity> entityClass() {
+      return eClass;
     }
 
-    return "";
-  }
-
-  public AurEventsPage calSyncUpdated(String calendarId, String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET",
-                         "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/sync/updated" + tokenParams(
-                             deltaToken, nextPageToken))
-        .execute().parseAs(AurEventsPage.class);
-  }
-
-  public AurEventsPage calSyncDeleted(String calendarId, String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET",
-                         "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/sync/deleted" + tokenParams(
-                             deltaToken, nextPageToken))
-        .execute().parseAs(AurEventsPage.class);
-  }
-
-  public AurEvent getCalendarEvent(String calendarId, String eventId) throws IOException {
-    return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + eventId)
-        .execute().parseAs(AurEvent.class);
-  }
-
-  public AurEvent getCalendarOccurrence(String calendarId, String masterId, String origStart) throws IOException {
-    return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId
-                                + "/occurrences/" + origStart)
-        .execute().parseAs(AurEvent.class);
-  }
-
-  public AurEventsPage getCalendarSeries(String calendarId, String masterId, String pageToken) throws IOException {
-    return createRequest("GET", "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events/" + masterId
-                                + "/series" + tokenParams(null, pageToken))
-        .execute().parseAs(AurEventsPage.class);
-  }
-
-  public AurEventsPage findEvents(String calendarId, List<String> iCalUIds, String pageToken) throws IOException {
-    return createRequest(
-        "GET",
-        Paths.calendar(calendarId) + "/events/find?" +
-        iCalUIds.stream()
-            .map(s -> "iCalUId=" + URLEncoder.encode(s, StandardCharsets.UTF_8))
-            .collect(Collectors.joining("&")) +
-        tokenParams(null, pageToken)
-    )
-        .execute().parseAs(AurEventsPage.class);
-  }
-
-  public XStream<AurEvent, IOException> streamFindEvents(String calendarId, List<String> iCalUIds) throws IOException {
-    return streamPaged(tk -> findEvents(calendarId, iCalUIds, tk));
-  }
-
-  public AurEventSaveResult createCalendarEvent(String calendarId, AurEvent event, boolean notifyAttendees)
-      throws IOException {
-    return createRequest("POST", "/calendars/" + calendarId + "/events" + "?notifyAttendees=" + notifyAttendees)
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event))
-        .execute().parseAs(AurEventSaveResult.class);
-  }
-
-  public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event,
-                                                boolean notifyAttendees) throws IOException {
-    return updateCalendarEvent(calendarId, eventId, event, notifyAttendees, null);
-  }
-
-  public AurEventSaveResult updateCalendarEvent(String calendarId, String eventId, AurEvent event,
-                                                boolean notifyAttendees, String etag) throws IOException {
-    HttpRequest
-        httpRequest =
-        createRequest("PATCH",
-                      "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees)
-            .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), event));
-    if (etag != null) {
-      httpRequest.getHeaders().setIfMatch(etag);
-    }
-    return httpRequest.execute().parseAs(AurEventSaveResult.class);
-  }
-
-  public void deleteCalendarEvent(String calendarId, String eventId, boolean notifyAttendees) throws IOException {
-    createRequest("DELETE", "/calendars/" + calendarId + "/events/" + eventId + "?notifyAttendees=" + notifyAttendees)
-        .execute();
-  }
-
-  public XStream<AurEvent, IOException> streamDeletedEvents(String calendarId, String pageOrDelta,
-                                                            Consumer<? super AurEventsPage> onPage,
-                                                            Predicate<? super AurEventsPage> stopWhen)
-      throws IOException {
-    return streamCalendarSync(true, calendarId, pageOrDelta, onPage, stopWhen);
-  }
-
-  public XStream<AurEvent, IOException> streamUpdatedEvents(String calendarId, String pageOrDelta,
-                                                            Consumer<? super AurEventsPage> onPage,
-                                                            Predicate<? super AurEventsPage> stopWhen)
-      throws IOException {
-    return streamCalendarSync(false, calendarId, pageOrDelta, onPage, stopWhen);
-  }
-
-  private XStream<AurEvent, IOException>
-  streamCalendarSync(boolean deleted, String calendarId, String pageOrDelta, Consumer<? super AurEventsPage> onPage,
-                     Predicate<? super AurEventsPage> stopWhen) throws IOException {
-
-    if (onPage == null) {
-      onPage = v -> {
-      };
+    @Override
+    public Class<Page> entityPageClass() {
+      return pClass;
     }
 
-    if (stopWhen == null) {
-      stopWhen = v -> false;
+    @Override
+    public Class<SaveResult> entitySaveResultClass() {
+      return sClass;
+    }
+  }
+
+  public class Accounts extends HttpApiSupport {
+
+    public AurAccount getMe() throws IOException {
+      return httpGet("/account").parseAs(AurAccount.class);
     }
 
-    final String deltaToken, pageToken;
-    if (pageOrDelta.startsWith("page:")) {
-      deltaToken = null;
-      pageToken = pageOrDelta.substring(5);
-    } else {
-      deltaToken = pageOrDelta;
-      pageToken = null;
+    public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
+      return httpGet("/am/oauth_regs").parseAs(AurOAuthClientRegsPage.class);
     }
 
-    AurEventsPage
-        firstPage =
-        deleted ? calSyncDeleted(calendarId, deltaToken, pageToken) : calSyncUpdated(calendarId, deltaToken, pageToken);
-
-    // query pages, until we get a page with done=true | totalSize=0
-    Predicate<? super AurEventsPage> finalStopWhen = stopWhen;
-    return IOXStream.iterateUntil(
-        firstPage,
-        qr -> deleted ? calSyncDeleted(calendarId, deltaToken, qr.getNextPageToken())
-                      : calSyncUpdated(calendarId, deltaToken, qr.getNextPageToken()),
-        qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
-    )
-        .filter(qr -> qr.getRecords() != null) // this can happen
-        .peek(onPage) // execute action on each page
-        .map(AurEventsPage::getRecords)
-        .flatMap(IOXStream::of);
-  }
-
-  public AurContact getContact(String contId, BodyType bodyType) throws IOException {
-    final StringBuilder sb = new StringBuilder();
-
-    if (bodyType != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("bodyType=" + bodyType.name());
+    public AurAccountToken upsertPersonal(AurAccountDto acc) throws IOException {
+      return httpPost("/am/accounts", new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
+          .parseAs(AurAccountToken.class);
     }
 
-    return createRequest("GET", "/contacts/" + contId + (sb.length() > 0 ? "?" + sb.toString() : ""))
-        .execute().parseAs(AurContact.class);
-  }
-
-  public AurContactSaveResult createContact(AurContact contact) throws IOException {
-    return createRequest("POST", "/contacts")
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), contact))
-        .execute().parseAs(AurContactSaveResult.class);
-  }
-
-  public AurContactSaveResult updateContact(String contId, AurContact contact, String etag) throws IOException {
-    HttpRequest httpRequest = createRequest("PATCH", "/contacts/" + contId)
-        .setContent(new JsonHttpContent(Utils.getDefaultJsonFactory(), contact));
-    if (etag != null) {
-      httpRequest.getHeaders().setIfMatch(etag);
-    }
-    return httpRequest.execute().parseAs(AurContactSaveResult.class);
-  }
-
-  public void deleteContact(String contId) throws IOException {
-    createRequest("DELETE", "/contacts/" + contId).execute();
-  }
-
-  public AurSyncStatus startContactsSync() throws IOException {
-    return createRequest("POST", "/contacts/sync").execute().parseAs(AurSyncStatus.class);
-  }
-
-  public AurContactsPage contSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET", "/contacts/sync/updated" + tokenParams(deltaToken, nextPageToken))
-        .execute().parseAs(AurContactsPage.class);
-  }
-
-  public AurContactsPage contSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET", "/contacts/sync/deleted" + tokenParams(deltaToken, nextPageToken))
-        .execute().parseAs(AurContactsPage.class);
-  }
-
-  public XStream<AurContact, IOException> streamDeletedContacts(String pageOrDelta,
-                                                                Consumer<? super AurContactsPage> onPage,
-                                                                Predicate<? super AurContactsPage> stopWhen)
-      throws IOException {
-    return streamContactsSync(true, pageOrDelta, onPage, stopWhen);
-  }
-
-  public XStream<AurContact, IOException> streamUpdatedContacts(String pageOrDelta,
-                                                                Consumer<? super AurContactsPage> onPage,
-                                                                Predicate<? super AurContactsPage> stopWhen)
-      throws IOException {
-    return streamContactsSync(false, pageOrDelta, onPage, stopWhen);
-  }
-
-  private XStream<AurContact, IOException> streamContactsSync(boolean deleted, String pageOrDelta,
-                                                              Consumer<? super AurContactsPage> onPage,
-                                                              Predicate<? super AurContactsPage> stopWhen)
-      throws IOException {
-
-    if (onPage == null) {
-      onPage = v -> {
-      };
+    public AurAccountToken upsertService(AurAccountDto svcAcc) throws IOException {
+      return httpPost("/am/svc_accounts", new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
+          .parseAs(AurAccountToken.class);
     }
 
-    if (stopWhen == null) {
-      stopWhen = v -> false;
+    public AurAccountToken upsertManaged(AurAccountDto acc, long svcAccountId)
+        throws IOException {
+      return httpPost("/am/svc_accounts/" + svcAccountId + "/accounts",
+                      new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
+          .parseAs(AurAccountToken.class);
     }
-
-    final String deltaToken, pageToken;
-    if (pageOrDelta.startsWith("page:")) {
-      deltaToken = null;
-      pageToken = pageOrDelta.substring(5);
-    } else {
-      deltaToken = pageOrDelta;
-      pageToken = null;
-    }
-
-    AurContactsPage
-        firstPage =
-        deleted ? contSyncDeleted(deltaToken, pageToken) : contSyncUpdated(deltaToken, pageToken);
-
-    // query pages, until we get a page with done=true | totalSize=0
-    Predicate<? super AurContactsPage> finalStopWhen = stopWhen;
-    return IOXStream.iterateUntil(
-        firstPage,
-        qr -> deleted ? contSyncDeleted(deltaToken, qr.getNextPageToken())
-                      : contSyncUpdated(deltaToken, qr.getNextPageToken()),
-        qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
-    )
-        .filter(qr -> qr.getRecords() != null) // this can happen
-        .peek(onPage) // execute action on each page
-        .map(AurContactsPage::getRecords)
-        .flatMap(IOXStream::of);
   }
 
-  public AurEmail getEmailMessage(String id, BodyType bodyType, boolean loadInlines) throws IOException {
-    final StringBuilder sb = new StringBuilder();
+  public class Calendars extends BasicEntitySupport<AurCalendar, AurCalendarsPage, AurCalendar> {
 
-    if (bodyType != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("bodyType=" + bodyType.name());
+    public Calendars() {
+      super("/calendars", AurCalendar.class, AurCalendarsPage.class, AurCalendar.class);
     }
 
-    if (loadInlines) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("loadInlines=true");
+    public CalendarEvents calendarEvents(String calendarId) {
+      return new CalendarEvents(calendarId);
+    }
+  }
+
+  public class CalendarEvents extends BasicEntitySupport<AurEvent, AurEventsPage, AurEventSaveResult>
+      implements SyncSupport<AurEvent, AurEventsPage> {
+
+    private final String calendarId;
+
+    public CalendarEvents(String calendarId) {
+      this(calendarId, false);
     }
 
-    return createRequest("GET", "/email/messages/" + id + (sb.length() > 0 ? "?" + sb.toString() : "")).execute()
-        .parseAs(AurEmail.class);
-  }
-
-  public AurEmailsPage getEmailThread(String id, BodyType bodyType, String pageToken) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    if (bodyType != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("bodyType=" + bodyType.name());
+    private CalendarEvents(String calendarId, boolean find) {
+      super(
+          "/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
+          AurEvent.class,
+          AurEventsPage.class,
+          AurEventSaveResult.class);
+      this.calendarId = calendarId;
     }
 
-    if (pageToken != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("pageToken=" + pageToken);
+
+    public XStream<AurEvent, IOException> streamFindEvents(String calendarId, List<String> iCalUIds)
+        throws IOException {
+      return new CalendarEvents(calendarId, true).streamPaged(
+          QueryParams.of(
+              iCalUIds.stream()
+                  .map(iCalUId -> qp("iCalUId", iCalUId))
+                  .collect(Collectors.toList())
+          )
+      );
     }
 
-    return createRequest("GET", "/email/conversations/" + id + (sb.length() > 0 ? "?" + sb.toString() : "")).execute()
-        .parseAs(AurEmailsPage.class);
+    public CalendarSeriesOccurrences occurrences(String masterId) {
+      return new CalendarSeriesOccurrences(calendarId, masterId);
+    }
   }
 
-  public XStream<AurEmail, IOException> streamEmailThread(String threadId, BodyType bodyType) throws IOException {
+  @RequiredArgsConstructor
+  public class CalendarSeriesOccurrences extends HttpApiSupport implements ListSupport<AurEvent, AurEventsPage> {
 
-    return streamPaged(tk -> getEmailThread(threadId, bodyType, tk));
-  }
+    private final String calendarId;
+    private final String masterId;
 
-  public AurEmailsPage getEmailMessages(String query, BodyType bodyType, String pageToken) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    if (query != null) {
-      sb.append("q=" + URLEncoder.encode(query, "utf8"));
+    @Override
+    public Class<AurEventsPage> entityPageClass() {
+      return AurEventsPage.class;
     }
 
-    if (bodyType != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("bodyType=" + bodyType.name());
+    @Override
+    public String entityRoot() {
+      return "/calendars/" + calendarId + "/events/" + masterId + "/occurrences";
     }
-
-    if (pageToken != null) {
-      if (sb.length() > 0) {
-        sb.append("&");
-      }
-      sb.append("pageToken=" + pageToken);
-    }
-    return createRequest("GET", "/email/messages" + (sb.length() > 0 ? "?" + sb.toString() : ""))
-        .execute().parseAs(AurEmailsPage.class);
-  }
-
-  public XStream<AurEmail, IOException> streamEmailQuery(String query, BodyType bodyType) throws IOException {
-    return streamPaged(tk -> getEmailMessages(query, bodyType, tk));
-  }
-
-  public AurSyncStatus startMailSync(Integer days) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    if (days != null) {
-      sb.append("daysWithin=" + days);
-    }
-
-//        if (bodyType != null) {
-//            if (sb.length() > 0)
-//                sb.append("&");
-//            sb.append("bodyType=" + bodyType.name());
-//        }
-
-    return createRequest("POST", "/email/sync" + (sb.length() > 0 ? "?" + sb.toString() : "")).execute()
-        .parseAs(AurSyncStatus.class);
-  }
-
-  public AurEmailsPage mailSyncUpdated(String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET", "/email/sync/updated" + tokenParams(deltaToken, nextPageToken))
-        .execute().parseAs(AurEmailsPage.class);
-  }
-
-  public AurEmailsPage mailSyncDeleted(String deltaToken, String nextPageToken) throws IOException {
-    return createRequest("GET", "/email/sync/deleted" + tokenParams(deltaToken, nextPageToken))
-        .execute().parseAs(AurEmailsPage.class);
-  }
-
-  public XStream<AurEmail, IOException> streamDeletedEmails(String pageOrDelta, Consumer<? super AurEmailsPage> onPage,
-                                                            Predicate<? super AurEmailsPage> stopWhen)
-      throws IOException {
-    return streamEmailSync(true, pageOrDelta, onPage, stopWhen);
-  }
-
-  public XStream<AurEmail, IOException> streamUpdatedEmails(String pageOrDelta, Consumer<? super AurEmailsPage> onPage,
-                                                            Predicate<? super AurEmailsPage> stopWhen)
-      throws IOException {
-    return streamEmailSync(false, pageOrDelta, onPage, stopWhen);
-  }
-
-  private XStream<AurEmail, IOException> streamEmailSync(boolean deleted, String pageOrDelta,
-                                                         Consumer<? super AurEmailsPage> onPage,
-                                                         Predicate<? super AurEmailsPage> stopWhen) throws IOException {
-
-    if (onPage == null) {
-      onPage = v -> {
-      };
-    }
-
-    if (stopWhen == null) {
-      stopWhen = v -> false;
-    }
-
-    final String deltaToken, pageToken;
-    if (pageOrDelta.startsWith("page:")) {
-      deltaToken = null;
-      pageToken = pageOrDelta.substring(5);
-    } else {
-      deltaToken = pageOrDelta;
-      pageToken = null;
-    }
-
-    AurEmailsPage firstPage = deleted ? mailSyncDeleted(deltaToken, pageToken) : mailSyncUpdated(deltaToken, pageToken);
-
-    // query pages, until we get a page with done=true | totalSize=0
-    Predicate<? super AurEmailsPage> finalStopWhen = stopWhen;
-    return IOXStream.iterateUntil(
-        firstPage,
-        qr -> deleted ? mailSyncDeleted(deltaToken, qr.getNextPageToken())
-                      : mailSyncUpdated(deltaToken, qr.getNextPageToken()),
-        qr -> qr.getNextPageToken() == null || finalStopWhen.test(qr)
-    )
-        .filter(qr -> qr.getRecords() != null) // this can happen
-        .peek(onPage) // execute action on each page
-        .map(AurEmailsPage::getRecords)
-        .flatMap(IOXStream::of);
-  }
-
-  public AurContent getEmailAttachment(String msgId, String attachmentId) throws IOException {
-    return createRequest("GET", "/email/messages/" + msgId + "/attachments/" + attachmentId).execute()
-        .parseAs(AurContent.class);
-  }
-
-  public <Entity extends AurIdEntity, Page extends AurQueryResult<Entity>> XStream<Entity, IOException> streamPaged(
-      XFunction<String, Page, IOException> getPage) throws IOException {
-    return streamPaged(getPage, null);
   }
 
 
-  public <Entity extends AurIdEntity, Page extends AurQueryResult<Entity>> XStream<Entity, IOException> streamPaged(
-      XFunction<String, Page, IOException> getPage,
-      Consumer<? super Page> tap
-  ) throws IOException {
+  public class Emails extends BasicEntitySupport<AurEmail, AurEmailsPage, AurEmail>
+      implements SyncSupport<AurEmail, AurEmailsPage> {
 
-    if (tap == null) {
-      tap = v -> {
-      };
+    public Emails() {
+      super("/email/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class);
     }
 
-    // query pages, until we get a page with done=true | totalSize=0
-    return IOXStream.iterateUntil(
-        getPage.apply(null),
-        qr -> getPage.apply(qr.getNextPageToken()),
-        qr -> qr.getNextPageToken() == null
-    )
-        .peek(tap) // execute action on each page
-        .map(Page::getRecords)
-        .flatMap(IOXStream::of);
+    public AurContent getAttachment(String msgId, String attachmentId) throws IOException {
+      return httpGet("/email/messages/" + msgId + "/attachments/" + attachmentId)
+          .parseAs(AurContent.class);
+    }
+
+    public EmailConvo conversation(String id) {
+      return new EmailConvo(id);
+    }
   }
 
-  private static final class Paths {
+  @RequiredArgsConstructor
+  public class EmailConvo extends HttpApiSupport implements ListSupport<AurEmail, AurEmailsPage> {
 
-    static String calendar(String calendarId) {
-      return "/calendars" + (calendarId == null ? "primary" : calendarId);
+    private final String convoId;
+
+    @Override
+    public String entityRoot() {
+      return "/email/conversations/" + convoId;
     }
 
-    static String event(String calendarId, String eventId) {
-      return calendar(calendarId) + "/events/" + eventId;
+    @Override
+    public Class<AurEmailsPage> entityPageClass() {
+      return AurEmailsPage.class;
+    }
+  }
+
+  public class Contacts extends BasicEntitySupport<AurContact, AurContactsPage, AurContactSaveResult>
+      implements SyncSupport<AurContact, AurContactsPage> {
+
+    public Contacts() {
+      super("/contacts", AurContact.class, AurContactsPage.class, AurContactSaveResult.class);
     }
   }
 }
