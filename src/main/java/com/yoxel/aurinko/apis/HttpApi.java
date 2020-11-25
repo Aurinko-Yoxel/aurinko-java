@@ -7,10 +7,9 @@ import com.google.api.client.http.HttpResponse;
 import java.io.IOException;
 
 /**
- *
+ * Support for http methods
  */
 public interface HttpApi {
-
 
   HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams) throws IOException;
 

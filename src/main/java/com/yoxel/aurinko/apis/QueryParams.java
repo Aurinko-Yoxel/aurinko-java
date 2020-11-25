@@ -13,9 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 /**
- *
+ * URL query parameters
  */
-
 public interface QueryParams {
 
   static QueryParam qp(String name, Object value) {

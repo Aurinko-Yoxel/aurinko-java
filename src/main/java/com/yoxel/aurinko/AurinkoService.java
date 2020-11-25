@@ -142,6 +142,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Accounts API
+   */
   public class Accounts extends HttpApiSupport {
 
     public AurAccount getMe() throws IOException {
@@ -170,6 +173,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Calendars API: /calendars
+   */
   public class Calendars extends BasicEntitySupport<AurCalendar, AurCalendarsPage, AurCalendar> {
 
     public Calendars() {
@@ -186,6 +192,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Events API: /calendars/:id/events
+   */
   public class CalendarEvents extends BasicEntitySupport<AurEvent, AurEventsPage, AurEventSaveResult>
       implements SyncSupport<AurEvent, AurEventsPage> {
 
@@ -196,17 +205,15 @@ public class AurinkoService {
     }
 
     private CalendarEvents(String calendarId, boolean find) {
-      super(
-          "/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
-          AurEvent.class,
-          AurEventsPage.class,
-          AurEventSaveResult.class);
+      super("/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
+            AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
       this.calendarId = calendarId;
     }
 
 
     public XStream<AurEvent, IOException> streamFindEvents(List<String> iCalUIds)
         throws IOException {
+      // trick to be able to call /find endpoint
       return new CalendarEvents(calendarId, true).streamPaged(
           QueryParams.of(
               iCalUIds.stream()
@@ -221,6 +228,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Occurrences API: /calendars/:calendarId/events/:masterId/occurrences
+   */
   @RequiredArgsConstructor
   public class CalendarSeriesOccurrences extends HttpApiSupport
       implements ListSupport<AurEvent, AurEventsPage>,
@@ -245,7 +255,9 @@ public class AurinkoService {
     }
   }
 
-
+  /**
+   * Email API: /email/messages
+   */
   public class Emails extends BasicEntitySupport<AurEmail, AurEmailsPage, AurEmail>
       implements SyncSupport<AurEmail, AurEmailsPage> {
 
@@ -263,6 +275,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Email conversations API: /email/conversations/:id
+   */
   @RequiredArgsConstructor
   public class EmailConvo extends HttpApiSupport implements ListSupport<AurEmail, AurEmailsPage> {
 
@@ -279,6 +294,9 @@ public class AurinkoService {
     }
   }
 
+  /**
+   * Contact API: /contacts
+   */
   public class Contacts extends BasicEntitySupport<AurContact, AurContactsPage, AurContactSaveResult>
       implements SyncSupport<AurContact, AurContactsPage> {
 
