@@ -21,10 +21,14 @@ public interface SyncSupport<Entity extends AurIdEntity, Page extends AurQueryRe
     extends EntityListApi<Entity, Page>, HttpApi {
 
   @RequiredArgsConstructor
-  public enum SyncScope {
+  enum SyncScope {
     UPDATED("updated"), DELETED("deleted");
 
     private final String path;
+  }
+
+  default AurSyncStatus syncStart() throws IOException {
+    return syncStart(QueryParams.EMPTY);
   }
 
   default AurSyncStatus syncStart(QueryParams params) throws IOException {
@@ -42,7 +46,7 @@ public interface SyncSupport<Entity extends AurIdEntity, Page extends AurQueryRe
     ).parseAs(entityPageClass());
   }
 
-  private XStream<Entity, IOException> streamSync(
+  default XStream<Entity, IOException> streamSync(
       SyncScope scope,
       String pageOrDelta,
       Consumer<? super Page> onPage,

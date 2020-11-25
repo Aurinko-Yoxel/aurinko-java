@@ -176,8 +176,13 @@ public class AurinkoService {
       super("/calendars", AurCalendar.class, AurCalendarsPage.class, AurCalendar.class);
     }
 
+    @Override
+    public String normalizeId(String id) {
+      return id == null ? "primary" : id;
+    }
+
     public CalendarEvents calendarEvents(String calendarId) {
-      return new CalendarEvents(calendarId);
+      return new CalendarEvents(normalizeId(calendarId));
     }
   }
 
@@ -192,15 +197,15 @@ public class AurinkoService {
 
     private CalendarEvents(String calendarId, boolean find) {
       super(
-          "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events" + (find ? "/find" : ""),
+          "/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
           AurEvent.class,
           AurEventsPage.class,
           AurEventSaveResult.class);
-      this.calendarId = (calendarId == null ? "primary" : calendarId);
+      this.calendarId = calendarId;
     }
 
 
-    public XStream<AurEvent, IOException> streamFindEvents(String calendarId, List<String> iCalUIds)
+    public XStream<AurEvent, IOException> streamFindEvents(List<String> iCalUIds)
         throws IOException {
       return new CalendarEvents(calendarId, true).streamPaged(
           QueryParams.of(
