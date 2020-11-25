@@ -18,7 +18,7 @@ import lombok.Value;
 
 public interface QueryParams {
 
-  static QueryParam qp(String name, String value) {
+  static QueryParam qp(String name, Object value) {
     return new QueryParam(name, value);
   }
 
@@ -39,6 +39,10 @@ public interface QueryParams {
     }
     return new QueryParamsList(paramsList);
 
+  }
+
+  static QueryParams of(String name, Object value) {
+    return of(new QueryParam(name, value));
   }
 
   static QueryParams of(QueryParam... params) {

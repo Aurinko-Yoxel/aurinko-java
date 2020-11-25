@@ -15,13 +15,21 @@ public interface UpdateSupport<Entity extends AurIdEntity, SaveResult>
     extends EntitySaveApi<Entity, SaveResult>, HttpApi {
 
   default SaveResult update(String id, Entity entity) throws IOException {
-    return update(id, entity, null);
+    return update(id, entity, QueryParams.EMPTY, null);
   }
 
   default SaveResult update(String id, Entity entity, String etag) throws IOException {
+    return update(id, entity, QueryParams.EMPTY, etag);
+  }
+
+  default SaveResult update(String id, Entity entity, QueryParams params) throws IOException {
+    return update(id, entity, params, null);
+  }
+
+  default SaveResult update(String id, Entity entity, QueryParams params, String etag) throws IOException {
     final HttpRequest request = httpPostPrepare(
         entityRoot() + "/" + id,
-        QueryParams.EMPTY,
+        params,
         new JsonHttpContent(Utils.getDefaultJsonFactory(), entity)
     );
 

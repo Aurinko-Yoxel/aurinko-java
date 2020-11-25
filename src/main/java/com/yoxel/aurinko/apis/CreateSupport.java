@@ -15,8 +15,11 @@ public interface CreateSupport<Entity extends AurIdEntity, SaveResult>
     extends EntitySaveApi<Entity, SaveResult>, HttpApi {
 
   default SaveResult create(Entity entity) throws IOException {
+    return create(entity, QueryParams.EMPTY);
+  }
+  default SaveResult create(Entity entity, QueryParams params) throws IOException {
 
-    return httpPost(entityRoot(), new JsonHttpContent(Utils.getDefaultJsonFactory(), entity))
+    return httpPost(entityRoot(), params, new JsonHttpContent(Utils.getDefaultJsonFactory(), entity))
         .parseAs(entitySaveResultClass());
   }
 
