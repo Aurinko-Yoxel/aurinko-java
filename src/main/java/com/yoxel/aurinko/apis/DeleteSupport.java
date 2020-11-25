@@ -8,7 +8,7 @@ import java.io.IOException;
 public interface DeleteSupport extends EntityApi, HttpApi {
 
   default void delete(String id, QueryParams params) throws IOException {
-    httpDelete(entityRoot() + "/" + id, params).ignore();
+    httpDelete(entityRoot() + "/" + normalizeId(id), params).ignore();
   }
 
   default void delete(String id) throws IOException {

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  */
 public interface ListSupport<Entity extends AurIdEntity, Page extends AurQueryResult<Entity>>
-    extends EntityListApi<Entity, Page>, EntityApi, HttpApi {
+    extends EntityListApi<Entity, Page>, HttpApi {
 
   default Page loadPage() throws IOException {
     return loadPage(QueryParams.EMPTY, null);
