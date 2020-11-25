@@ -15,6 +15,7 @@ import com.yoxel.aurinko.apis.CrudAndListSupport;
 import com.yoxel.aurinko.apis.HttpApi;
 import com.yoxel.aurinko.apis.ListSupport;
 import com.yoxel.aurinko.apis.QueryParams;
+import com.yoxel.aurinko.apis.ReadSupport;
 import com.yoxel.aurinko.apis.SyncSupport;
 import com.yoxel.aurinko.bean.AurAccount;
 import com.yoxel.aurinko.bean.AurAccountToken;
@@ -191,11 +192,11 @@ public class AurinkoService {
 
     private CalendarEvents(String calendarId, boolean find) {
       super(
-          "/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
+          "/calendars/" + (calendarId == null ? "primary" : calendarId) + "/events" + (find ? "/find" : ""),
           AurEvent.class,
           AurEventsPage.class,
           AurEventSaveResult.class);
-      this.calendarId = calendarId;
+      this.calendarId = (calendarId == null ? "primary" : calendarId);
     }
 
 
@@ -216,10 +217,17 @@ public class AurinkoService {
   }
 
   @RequiredArgsConstructor
-  public class CalendarSeriesOccurrences extends HttpApiSupport implements ListSupport<AurEvent, AurEventsPage> {
+  public class CalendarSeriesOccurrences extends HttpApiSupport
+      implements ListSupport<AurEvent, AurEventsPage>,
+                 ReadSupport<AurEvent> {
 
     private final String calendarId;
     private final String masterId;
+
+    @Override
+    public Class<AurEvent> entityClass() {
+      return AurEvent.class;
+    }
 
     @Override
     public Class<AurEventsPage> entityPageClass() {
