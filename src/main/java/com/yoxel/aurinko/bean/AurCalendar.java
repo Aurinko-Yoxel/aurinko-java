@@ -3,21 +3,33 @@ package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.Key;
 
-import lombok.Builder;
 import lombok.Data;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+
 @Data
-@Builder
 public class AurCalendar extends AurIdEntity {
-    @Key
-    String name;
 
-    @Key
-    String color;
+  public AurCalendar(String name) {
+    this.name = name;
+  }
 
-    @Key
-    String accessRole;
+  public AurCalendar() {
+  }
 
-    @Key
-    boolean primary;
+  @Key
+  String name;
+
+  @Key
+  String color;
+
+  @Key
+  String accessRole;
+
+  @Key
+  Boolean primary;
+
+  public boolean isPrimary() {
+    return isTrue(primary);
+  }
 }
