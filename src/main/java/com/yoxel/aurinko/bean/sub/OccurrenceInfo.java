@@ -11,7 +11,7 @@ public final class OccurrenceInfo extends GenericJson {
     private String id;
 
     @Key
-    private String recurringMasterId;
+    private String masterId;
 
     @Key
     private String type;
