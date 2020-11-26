@@ -116,14 +116,20 @@ public class AurinkoService {
       > extends HttpApiSupport implements CrudAndListSupport<Entity, Page, SaveResult> {
 
     private final String root;
+    private final String ePath;
     private final Class<Entity> eClass;
     private final Class<Page> pClass;
     private final Class<SaveResult> sClass;
 
 
     @Override
-    public String entityRoot() {
+    public String entityApiRoot() {
       return root;
+    }
+
+    @Override
+    public String entityPath() {
+      return ePath;
     }
 
     @Override
@@ -179,7 +185,7 @@ public class AurinkoService {
   public class Calendars extends BasicEntitySupport<AurCalendar, AurCalendarsPage, AurCalendar> {
 
     public Calendars() {
-      super("/calendars", AurCalendar.class, AurCalendarsPage.class, AurCalendar.class);
+      super("/calendars", "", AurCalendar.class, AurCalendarsPage.class, AurCalendar.class);
     }
 
     @Override
@@ -205,7 +211,8 @@ public class AurinkoService {
     }
 
     private CalendarEvents(String calendarId, boolean find) {
-      super("/calendars/" + calendarId + "/events" + (find ? "/find" : ""),
+      super("/calendars/" + calendarId,
+            "/events" + (find ? "/find" : ""),
             AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
       this.calendarId = calendarId;
     }
@@ -250,8 +257,13 @@ public class AurinkoService {
     }
 
     @Override
-    public String entityRoot() {
-      return "/calendars/" + calendarId + "/events/" + masterId + "/occurrences";
+    public String entityApiRoot() {
+      return "/calendars/" + calendarId + "/events/" + masterId;
+    }
+
+    @Override
+    public String entityPath() {
+      return "/occurrences";
     }
   }
 
@@ -262,7 +274,7 @@ public class AurinkoService {
       implements SyncSupport<AurEmail, AurEmailsPage> {
 
     public Emails() {
-      super("/email/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class);
+      super("/email", "/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class);
     }
 
     public AurContent getAttachment(String msgId, String attachmentId) throws IOException {
@@ -284,8 +296,13 @@ public class AurinkoService {
     private final String convoId;
 
     @Override
-    public String entityRoot() {
+    public String entityApiRoot() {
       return "/email/conversations/" + convoId;
+    }
+
+    @Override
+    public String entityPath() {
+      return "";
     }
 
     @Override
@@ -301,7 +318,7 @@ public class AurinkoService {
       implements SyncSupport<AurContact, AurContactsPage> {
 
     public Contacts() {
-      super("/contacts", AurContact.class, AurContactsPage.class, AurContactSaveResult.class);
+      super("/contacts", "", AurContact.class, AurContactsPage.class, AurContactSaveResult.class);
     }
   }
 }

@@ -4,7 +4,6 @@ import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.json.JsonHttpContent;
 
 import com.yoxel.aurinko.bean.AurIdEntity;
-import com.yoxel.aurinko.bean.AurSaveResult;
 
 import java.io.IOException;
 
@@ -19,7 +18,7 @@ public interface CreateSupport<Entity extends AurIdEntity, SaveResult>
   }
   default SaveResult create(Entity entity, QueryParams params) throws IOException {
 
-    return httpPost(entityRoot(), params, new JsonHttpContent(Utils.getDefaultJsonFactory(), entity))
+    return httpPost(entityFullPath(), params, new JsonHttpContent(Utils.getDefaultJsonFactory(), entity))
         .parseAs(entitySaveResultClass());
   }
 

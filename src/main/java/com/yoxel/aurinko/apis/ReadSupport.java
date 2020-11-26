@@ -16,7 +16,7 @@ public interface ReadSupport<Entity extends AurIdEntity>
 
   default Entity read(String id, QueryParams params) throws IOException {
 
-    return httpGet(entityRoot() + "/" + normalizeId(id), params)
+    return httpGet(entityFullPath() + "/" + normalizeId(id), params)
         .parseAs(entityClass());
   }
 
