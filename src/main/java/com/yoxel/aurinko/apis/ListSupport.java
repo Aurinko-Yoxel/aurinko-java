@@ -26,7 +26,7 @@ public interface ListSupport<Entity extends AurIdEntity, Page extends AurQueryRe
   default Page loadPage(QueryParams query, String pageToken) throws IOException {
 
     return httpGet(
-        entityRoot(),
+        entityFullPath(),
         query.add("pageToken", pageToken)
     ).parseAs(entityPageClass());
   }

@@ -32,13 +32,13 @@ public interface SyncSupport<Entity extends AurIdEntity, Page extends AurQueryRe
   }
 
   default AurSyncStatus syncStart(QueryParams params) throws IOException {
-    return httpPost(entityRoot() + "/sync", params).parseAs(AurSyncStatus.class);
+    return httpPost(entityApiRoot() + "/sync", params).parseAs(AurSyncStatus.class);
   }
 
   default Page syncPage(SyncScope scope, String deltaToken, String pageToken) throws IOException {
 
     return httpGet(
-        entityRoot() + "/sync/" + scope.path,
+        entityApiRoot() + "/sync/" + scope.path,
         QueryParams.of(
             qp("deltaToken", deltaToken),
             qp("pageToken", pageToken)
