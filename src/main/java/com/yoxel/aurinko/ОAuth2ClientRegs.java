@@ -98,8 +98,8 @@ public final class ОAuth2ClientRegs {
             value = syncStore.getSecret(key);
         }
 
-        if (value == null)
-            throw new IllegalArgumentException("partner: " + partner + ", key: " + key);
+//        if (value == null)
+//            throw new IllegalArgumentException("partner: " + partner + ", key: " + key);
 
         return value;
     }
