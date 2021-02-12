@@ -18,7 +18,7 @@ import static com.yoxel.aurinko.apis.QueryParams.qp;
 /**
  *
  */
-public interface SyncSupport<Entity extends AurIdEntity, Page extends AurQueryResult<Entity>>
+public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
     extends EntityListApi<Entity, Page>, HttpApi {
 
   @RequiredArgsConstructor
