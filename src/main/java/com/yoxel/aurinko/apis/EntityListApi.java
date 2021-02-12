@@ -7,7 +7,7 @@ import com.yoxel.aurinko.bean.AurQueryResult;
 /**
  *
  */
-public interface EntityListApi<Entity extends AurIdEntity, Page extends AurQueryResult<Entity>>
+public interface EntityListApi<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
     extends EntityApi {
 
   Class<Page> entityPageClass();

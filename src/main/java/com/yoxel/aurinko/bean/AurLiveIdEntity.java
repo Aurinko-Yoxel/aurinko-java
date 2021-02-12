@@ -19,4 +19,8 @@ public abstract class AurLiveIdEntity extends AurIdEntity {
     @Key
     private DateTime lastModifiedTime;
 
+    // TODO: this is a workaround
+    @Key
+    private DateTime timestamp;
+
 }
