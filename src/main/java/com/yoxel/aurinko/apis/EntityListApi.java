@@ -1,6 +1,7 @@
 package com.yoxel.aurinko.apis;
 
 import com.yoxel.aurinko.bean.AurIdEntity;
+import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurQueryResult;
 
 /**

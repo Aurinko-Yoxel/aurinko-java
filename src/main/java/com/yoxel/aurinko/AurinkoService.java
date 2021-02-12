@@ -30,7 +30,7 @@ import com.yoxel.aurinko.bean.AurEmailsPage;
 import com.yoxel.aurinko.bean.AurEvent;
 import com.yoxel.aurinko.bean.AurEventSaveResult;
 import com.yoxel.aurinko.bean.AurEventsPage;
-import com.yoxel.aurinko.bean.AurIdEntity;
+import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurOAuthClientRegsPage;
 import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.dto.AurAccountDto;
@@ -110,7 +110,7 @@ public class AurinkoService {
 
   @RequiredArgsConstructor
   abstract class BasicEntitySupport<
-      Entity extends AurIdEntity,
+      Entity extends AurLiveIdEntity,
       Page extends AurQueryResult<Entity>,
       SaveResult
       > extends HttpApiSupport implements CrudAndListSupport<Entity, Page, SaveResult> {

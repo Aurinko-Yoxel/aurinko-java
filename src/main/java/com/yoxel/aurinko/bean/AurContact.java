@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AurContact extends AurIdEntity {
+public class AurContact extends AurLiveIdEntity {
     @Key
     private ContactName name;
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Data
-public class AurEvent extends AurIdEntity {
+public class AurEvent extends AurLiveIdEntity {
     @Key("folderId")
     private String calendarId;
 
