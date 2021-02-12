@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public abstract class AurSaveResult <T extends AurIdEntity> extends GenericJson {
+public abstract class AurSaveResult <T extends AurLiveIdEntity> extends GenericJson {
     @Key
     private String id;
 

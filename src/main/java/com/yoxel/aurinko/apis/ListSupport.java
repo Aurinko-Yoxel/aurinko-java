@@ -1,6 +1,7 @@
 package com.yoxel.aurinko.apis;
 
 import com.yoxel.aurinko.bean.AurIdEntity;
+import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
 /**
  *
  */
-public interface ListSupport<Entity extends AurIdEntity, Page extends AurQueryResult<Entity>>
+public interface ListSupport<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
     extends EntityListApi<Entity, Page>, HttpApi {
 
   default Page loadPage() throws IOException {

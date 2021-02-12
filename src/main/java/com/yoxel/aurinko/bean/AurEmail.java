@@ -2,7 +2,6 @@ package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
-import com.yoxel.aurinko.bean.AurIdEntity;
 import com.yoxel.aurinko.bean.sub.Attachment;
 import com.yoxel.aurinko.bean.sub.EmailAddress;
 import com.yoxel.aurinko.bean.sub.InetHeader;
@@ -11,7 +10,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AurEmail extends AurIdEntity {
+public class AurEmail extends AurLiveIdEntity {
     
     @Key
     private String subject;

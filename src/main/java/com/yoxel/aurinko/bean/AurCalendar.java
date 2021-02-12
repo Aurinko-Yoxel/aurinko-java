@@ -8,7 +8,7 @@ import lombok.Data;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
 @Data
-public class AurCalendar extends AurIdEntity {
+public class AurCalendar extends AurLiveIdEntity {
 
   public AurCalendar(String name) {
     this.name = name;
