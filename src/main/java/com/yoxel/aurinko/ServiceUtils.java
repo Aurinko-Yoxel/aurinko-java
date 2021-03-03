@@ -116,7 +116,7 @@ public class ServiceUtils {
 
     final List<String> scopes = new ArrayList<>();
     if (templ.isScanEmail()) {
-      scopes.add("Mail.Read");
+      scopes.add(templ.getProtocol() == AbsService.Protocol.GMAIL ? "Mail.All" : "Mail.Read");
     }
     if (templ.isImportEvents()) {
       scopes.add("Calendar.ReadWrite");
@@ -145,7 +145,7 @@ public class ServiceUtils {
       accDto.setServiceType("Google");
       accDto.setAuthString2(templ.getPassword());
 
-      scopes.replaceAll(s -> "Mail.Read".equalsIgnoreCase(s) ? "Mail.All" : s);
+//      scopes.replaceAll(s -> "Mail.Read".equalsIgnoreCase(s) ? "Mail.All" : s);
 
       try {
         final GenericJson
@@ -180,7 +180,7 @@ public class ServiceUtils {
 
   public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc,
                                             SyncData sd, ОAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
-    if (!acc.getProtocol().isReadEmail()) {
+    if (!acc.getProtocol().isReadEmail() || acc.getEmailAddress() == null) {
       return null;
     }
 
