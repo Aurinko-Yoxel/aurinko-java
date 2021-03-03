@@ -75,20 +75,22 @@ public class ServiceUtils {
 
     if (acc.getProtocol() == AbsService.Protocol.GMAIL) {
       accDto.setServiceType("Google");
-      if (sd != null && sd.getAppKeyPrefix() == null) {
-        accDto.setOauthClientId(appRegs.getOAuthClientReg("google.oauth2.client"));
-      }
+      if (sd != null) {
+        if (sd.getAppKeyPrefix() == null) {
+          accDto.setOauthClientId(appRegs.getOAuthClientReg("google.oauth2.client"));
+        }
 
-      if (sd.getAccessToken() == null) {
-        if (acc.isImportEvents()) {
-          accDto.setAuthString1(sd.getCalAccessToken());
-          accDto.setAuthString2(sd.getCalRefreshToken());
-        } else if (acc.isImportContacts()) {
-          accDto.setAuthString1(sd.getContAccessToken());
-          accDto.setAuthString2(sd.getContRefreshToken());
-        } else if (acc.isScanEmail()) {
-          accDto.setAuthString1(sd.getMailAccessToken());
-          accDto.setAuthString2(sd.getMailRefreshToken());
+        if (sd.getAccessToken() == null) {
+          if (acc.isImportEvents()) {
+            accDto.setAuthString1(sd.getCalAccessToken());
+            accDto.setAuthString2(sd.getCalRefreshToken());
+          } else if (acc.isImportContacts()) {
+            accDto.setAuthString1(sd.getContAccessToken());
+            accDto.setAuthString2(sd.getContRefreshToken());
+          } else if (acc.isScanEmail()) {
+            accDto.setAuthString1(sd.getMailAccessToken());
+            accDto.setAuthString2(sd.getMailRefreshToken());
+          }
         }
       }
     } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
