@@ -56,7 +56,6 @@ public class ServiceUtils {
 
     accDto.setActive(!acc.isOffline());
     accDto.setAuthScopes(scopes.toArray(new String[scopes.size()]));
-    accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
     accDto.setEmail(acc.getEmailAddress());
     accDto.setName(userName);
     accDto.setLoginString(acc.getUsername());
@@ -75,6 +74,7 @@ public class ServiceUtils {
 
     if (acc.getProtocol() == AbsService.Protocol.GMAIL) {
       accDto.setServiceType("Google");
+      accDto.setServerUrl(acc.getServer());
       if (sd != null) {
         if (sd.getAppKeyPrefix() == null) {
           accDto.setOauthClientId(appRegs.getOAuthClientReg("google.oauth2.client"));
@@ -96,14 +96,19 @@ public class ServiceUtils {
     } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
       if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())) {
         accDto.setServiceType("Office365");
+        accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
       } else {
         accDto.setServiceType("EWS365");
+        accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
+                            + "/EWS/Exchange.asmx");
         if (sd == null || sd.getAppKeyPrefix() == null) {
           accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
         }
       }
     } else if (acc.getProtocol() == AbsService.Protocol.EWS) {
       accDto.setServiceType("EWS");
+      accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
+                          + "/EWS/Exchange.asmx");
       accDto.setAuthString1(acc.getUsername());
       accDto.setAuthString2(acc.getPassword());
     }
@@ -135,7 +140,6 @@ public class ServiceUtils {
     final AurAccountDto accDto = new AurAccountDto();
 
     accDto.setActive(true);
-    accDto.setServerUrl(templ.getInstUrl());
     accDto.setAuthScopes(scopes.toArray(new String[0]));
     accDto.setName(authDomain == null ? templ.getName() : authDomain);
 //        authObtainedAt;
@@ -143,6 +147,7 @@ public class ServiceUtils {
 
     if (templ.getProtocol() == AbsService.Protocol.GMAIL) {
       accDto.setServiceType("Google");
+      accDto.setServerUrl(templ.getInstUrl());
       accDto.setAuthString2(templ.getPassword());
 
 //      scopes.replaceAll(s -> "Mail.Read".equalsIgnoreCase(s) ? "Mail.All" : s);
@@ -163,12 +168,14 @@ public class ServiceUtils {
       }
     } else if (templ.getProtocol() == AbsService.Protocol.OFFICE365) {
       accDto.setServiceType("EWS365");
+      accDto.setServerUrl(templ.getInstUrl() + "/EWS/Exchange.asmx");
       //accDto.setOauthClientId("83f46668-ec23-405f-a0be-21ec17d475b3");
       accDto.setOauthClientId(appRegs.getOAuthClientReg("daemon.office365.oauth2.client"));
       accDto.setAuthOrgId(templ.getExtId());
       accDto.setAuthString1(authAccess.getAuthString(Long.parseLong(templ.getPassword())));
     } else if (templ.getProtocol() == AbsService.Protocol.EWS) {
       accDto.setServiceType("EWS");
+      accDto.setServerUrl(templ.getInstUrl() + "/EWS/Exchange.asmx");
       accDto.setAuthOrgId(authDomain);
       accDto.setAuthString1(templ.getUsername());
       accDto.setAuthString2(templ.getPassword());
