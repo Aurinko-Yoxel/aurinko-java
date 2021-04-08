@@ -3,6 +3,7 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.BasicAuthentication;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpIOExceptionHandler;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -74,21 +75,19 @@ public class AurinkoService {
   }
 
   public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
-    return new AurinkoService(new BackoffInterceptorWrapper(
-        new BasicAuthentication(clientId, clientSecret),
-        createBackoff()
-    ));
+    return createService(new BasicAuthentication(clientId, clientSecret));
   }
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
-    return new AurinkoService(new BackoffInterceptorWrapper(
-        new BearerAuthorization(accessToken),
-        createBackoff()
-    ));
+    return createService(new BearerAuthorization(accessToken));
   }
 
-  private static ExponentialBackOff createBackoff() {
-    return new ExponentialBackOff();
+  private static AurinkoService createService(HttpExecuteInterceptor httpInterceptor) {
+    return new AurinkoService(new BackoffInterceptorWrapper(
+        httpInterceptor,
+        new ExponentialBackOff(),
+        BackoffInterceptorWrapper.ON_RATE_LIMITING
+    ));
   }
 
   private HttpRequest createRequest(String method, String path) throws IOException {
