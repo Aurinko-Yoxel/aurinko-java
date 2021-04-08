@@ -10,6 +10,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
+import com.google.api.client.util.ExponentialBackOff;
 
 import com.yoxel.aurinko.apis.CrudAndListSupport;
 import com.yoxel.aurinko.apis.HttpApi;
@@ -73,13 +74,22 @@ public class AurinkoService {
   }
 
   public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
-    return new AurinkoService(new BasicAuthentication(clientId, clientSecret));
+    return new AurinkoService(new BackoffInterceptorWrapper(
+        new BasicAuthentication(clientId, clientSecret),
+        createBackoff()
+    ));
   }
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
-    return new AurinkoService(new BearerAuthorization(accessToken));
+    return new AurinkoService(new BackoffInterceptorWrapper(
+        new BearerAuthorization(accessToken),
+        createBackoff()
+    ));
   }
 
+  private static ExponentialBackOff createBackoff() {
+    return new ExponentialBackOff();
+  }
 
   private HttpRequest createRequest(String method, String path) throws IOException {
     HttpRequest httpRequest = httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
