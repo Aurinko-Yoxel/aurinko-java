@@ -38,6 +38,8 @@ import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.XStream;
 
+import org.joda.time.DateTime;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -216,21 +218,31 @@ public class AurinkoService {
     private final String calendarId;
 
     public CalendarEvents(String calendarId) {
-      this(calendarId, false);
+      this(calendarId, "");
     }
 
-    private CalendarEvents(String calendarId, boolean find) {
+    private CalendarEvents(String calendarId, String postfix) {
       super("/calendars/" + calendarId,
-            "/events" + (find ? "/find" : ""),
+            "/events" + postfix,
             AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
       this.calendarId = calendarId;
     }
 
+    public XStream<AurEvent, IOException> streamRange(DateTime timeMin, DateTime timeMax)
+      throws IOException {
+
+      return new CalendarEvents(calendarId, "/range").streamPaged(
+          QueryParams.of(
+              qp("timeMin", timeMin.toDateTimeISO()),
+              qp("timeMax", timeMin.toDateTimeISO())
+          )
+      );
+    }
 
     public XStream<AurEvent, IOException> streamFindEvents(List<String> iCalUIds)
         throws IOException {
       // trick to be able to call /find endpoint
-      return new CalendarEvents(calendarId, true).streamPaged(
+      return new CalendarEvents(calendarId, "/find").streamPaged(
           QueryParams.of(
               iCalUIds.stream()
                   .map(iCalUId -> qp("iCalUId", iCalUId))
