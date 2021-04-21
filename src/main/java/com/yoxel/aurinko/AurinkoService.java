@@ -229,12 +229,12 @@ public class AurinkoService {
     }
 
     public XStream<AurEvent, IOException> streamRange(DateTime timeMin, DateTime timeMax)
-      throws IOException {
+        throws IOException {
 
       return new CalendarEvents(calendarId, "/range").streamPaged(
           QueryParams.of(
               qp("timeMin", timeMin.toDateTimeISO()),
-              qp("timeMax", timeMin.toDateTimeISO())
+              qp("timeMax", timeMax.toDateTimeISO())
           )
       );
     }
