@@ -1,6 +1,5 @@
 package com.yoxel.aurinko.apis;
 
-import com.yoxel.aurinko.bean.AurIdEntity;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.bean.AurSyncStatus;
@@ -49,7 +48,7 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
 
   default XStream<Entity, IOException> streamSync(
       SyncScope scope,
-      String pageOrDelta,
+      SyncToken token,
       Consumer<? super Page> onPage,
       Predicate<? super Page> stopWhen
   ) throws IOException {
@@ -59,13 +58,14 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
       };
     }
 
-    final String deltaToken, pageToken;
-    if (pageOrDelta.startsWith("page:")) {
-      deltaToken = null;
-      pageToken = pageOrDelta.substring(5);
-    } else {
-      deltaToken = pageOrDelta;
-      pageToken = null;
+    String deltaToken = null, pageToken = null;
+    switch (token.getType()) {
+      case DELTA:
+        deltaToken = token.getValue();
+        break;
+      case PAGE:
+        pageToken = token.getValue();
+        break;
     }
 
     // query pages, until we get a page with done=true | totalSize=0
