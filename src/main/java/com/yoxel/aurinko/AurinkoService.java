@@ -76,28 +76,11 @@ public class AurinkoService {
   public enum BodyType {html, text}
 
   private AurinkoService(HttpRequestInitializer requestInitializer) {
-    HttpClientBuilder
-        httpClientBuilder =
-        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
-//            .setRetryHandler(new HttpRequestRetryHandler() {
-//              @Override
-//              public boolean retryRequest(IOException exception, int executionCount,
-//                                          HttpContext context) {
-//                {
-//                  if (executionCount > 5) {
-//                    return false;
-//                  }
-//
-//                  if (exception instanceof org.apache.http.NoHttpResponseException) {
-//                    return true;
-//                  }
-//
-//                  return false;
-//                }
-//              }
-//            })
+//    HttpClientBuilder
+//        httpClientBuilder =
+//        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
 
-    this.httpTransport = new ApacheHttpTransport(httpClientBuilder.build());
+    this.httpTransport = new ApacheHttpTransport();
     this.requestInitializer = requestInitializer;
   }
 
