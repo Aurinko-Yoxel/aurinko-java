@@ -78,24 +78,24 @@ public class AurinkoService {
   private AurinkoService(HttpRequestInitializer requestInitializer) {
     HttpClientBuilder
         httpClientBuilder =
-        ApacheHttpTransport.newDefaultHttpClientBuilder()
-            .setRetryHandler(new HttpRequestRetryHandler() {
-              @Override
-              public boolean retryRequest(IOException exception, int executionCount,
-                                          HttpContext context) {
-                {
-                  if (executionCount > 5) {
-                    return false;
-                  }
-
-                  if (exception instanceof org.apache.http.NoHttpResponseException) {
-                    return true;
-                  }
-
-                  return false;
-                }
-              }
-            });
+        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
+//            .setRetryHandler(new HttpRequestRetryHandler() {
+//              @Override
+//              public boolean retryRequest(IOException exception, int executionCount,
+//                                          HttpContext context) {
+//                {
+//                  if (executionCount > 5) {
+//                    return false;
+//                  }
+//
+//                  if (exception instanceof org.apache.http.NoHttpResponseException) {
+//                    return true;
+//                  }
+//
+//                  return false;
+//                }
+//              }
+//            })
 
     this.httpTransport = new ApacheHttpTransport(httpClientBuilder.build());
     this.requestInitializer = requestInitializer;
@@ -123,10 +123,9 @@ public class AurinkoService {
         httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
             .buildRequest(method, new GenericUrl(BASE_URL + path), null)
             .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
-            .setNumberOfRetries(3)
-            .setConnectTimeout(120 * 1000).setReadTimeout(180 * 1000);
+            .setNumberOfRetries(3).setConnectTimeout(120 * 1000).setReadTimeout(120 * 1000);
 
-    httpRequest.getHeaders().setUserAgent("Aurinko.io/1.0");
+    httpRequest.getHeaders().setUserAgent("Yoxel Sync (Aurinko)/1.0");
 //        if ("PATCH".equalsIgnoreCase(method))
 //            httpRequest.getHeaders().set("X-HTTP-Method-Override", method);
 
