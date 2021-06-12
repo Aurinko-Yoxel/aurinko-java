@@ -38,6 +38,10 @@ import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.XStream;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.HttpContext;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -72,7 +76,28 @@ public class AurinkoService {
   public enum BodyType {html, text}
 
   private AurinkoService(HttpRequestInitializer requestInitializer) {
-    this.httpTransport = new ApacheHttpTransport();
+    HttpClientBuilder
+        httpClientBuilder =
+        ApacheHttpTransport.newDefaultHttpClientBuilder()
+            .setRetryHandler(new HttpRequestRetryHandler() {
+              @Override
+              public boolean retryRequest(IOException exception, int executionCount,
+                                          HttpContext context) {
+                {
+                  if (executionCount > 5) {
+                    return false;
+                  }
+
+                  if (exception instanceof org.apache.http.NoHttpResponseException) {
+                    return true;
+                  }
+
+                  return false;
+                }
+              }
+            });
+
+    this.httpTransport = new ApacheHttpTransport(httpClientBuilder.build());
     this.requestInitializer = requestInitializer;
   }
 
@@ -93,10 +118,13 @@ public class AurinkoService {
   }
 
   private HttpRequest createRequest(String method, String path) throws IOException {
-    HttpRequest httpRequest = httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
-        .buildRequest(method, new GenericUrl(BASE_URL + path), null)
-        .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler).setNumberOfRetries(3)
-        .setConnectTimeout(120 * 1000).setReadTimeout(180 * 1000);
+    HttpRequest
+        httpRequest =
+        httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
+            .buildRequest(method, new GenericUrl(BASE_URL + path), null)
+            .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
+            .setNumberOfRetries(3)
+            .setConnectTimeout(120 * 1000).setReadTimeout(180 * 1000);
 
     httpRequest.getHeaders().setUserAgent("Aurinko.io/1.0");
 //        if ("PATCH".equalsIgnoreCase(method))
@@ -104,7 +132,6 @@ public class AurinkoService {
 
     return httpRequest;
   }
-
 
   public Accounts accounts = new Accounts();
   public Calendars calendars = new Calendars();
@@ -114,7 +141,8 @@ public class AurinkoService {
   abstract class HttpApiSupport implements HttpApi {
 
     @Override
-    public HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams) throws IOException {
+    public HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams)
+        throws IOException {
       return createRequest(method, path + queryParams.toUrlString());
     }
   }
@@ -178,7 +206,8 @@ public class AurinkoService {
     }
 
     public AurAccountToken upsertService(AurAccountDto svcAcc) throws IOException {
-      return httpPost("/am/svc_accounts", new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
+      return httpPost("/am/svc_accounts",
+                      new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
           .parseAs(AurAccountToken.class);
     }
 
@@ -212,7 +241,8 @@ public class AurinkoService {
   /**
    * Events API: /calendars/:id/events
    */
-  public class CalendarEvents extends BasicEntitySupport<AurEvent, AurEventsPage, AurEventSaveResult>
+  public class CalendarEvents
+      extends BasicEntitySupport<AurEvent, AurEventsPage, AurEventSaveResult>
       implements SyncSupport<AurEvent, AurEventsPage> {
 
     private final String calendarId;
@@ -335,7 +365,8 @@ public class AurinkoService {
   /**
    * Contact API: /contacts
    */
-  public class Contacts extends BasicEntitySupport<AurContact, AurContactsPage, AurContactSaveResult>
+  public class Contacts
+      extends BasicEntitySupport<AurContact, AurContactsPage, AurContactSaveResult>
       implements SyncSupport<AurContact, AurContactsPage> {
 
     public Contacts() {
