@@ -123,7 +123,7 @@ public class AurinkoService {
         httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
             .buildRequest(method, new GenericUrl(BASE_URL + path), null)
             .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
-            .setNumberOfRetries(3).setConnectTimeout(120 * 1000).setReadTimeout(120 * 1000);
+            .setNumberOfRetries(3).setConnectTimeout(30 * 1000).setReadTimeout(60 * 1000);
 
     httpRequest.getHeaders().setUserAgent("Yoxel Sync (Aurinko)/1.0");
 //        if ("PATCH".equalsIgnoreCase(method))
