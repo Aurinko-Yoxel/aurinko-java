@@ -78,7 +78,11 @@ public class ServiceUtils {
       accDto.setServerUrl(acc.getServer());
       if (sd != null) {
         if (sd.getAppKeyPrefix() == null) {
-          accDto.setOauthClientId(appRegs.getOAuthClientReg("google.oauth2.client"));
+          if ("repfabric".equals(appRegs.getPartner())) {
+            accDto.setOauthClientId(appRegs.getOAuthClientReg("repfabric.google.oauth2.client"));
+          } else {
+            accDto.setOauthClientId(appRegs.getOAuthClientReg("google.oauth2.client"));
+          }
         }
 
         if (sd.getAccessToken() == null || sd.getRefreshToken() == null) {
