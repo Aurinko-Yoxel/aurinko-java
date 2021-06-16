@@ -3,6 +3,8 @@ package com.yoxel.aurinko;
 
 import com.yoxel.aurinko.bean.AurOAuthClientReg;
 import com.yoxel.model2.AurinkoPartnerToken;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ public final class ОAuth2ClientRegs {
         this.syncStore = syncStore;
     }
 
+    @Getter
     private String partner;
 
     private SecretStoreAccess syncStore;
