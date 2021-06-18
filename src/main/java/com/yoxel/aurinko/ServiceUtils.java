@@ -16,6 +16,8 @@ import com.yoxel.model2.user.SyncData;
 import com.yoxel.oauth.common.SecurityUtils;
 import com.yoxel.persist.util.Strings;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -55,11 +57,14 @@ public class ServiceUtils {
 
     final AurAccountDto accDto = new AurAccountDto();
 
+    accDto.setName(userName);
     accDto.setActive(!acc.isOffline());
     accDto.setAuthScopes(scopes.toArray(new String[scopes.size()]));
     accDto.setEmail(acc.getEmailAddress());
-    accDto.setName(userName);
-    accDto.setLoginString(acc.getUsername());
+
+    if (!StringUtils.isBlank(acc.getUsername()) && !"X".equals(acc.getUsername())) {
+      accDto.setLoginString(acc.getUsername());
+    }
 
     if (sd != null) {
       if (sd.getAppKeyPrefix() != null) {
