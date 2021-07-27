@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class AurEvent extends AurLiveIdEntity {
+
     @Key("folderId")
     private String calendarId;
 
@@ -56,7 +57,4 @@ public class AurEvent extends AurLiveIdEntity {
 
     @Key
     private List<String> categories;
-
-    @Key
-    private List<String> omitted;
 }
