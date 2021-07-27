@@ -23,4 +23,6 @@ public abstract class AurLiveIdEntity extends AurIdEntity {
     @Key
     private DateTime timestamp;
 
+    @Key
+    private List<String> omitted;
 }
