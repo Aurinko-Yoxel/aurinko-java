@@ -5,6 +5,7 @@ import com.yoxel.aurinko.bean.sub.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Data
@@ -57,4 +58,7 @@ public class AurEvent extends AurLiveIdEntity {
 
     @Key
     private List<String> categories;
+
+    @Key
+    private Map<String, String> nativeProperties;
 }
