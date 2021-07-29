@@ -8,10 +8,11 @@ import com.yoxel.aurinko.bean.sub.InetHeader;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class AurEmail extends AurLiveIdEntity {
-    
+
     @Key
     private String subject;
 
@@ -78,4 +79,6 @@ public class AurEmail extends AurLiveIdEntity {
     @Key
     private List<String> omitted;
 
+    @Key
+    private Map<String, String> nativeProperties;
 }

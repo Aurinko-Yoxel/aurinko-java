@@ -73,7 +73,7 @@ public class AurinkoService {
     return supportsRetry;
   };
 
-  public enum BodyType {html, text}
+  public enum BodyType {html, text, none}
 
   private AurinkoService(HttpRequestInitializer requestInitializer) {
 //    HttpClientBuilder
