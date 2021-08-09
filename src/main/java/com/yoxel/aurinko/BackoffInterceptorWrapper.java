@@ -25,6 +25,8 @@ public class BackoffInterceptorWrapper implements HttpRequestInitializer {
 
   @Override
   public void initialize(HttpRequest request) throws IOException {
+    handler.getBackOff().reset();
+
     request.setInterceptor(underlying);
     request.setUnsuccessfulResponseHandler(handler);
   }
