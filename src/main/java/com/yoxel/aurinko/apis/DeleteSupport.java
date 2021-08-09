@@ -12,7 +12,7 @@ public interface DeleteSupport extends EntityApi, HttpApi {
   }
 
   default void delete(String id) throws IOException {
-    httpDelete(id, QueryParams.EMPTY);
+    httpDelete(id, QueryParams.EMPTY).ignore();
   }
 
 }
