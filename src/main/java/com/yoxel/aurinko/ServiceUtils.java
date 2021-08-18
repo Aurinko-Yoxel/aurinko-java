@@ -103,7 +103,7 @@ public class ServiceUtils {
           }
         }
       }
-    } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
+    } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365 && acc.getAuthMethod() == null) {
       if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())) {
         accDto.setServiceType("Office365");
         accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
@@ -115,7 +115,8 @@ public class ServiceUtils {
           accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
         }
       }
-    } else if (acc.getProtocol() == AbsService.Protocol.EWS) {
+    } else if (acc.getProtocol() == AbsService.Protocol.EWS
+               || acc.getProtocol() == AbsService.Protocol.OFFICE365 && acc.getAuthMethod() != null) {
       accDto.setServiceType("EWS");
       accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
                           + "/EWS/Exchange.asmx");
