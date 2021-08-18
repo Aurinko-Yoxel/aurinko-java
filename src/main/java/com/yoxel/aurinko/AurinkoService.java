@@ -38,10 +38,6 @@ import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.XStream;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HttpContext;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -82,6 +78,10 @@ public class AurinkoService {
 
     this.httpTransport = new ApacheHttpTransport();
     this.requestInitializer = requestInitializer;
+  }
+
+  public void close() throws IOException {
+    httpTransport.shutdown();
   }
 
   public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
