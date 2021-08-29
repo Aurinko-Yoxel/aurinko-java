@@ -50,7 +50,7 @@ import static com.yoxel.aurinko.apis.QueryParams.qp;
 
 public class AurinkoService {
 
-  private static final String BASE_URL = "https://api.aurinko.io/v1";
+  private static final String BASE_URL = "https://aurinko.yoxel.com/v1";
 
   private final HttpTransport httpTransport;
 
