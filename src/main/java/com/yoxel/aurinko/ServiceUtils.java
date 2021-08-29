@@ -127,9 +127,7 @@ public class ServiceUtils {
     return accDto;
   }
 
-  private static AurAccountDto fromTemplate(ServiceTemplate templ, ОAuth2ClientRegs appRegs,
-                                            AuthServiceAccess authAccess) throws IOException {
-
+  public static List<String> templateScopes(ServiceTemplate templ) {
     final List<String> scopes = new ArrayList<>();
     if (templ.isScanEmail()) {
       scopes.add(templ.getProtocol() == AbsService.Protocol.GMAIL ? "Mail.All" : "Mail.Read");
@@ -143,6 +141,14 @@ public class ServiceUtils {
     if (templ.isImportTasks()) {
       scopes.add("Tasks.ReadWrite");
     }
+
+    return scopes;
+  }
+
+  private static AurAccountDto fromTemplate(ServiceTemplate templ, ОAuth2ClientRegs appRegs,
+                                            AuthServiceAccess authAccess) throws IOException {
+
+    final List<String> scopes = templateScopes(templ);
 
     String[] ss = Strings.splitByComma(templ.getAuthDomains());
 
