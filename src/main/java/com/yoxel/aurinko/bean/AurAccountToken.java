@@ -9,4 +9,11 @@ public class AurAccountToken {
 
   @Key
   private String accessToken;
+
+  @Key
+  private String userId;
+
+  @Key
+  private String userSession;
+
 }

@@ -115,6 +115,7 @@ public class AurinkoService {
     return httpRequest;
   }
 
+  public Auth auth = new Auth();
   public Accounts accounts = new Accounts();
   public Calendars calendars = new Calendars();
   public Emails emails = new Emails();
@@ -166,6 +167,16 @@ public class AurinkoService {
     @Override
     public Class<SaveResult> entitySaveResultClass() {
       return sClass;
+    }
+  }
+
+  /**
+   * Auth API
+   */
+  public class Auth extends HttpApiSupport {
+
+    public AurAccountToken getToken(String code) throws IOException {
+      return httpGet("/auth/token/"+code).parseAs(AurAccountToken.class);
     }
   }
 
