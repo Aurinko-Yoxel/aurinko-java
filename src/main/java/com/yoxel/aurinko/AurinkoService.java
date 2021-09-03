@@ -194,21 +194,28 @@ public class AurinkoService {
     }
 
     public AurAccountToken upsertPersonal(AurAccountDto acc) throws IOException {
-      return httpPost("/am/accounts", new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-          .parseAs(AurAccountToken.class);
+      return httpPost(
+          "/am/accounts",
+          QueryParams.of("recycleKeys", "email,clientOrgId"),
+          new JsonHttpContent(Utils.getDefaultJsonFactory(), acc)
+      ).parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertService(AurAccountDto svcAcc) throws IOException {
-      return httpPost("/am/svc_accounts",
-                      new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc))
-          .parseAs(AurAccountToken.class);
+      return httpPost(
+          "/am/svc_accounts",
+          QueryParams.of("recycleKeys", "clientOrgId"),
+          new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc)
+      ).parseAs(AurAccountToken.class);
     }
 
     public AurAccountToken upsertManaged(AurAccountDto acc, long svcAccountId)
         throws IOException {
-      return httpPost("/am/svc_accounts/" + svcAccountId + "/accounts",
-                      new JsonHttpContent(Utils.getDefaultJsonFactory(), acc))
-          .parseAs(AurAccountToken.class);
+      return httpPost(
+          "/am/svc_accounts/" + svcAccountId + "/accounts",
+          QueryParams.of("recycleKeys", "email"),
+          new JsonHttpContent(Utils.getDefaultJsonFactory(), acc)
+      ).parseAs(AurAccountToken.class);
     }
   }
 
