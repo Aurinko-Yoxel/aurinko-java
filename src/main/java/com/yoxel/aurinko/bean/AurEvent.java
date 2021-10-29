@@ -11,7 +11,7 @@ import java.util.Map;
 @Data
 public class AurEvent extends AurLiveIdEntity {
 
-    @Key("folderId")
+    @Key // ("folderId")
     private String calendarId;
 
     @Key
