@@ -17,6 +17,7 @@ import com.yoxel.oauth.common.SecurityUtils;
 import com.yoxel.persist.util.Strings;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -128,17 +129,24 @@ public class ServiceUtils {
   }
 
   public static List<String> templateScopes(ServiceTemplate templ) {
+
+
+    final boolean
+        allScopes =
+        !templ.isScanEmail() && !templ.isImportEvents() && !templ.isImportContacts()
+        && !templ.isImportTasks();
+
     final List<String> scopes = new ArrayList<>();
-    if (templ.isScanEmail()) {
+    if (templ.isScanEmail() || allScopes) {
       scopes.add(templ.getProtocol() == AbsService.Protocol.GMAIL ? "Mail.All" : "Mail.Read");
     }
-    if (templ.isImportEvents()) {
+    if (templ.isImportEvents() || allScopes) {
       scopes.add("Calendar.ReadWrite");
     }
-    if (templ.isImportContacts()) {
+    if (templ.isImportContacts() || allScopes) {
       scopes.add("Contacts.ReadWrite");
     }
-    if (templ.isImportTasks()) {
+    if (templ.isImportTasks() || allScopes) {
       scopes.add("Tasks.ReadWrite");
     }
 
@@ -186,6 +194,9 @@ public class ServiceUtils {
         throw new IllegalArgumentException("Bad json");
       }
     } else if (templ.getProtocol() == AbsService.Protocol.OFFICE365) {
+      // Migrate only old AuthService accounts
+      Validate.notNull(templ.getPassword());
+
       accDto.setServiceType("EWS365");
       accDto.setServerUrl(templ.getInstUrl() + "/EWS/Exchange.asmx");
       //accDto.setOauthClientId("83f46668-ec23-405f-a0be-21ec17d475b3");
@@ -218,9 +229,6 @@ public class ServiceUtils {
 
     final AurAccountDto
         aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
-    if (aurAcc.getAuthString1() == null && aurAcc.getAuthString2() == null) {
-      return null;
-    }
 
     aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
 
@@ -234,14 +242,17 @@ public class ServiceUtils {
         return null;
       }
 
+      if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
+        aurAcc.setServiceType(svcTempl.getPassword() != null ? "EWS365" : "Office365");
+      }
+
       try {
         AurAccount svcAcc = AurinkoService
             .createWithAccountAuth(svcTempl.getAurinkoToken())
             .accounts
             .getMe();
         log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc
-            .getEmailAddress()
-                 + ", clientOrgId: " + uma.getClientCompany().getExtId());
+            .getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
         aurToken = aurinko.accounts.upsertManaged(aurAcc, svcAcc.getId());
       } catch (IOException e) {
@@ -249,10 +260,13 @@ public class ServiceUtils {
       }
 
     } else {
+      if (aurAcc.getAuthString1() == null && aurAcc.getAuthString2() == null) {
+        return null;
+      }
+
       log.info(
           "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress()
-          + ", clientOrgId: "
-          + uma.getClientCompany().getExtId());
+          + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
       try {
         aurToken = aurinko.accounts.upsertPersonal(aurAcc);
@@ -283,8 +297,7 @@ public class ServiceUtils {
 
     log.info(
         "Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName()
-        + ", clientOrgId: " + clientOrgId
-        + "/" + svcTempl.getGroupId());
+        + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
 
     AurAccountToken aurToken = null;
     try {
