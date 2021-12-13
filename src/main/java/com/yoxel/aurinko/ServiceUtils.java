@@ -105,7 +105,8 @@ public class ServiceUtils {
         }
       }
     } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365 && acc.getAuthMethod() == null) {
-      if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())) {
+      if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())
+          && !"crm.me".equals(appRegs.getPartner())) {
         accDto.setServiceType("Office365");
         accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
       } else {
