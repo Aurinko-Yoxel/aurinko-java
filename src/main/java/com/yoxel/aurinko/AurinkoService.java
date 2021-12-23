@@ -48,7 +48,7 @@ import lombok.RequiredArgsConstructor;
 
 import static com.yoxel.aurinko.apis.QueryParams.qp;
 
-public class AurinkoService {
+public class AurinkoService implements AutoCloseable {
 
   private static final String BASE_URL = "https://aurinko.yoxel.com/v1";
 
@@ -115,6 +115,7 @@ public class AurinkoService {
     return httpRequest;
   }
 
+  public Api api = new Api();
   public Auth auth = new Auth();
   public Accounts accounts = new Accounts();
   public Calendars calendars = new Calendars();
@@ -178,6 +179,10 @@ public class AurinkoService {
     public AurAccountToken getToken(String code) throws IOException {
       return httpGet("/auth/token/"+code).parseAs(AurAccountToken.class);
     }
+  }
+
+  public class Api extends HttpApiSupport {
+
   }
 
   /**
