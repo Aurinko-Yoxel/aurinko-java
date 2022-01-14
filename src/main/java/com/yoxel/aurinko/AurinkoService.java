@@ -95,7 +95,7 @@ public class AurinkoService implements AutoCloseable {
   private static AurinkoService createService(HttpExecuteInterceptor httpInterceptor) {
     return new AurinkoService(new BackoffInterceptorWrapper(
         httpInterceptor,
-        new ExponentialBackOff(),
+        new ExponentialBackOff.Builder().setMultiplier(2.0).build(),
         BackoffInterceptorWrapper.ON_RATE_LIMITING
     ));
   }
