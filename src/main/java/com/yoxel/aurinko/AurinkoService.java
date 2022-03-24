@@ -219,7 +219,7 @@ public class AurinkoService implements AutoCloseable {
     public AurAccountToken upsertGoogleService(AurAccountDto svcAcc) throws IOException {
       return httpPost(
           "/am/svc_accounts",
-          QueryParams.of("recycleKeys", "authUserId,clientOrgId"),
+          QueryParams.of("recycleKeys", "userId,clientOrgId"),
           new JsonHttpContent(Utils.getDefaultJsonFactory(), svcAcc)
       ).parseAs(AurAccountToken.class);
     }
