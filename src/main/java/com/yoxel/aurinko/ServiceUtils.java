@@ -23,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -166,7 +169,7 @@ public class ServiceUtils {
     final AurAccountDto accDto = new AurAccountDto();
 
     accDto.setActive(true);
-    accDto.setAuthScopes(scopes.toArray(new String[0]));
+    accDto.setAuthScopes(scopes.toArray(new String[scopes.size()]));
     accDto.setName(authDomain == null ? templ.getName() : authDomain);
 //        authObtainedAt;
 //        authExpiresAt;
@@ -288,11 +291,29 @@ public class ServiceUtils {
                                              ServiceTemplate svcTempl,
                                              ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
+    return syncTemplate( aurinko,  clientOrgId, svcTempl, Collections.emptyList(),  appRegs,  authAccess);
+  }
+
+  public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
+                                             ServiceTemplate svcTempl, List<String> withScopes,
+                                             ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
+      throws IOException {
     if (!svcTempl.getProtocol().isReadEmail() || svcTempl.getPassword() == null) {
       return null;
     }
 
     final AurAccountDto aurAcc = fromTemplate(svcTempl, appRegs, authAccess);
+
+    if (withScopes != null && !withScopes.isEmpty()) {
+      final List<String> scopes = new ArrayList<>(Arrays.asList(aurAcc.getAuthScopes()));
+      withScopes.forEach(s -> {
+        if (!scopes.contains(s)) {
+          scopes.add(s);
+        }
+      });
+
+      aurAcc.setAuthScopes(scopes.toArray(new String[scopes.size()]));
+    }
 
     aurAcc.setClientOrgId(clientOrgId + "/" + svcTempl.getGroupId());
 
