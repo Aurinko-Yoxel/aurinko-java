@@ -134,7 +134,6 @@ public class ServiceUtils {
 
   public static List<String> templateScopes(ServiceTemplate templ) {
 
-
     final boolean
         allScopes =
         !templ.isScanEmail() && !templ.isImportEvents() && !templ.isImportContacts()
@@ -291,11 +290,11 @@ public class ServiceUtils {
                                              ServiceTemplate svcTempl,
                                              ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
-    return syncTemplate( aurinko,  clientOrgId, svcTempl, Collections.emptyList(),  appRegs,  authAccess);
+    return syncTemplate(aurinko, clientOrgId, svcTempl, Collections.emptyList(), false, appRegs, authAccess);
   }
 
   public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
-                                             ServiceTemplate svcTempl, List<String> withScopes,
+                                             ServiceTemplate svcTempl, List<String> withScopes, boolean gmailMode,
                                              ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
     if (!svcTempl.getProtocol().isReadEmail() || svcTempl.getPassword() == null) {
@@ -315,7 +314,7 @@ public class ServiceUtils {
       aurAcc.setAuthScopes(scopes.toArray(new String[scopes.size()]));
     }
 
-    aurAcc.setClientOrgId(clientOrgId + "/" + svcTempl.getGroupId());
+    aurAcc.setClientOrgId(clientOrgId + (gmailMode ? "" : ("/" + svcTempl.getGroupId())));
 
     log.info(
         "Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName()
@@ -323,7 +322,7 @@ public class ServiceUtils {
 
     AurAccountToken aurToken = null;
     try {
-      return aurinko.accounts.upsertService(aurAcc);
+      return gmailMode ? aurinko.accounts.upsertGoogleService(aurAcc) : aurinko.accounts.upsertService(aurAcc);
     } catch (IOException e) {
       log.warn("Failed to upsert Aurinko service account " + e.getMessage());
     }
