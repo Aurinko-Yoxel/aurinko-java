@@ -34,8 +34,12 @@ import com.yoxel.aurinko.bean.AurEventSaveResult;
 import com.yoxel.aurinko.bean.AurEventsPage;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurOAuthClientRegsPage;
+import com.yoxel.aurinko.bean.AurPlural;
 import com.yoxel.aurinko.bean.AurQueryResult;
+import com.yoxel.aurinko.bean.AurSubscription;
+import com.yoxel.aurinko.bean.AurSubscriptionsPage;
 import com.yoxel.aurinko.dto.AurAccountDto;
+import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
 
 import org.joda.time.DateTime;
@@ -179,7 +183,7 @@ public class AurinkoService implements AutoCloseable {
   public class Auth extends HttpApiSupport {
 
     public AurAccountToken getToken(String code) throws IOException {
-      return httpGet("/auth/token/"+code).parseAs(AurAccountToken.class);
+      return httpGet("/auth/token/" + code).parseAs(AurAccountToken.class);
     }
   }
 
@@ -386,6 +390,42 @@ public class AurinkoService implements AutoCloseable {
 
     public Contacts() {
       super("/contacts", "", AurContact.class, AurContactsPage.class, AurContactSaveResult.class);
+    }
+  }
+
+  public class Subscriptions extends HttpApiSupport {
+
+    private final int pageSize = 50;
+
+    public AurSubscription get(long id) throws IOException {
+      return httpGet("/subscriptions/" + id).parseAs(AurSubscription.class);
+    }
+
+    public void delete(long id) throws IOException {
+      httpDelete("/subscriptions/" + id);
+    }
+
+    public AurSubscription create(AurSubscription subscription) throws IOException {
+      return httpPost(
+          "/subscriptions",
+          new JsonHttpContent(Utils.getDefaultJsonFactory(), subscription)
+      ).parseAs(AurSubscription.class);
+    }
+
+    private AurSubscriptionsPage loadPage(int offset) throws IOException {
+      return httpGet(
+          "/subscriptions",
+          QueryParams.of(qp("offset", offset), qp("limit", pageSize))
+      ).parseAs(AurSubscriptionsPage.class);
+    }
+
+    public XStream<AurSubscriptionsPage, IOException> list() throws IOException {
+
+      return IOXStream.iterateUntil(
+          loadPage(0),
+          pg -> loadPage(((int) pg.getOffset()) + pageSize),
+          AurPlural::isDone
+      );
     }
   }
 }
