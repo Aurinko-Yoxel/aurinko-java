@@ -122,6 +122,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public Api api = new Api();
+  public Subscriptions subscriptions = new Subscriptions();
   public Auth auth = new Auth();
   public Accounts accounts = new Accounts();
   public Calendars calendars = new Calendars();
