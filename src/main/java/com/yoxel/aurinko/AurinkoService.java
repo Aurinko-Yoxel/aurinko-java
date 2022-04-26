@@ -420,13 +420,15 @@ public class AurinkoService implements AutoCloseable {
       ).parseAs(AurSubscriptionsPage.class);
     }
 
-    public XStream<AurSubscriptionsPage, IOException> list() throws IOException {
+    public XStream<AurSubscription, IOException> list() throws IOException {
 
-      return IOXStream.iterateUntil(
-          loadPage(0),
-          pg -> loadPage(((int) pg.getOffset()) + pageSize),
-          AurPlural::isDone
-      );
+      return IOXStream
+          .iterateUntil(
+              loadPage(0),
+              pg -> loadPage(((int) pg.getOffset()) + pageSize),
+              AurPlural::isDone
+          )
+          .flatMap(pg -> IOXStream.of(pg.getRecords()));
     }
   }
 }
