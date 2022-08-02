@@ -48,13 +48,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import static com.yoxel.aurinko.apis.QueryParams.qp;
 
 public class AurinkoService implements AutoCloseable {
 
-  private static final String BASE_URL = "https://aurinko.yoxel.com/v1";
+  private static final String DEFAULT_BASE_URL = "https://aurinko.yoxel.com";
+
+  private final String baseUrl;
 
   private final HttpTransport httpTransport;
 
@@ -75,11 +79,12 @@ public class AurinkoService implements AutoCloseable {
 
   public enum BodyType {html, text, none}
 
-  private AurinkoService(HttpRequestInitializer requestInitializer) {
+  private AurinkoService(String baseUrl, HttpRequestInitializer requestInitializer) {
 //    HttpClientBuilder
 //        httpClientBuilder =
 //        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
 
+    this.baseUrl = baseUrl;
     this.httpTransport = new ApacheHttpTransport();
     this.requestInitializer = requestInitializer;
   }
@@ -88,29 +93,39 @@ public class AurinkoService implements AutoCloseable {
     httpTransport.shutdown();
   }
 
+  public static AurinkoService createWithAppAuth(String baseUrl, String clientId, String clientSecret) {
+    return createService(baseUrl, new BasicAuthentication(clientId, clientSecret));
+  }
+
   public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
-    return createService(new BasicAuthentication(clientId, clientSecret));
+    return createWithAppAuth(DEFAULT_BASE_URL, clientId, clientSecret);
+  }
+
+  public static AurinkoService createWithAccountAuth(String baseUrl, String accessToken) {
+    return createService(baseUrl, new BearerAuthorization(accessToken));
   }
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
-    return createService(new BearerAuthorization(accessToken));
+    return createWithAccountAuth(DEFAULT_BASE_URL, accessToken);
   }
 
-  private static AurinkoService createService(HttpExecuteInterceptor httpInterceptor) {
-    return new AurinkoService(new BackoffInterceptorWrapper(
-        httpInterceptor,
-        new ExponentialBackOff.Builder()
-            .setMultiplier(2.0)
-            .build(),
-        BackoffInterceptorWrapper.ON_RATE_LIMITING
-    ));
+  private static AurinkoService createService(String baseUrl, HttpExecuteInterceptor httpInterceptor) {
+    return new AurinkoService(
+        baseUrl,
+        new BackoffInterceptorWrapper(
+            httpInterceptor,
+            new ExponentialBackOff.Builder()
+                .setMultiplier(2.0)
+                .build(),
+            BackoffInterceptorWrapper.ON_RATE_LIMITING
+        ));
   }
 
   private HttpRequest createRequest(String method, String path) throws IOException {
     HttpRequest
         httpRequest =
         httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
-            .buildRequest(method, new GenericUrl((path.startsWith("https://") ? "" : BASE_URL) + path), null)
+            .buildRequest(method, new GenericUrl((path.startsWith("https://") ? "" : baseUrl + "/v1") + path), null)
             .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
             .setNumberOfRetries(5).setConnectTimeout(30 * 1000).setReadTimeout(35 * 1000);
 
@@ -128,6 +143,22 @@ public class AurinkoService implements AutoCloseable {
   public Calendars calendars = new Calendars();
   public Emails emails = new Emails();
   public Contacts contacts = new Contacts();
+
+  /**
+   * Create a client for /dynamic API, using specific api_configuration ID.
+   */
+  public <Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>> Dynamic<Entity, Page>
+  dynamic(AurinkoClass<Entity, Page> clazz, Integer apiConfId) {
+    return new Dynamic<>(clazz, apiConfId);
+  }
+
+  /**
+   * Create a client for /dynamic API, using default api configuration, configured on app-level.
+   */
+  public <Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>> Dynamic<Entity, Page>
+  dynamic(AurinkoClass<Entity, Page> clazz) {
+    return new Dynamic<>(clazz, null);
+  }
 
   abstract class HttpApiSupport implements HttpApi {
 
@@ -181,20 +212,21 @@ public class AurinkoService implements AutoCloseable {
   /**
    * Auth API
    */
-  public class Auth extends HttpApiSupport {
+  class Auth extends HttpApiSupport {
 
     public AurAccountToken getToken(String code) throws IOException {
       return httpGet("/auth/token/" + code).parseAs(AurAccountToken.class);
     }
   }
 
-  public class Api extends HttpApiSupport {
+  class Api extends HttpApiSupport {
 
   }
 
   /**
    * Accounts API
    */
+  @NoArgsConstructor(access = AccessLevel.PACKAGE)
   public class Accounts extends HttpApiSupport {
 
     public AurAccount getMe() throws IOException {
@@ -244,7 +276,7 @@ public class AurinkoService implements AutoCloseable {
    */
   public class Calendars extends BasicEntitySupport<AurCalendar, AurCalendarsPage, AurCalendar> {
 
-    public Calendars() {
+    Calendars() {
       super("/calendars", "", AurCalendar.class, AurCalendarsPage.class, AurCalendar.class);
     }
 
@@ -267,7 +299,7 @@ public class AurinkoService implements AutoCloseable {
 
     private final String calendarId;
 
-    public CalendarEvents(String calendarId) {
+    CalendarEvents(String calendarId) {
       this(calendarId, "");
     }
 
@@ -309,7 +341,7 @@ public class AurinkoService implements AutoCloseable {
   /**
    * Occurrences API: /calendars/:calendarId/events/:masterId/occurrences
    */
-  @RequiredArgsConstructor
+  @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
   public class CalendarSeriesOccurrences extends HttpApiSupport
       implements ListSupport<AurEvent, AurEventsPage>,
                  ReadSupport<AurEvent> {
@@ -344,7 +376,7 @@ public class AurinkoService implements AutoCloseable {
   public class Emails extends BasicEntitySupport<AurEmail, AurEmailsPage, AurEmail>
       implements SyncSupport<AurEmail, AurEmailsPage> {
 
-    public Emails() {
+    Emails() {
       super("/email", "/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class);
     }
 
@@ -361,7 +393,7 @@ public class AurinkoService implements AutoCloseable {
   /**
    * Email conversations API: /email/conversations/:id
    */
-  @RequiredArgsConstructor
+  @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
   public class EmailConvo extends HttpApiSupport implements ListSupport<AurEmail, AurEmailsPage> {
 
     private final String convoId;
@@ -389,8 +421,19 @@ public class AurinkoService implements AutoCloseable {
       extends BasicEntitySupport<AurContact, AurContactsPage, AurContactSaveResult>
       implements SyncSupport<AurContact, AurContactsPage> {
 
-    public Contacts() {
+    Contacts() {
       super("/contacts", "", AurContact.class, AurContactsPage.class, AurContactSaveResult.class);
+    }
+  }
+
+
+  public class Dynamic<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
+      extends BasicEntitySupport<Entity, Page, Entity> {
+
+    Dynamic(AurinkoClass<Entity, Page> aurClass, Integer apiConfId) {
+      super(
+          "/dynamic/" + (apiConfId == null ? "default" : apiConfId),
+          "/objects/" + aurClass.name, aurClass.entityClass, aurClass.pageClass, aurClass.entityClass);
     }
   }
 
