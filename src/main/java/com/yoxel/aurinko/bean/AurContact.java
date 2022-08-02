@@ -3,10 +3,12 @@ package com.yoxel.aurinko.bean;
 import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class AurContact extends AurLiveIdEntity {
     @Key
     private ContactName name;
@@ -39,9 +41,11 @@ public class AurContact extends AurLiveIdEntity {
     private List<PhoneNumber> phoneNumbers;
 
     @Key
-    List<PostalAddress> addresses;
+    private List<PostalAddress> addresses;
 
     @Key
-    List<Url> urls;
+    private List<Url> urls;
 
+    @Key
+    private String companyId;
 }
