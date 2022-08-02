@@ -6,6 +6,8 @@ import com.yoxel.aurinko.bean.sub.PhoneNumber;
 import com.yoxel.aurinko.bean.sub.PostalAddress;
 import com.yoxel.aurinko.bean.sub.Url;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,13 +38,13 @@ public class AurCompany extends AurLiveIdEntity {
   private String domain;
 
   @Key
-  private PostalAddress address;
+  private List<PostalAddress> addresses;
 
   @Key
-  private Url website;
+  private List<Url> urls;
 
   @Key
-  private PhoneNumber phone;
+  private List<PhoneNumber> phoneNumbers;
 
   @Key
   private String timezone;
