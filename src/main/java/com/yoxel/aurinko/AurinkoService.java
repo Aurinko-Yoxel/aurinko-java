@@ -56,6 +56,9 @@ import static com.yoxel.aurinko.apis.QueryParams.qp;
 
 public class AurinkoService implements AutoCloseable {
 
+  public static final HttpExecuteInterceptor EMPTY_INTERCEPTOR = request -> {
+  };
+
   private static final String DEFAULT_BASE_URL = "https://aurinko.yoxel.com";
 
   private final String baseUrl;
@@ -94,7 +97,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public static AurinkoService createWithAppAuth(String baseUrl, String clientId, String clientSecret) {
-    return createService(baseUrl, new BasicAuthentication(clientId, clientSecret));
+    return create(baseUrl, new BasicAuthentication(clientId, clientSecret));
   }
 
   public static AurinkoService createWithAppAuth(String clientId, String clientSecret) {
@@ -102,14 +105,26 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public static AurinkoService createWithAccountAuth(String baseUrl, String accessToken) {
-    return createService(baseUrl, new BearerAuthorization(accessToken));
+    return create(baseUrl, new BearerAuthorization(accessToken));
   }
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
     return createWithAccountAuth(DEFAULT_BASE_URL, accessToken);
   }
 
-  private static AurinkoService createService(String baseUrl, HttpExecuteInterceptor httpInterceptor) {
+  public static AurinkoService create(HttpExecuteInterceptor httpInterceptor) {
+    return create(DEFAULT_BASE_URL, httpInterceptor);
+  }
+
+  public static AurinkoService create(String baseUrl) {
+    return create(baseUrl, EMPTY_INTERCEPTOR);
+  }
+
+  public static AurinkoService create() {
+    return create(DEFAULT_BASE_URL, EMPTY_INTERCEPTOR);
+  }
+
+  public static AurinkoService create(String baseUrl, HttpExecuteInterceptor httpInterceptor) {
     return new AurinkoService(
         baseUrl,
         new BackoffInterceptorWrapper(
