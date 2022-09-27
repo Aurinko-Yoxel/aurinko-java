@@ -212,14 +212,14 @@ public class AurinkoService implements AutoCloseable {
   /**
    * Auth API
    */
-  class Auth extends HttpApiSupport {
+  public class Auth extends HttpApiSupport {
 
     public AurAccountToken getToken(String code) throws IOException {
       return httpGet("/auth/token/" + code).parseAs(AurAccountToken.class);
     }
   }
 
-  class Api extends HttpApiSupport {
+  public class Api extends HttpApiSupport {
 
   }
 
