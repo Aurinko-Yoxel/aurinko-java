@@ -152,6 +152,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public Api api = new Api();
+  public Direct direct = new Direct();
   public Subscriptions subscriptions = new Subscriptions();
   public Auth auth = new Auth();
   public Accounts accounts = new Accounts();
@@ -177,10 +178,14 @@ public class AurinkoService implements AutoCloseable {
 
   abstract class HttpApiSupport implements HttpApi {
 
+    String basePath() {
+      return "";
+    }
+
     @Override
     public HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams)
         throws IOException {
-      return createRequest(method, path + queryParams.toUrlString());
+      return createRequest(method, basePath() + path + queryParams.toUrlString());
     }
   }
 
@@ -236,6 +241,14 @@ public class AurinkoService implements AutoCloseable {
 
   public class Api extends HttpApiSupport {
 
+  }
+
+  public class Direct extends HttpApiSupport {
+
+    @Override
+    String basePath() {
+      return "/direct";
+    }
   }
 
   /**
