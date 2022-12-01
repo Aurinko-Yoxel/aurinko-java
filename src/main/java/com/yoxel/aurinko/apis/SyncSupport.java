@@ -35,11 +35,16 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
     return httpPost(entityApiRoot() + "/sync", params).parseAs(AurSyncStatus.class);
   }
 
-  default Page syncPage(SyncScope scope, String deltaToken, String pageToken) throws IOException {
+  default Page syncPage(
+      SyncScope scope,
+      String deltaToken,
+      String pageToken,
+      QueryParams queryParams
+  ) throws IOException {
 
     return httpGet(
         entityApiRoot() + "/sync/" + scope.path,
-        QueryParams.of(
+        queryParams.addAll(
             qp("deltaToken", deltaToken),
             qp("pageToken", pageToken)
         )
@@ -49,6 +54,7 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
   default XStream<Entity, IOException> streamSync(
       SyncScope scope,
       SyncToken token,
+      QueryParams queryParams,
       Consumer<? super Page> onPage,
       Predicate<? super Page> stopWhen
   ) throws IOException {
@@ -71,8 +77,8 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
     // query pages, until we get a page with done=true | totalSize=0
     return IOXStream
         .iterateUntil(
-            syncPage(scope, deltaToken, pageToken),
-            qr -> syncPage(scope, null, qr.getNextPageToken()),
+            syncPage(scope, deltaToken, pageToken, queryParams),
+            qr -> syncPage(scope, null, qr.getNextPageToken(), queryParams),
             qr -> qr.getNextPageToken() == null || (stopWhen != null && stopWhen.test(qr))
         )
         .peek(onPage)
