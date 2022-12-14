@@ -30,9 +30,6 @@ public class AurEvent extends AurLiveIdEntity {
     private EventDateTime end;
 
     @Key
-    private Organizer createdBy;
-
-    @Key
     private Organizer organizer;
 
     @Key
