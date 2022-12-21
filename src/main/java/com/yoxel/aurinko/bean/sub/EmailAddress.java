@@ -7,6 +7,12 @@ import lombok.Data;
 @Data
 public final class EmailAddress extends GenericJson {
     @Key
+    private String id;
+
+    @Key
+    private Boolean deleted;
+
+    @Key
     private String name;
 
     @Key
@@ -14,4 +20,5 @@ public final class EmailAddress extends GenericJson {
 
     @Key
     private String raw;
+
 }

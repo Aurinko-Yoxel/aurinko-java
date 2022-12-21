@@ -8,6 +8,12 @@ import lombok.Data;
 public class PostalAddress extends GenericJson {
 
     @Key
+    private String id;
+
+    @Key
+    private Boolean deleted;
+
+    @Key
     private String street;
 
     @Key

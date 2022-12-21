@@ -8,6 +8,12 @@ import lombok.Data;
 public class PhoneNumber extends GenericJson {
 
     @Key
+    private String id;
+
+    @Key
+    private Boolean deleted;
+
+    @Key
     private String number;
 
     @Key
