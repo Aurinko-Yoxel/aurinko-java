@@ -4,13 +4,12 @@ import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
 
-import com.yoxel.aurinko.bean.AurAccount;
 import com.yoxel.aurinko.bean.AurAccountToken;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.model2.ClientCompany;
 import com.yoxel.model2.ClientUser;
 import com.yoxel.model2.ServiceTemplate;
-import com.yoxel.model2.user.AbsService;
+import com.yoxel.model2.user.AbsService.Protocol;
 import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
 import com.yoxel.oauth.common.SecurityUtils;
@@ -19,14 +18,13 @@ import com.yoxel.persist.util.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ServiceUtils {
@@ -42,8 +40,12 @@ public class ServiceUtils {
     SyncData getSyncData(Account acc);
   }
 
-  private static AurAccountDto fromAccount(Account acc, String userName, SyncData sd,
-                                           ОAuth2ClientRegs appRegs) {
+  private static AurAccountDto fromAccount(
+      Account acc,
+      SyncData sd,
+      OAuth2ClientRegs appRegs,
+      UserModelAccess uma
+  ) {
 
     final List<String> scopes = new ArrayList<>();
     if (acc.isScanEmail()) {
@@ -61,9 +63,9 @@ public class ServiceUtils {
 
     final AurAccountDto accDto = new AurAccountDto();
 
-    accDto.setName(userName);
+    accDto.setName(uma.getClientUser().getName());
     accDto.setActive(!acc.isOffline());
-    accDto.setAuthScopes(scopes.toArray(new String[scopes.size()]));
+    accDto.setAuthScopes(scopes.toArray(new String[0]));
     accDto.setEmail(acc.getEmailAddress());
 
     if (!StringUtils.isBlank(acc.getUsername()) && !"X".equals(acc.getUsername())) {
@@ -82,7 +84,7 @@ public class ServiceUtils {
       }
     }
 
-    if (acc.getProtocol() == AbsService.Protocol.GMAIL) {
+    if (acc.getProtocol() == Protocol.GMAIL) {
       accDto.setServiceType("Google");
       accDto.setServerUrl(acc.getServer());
       if (sd != null) {
@@ -107,7 +109,7 @@ public class ServiceUtils {
           }
         }
       }
-    } else if (acc.getProtocol() == AbsService.Protocol.OFFICE365 && acc.getAuthMethod() == null) {
+    } else if (acc.getProtocol() == Protocol.OFFICE365 && acc.getAuthMethod() == null) {
       if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())
           && !"crm.me".equals(appRegs.getPartner())) {
         accDto.setServiceType("Office365");
@@ -120,13 +122,21 @@ public class ServiceUtils {
           accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
         }
       }
-    } else if (acc.getProtocol() == AbsService.Protocol.EWS
-               || acc.getProtocol() == AbsService.Protocol.OFFICE365 && acc.getAuthMethod() != null) {
+    } else if (acc.getProtocol() == Protocol.EWS
+               || acc.getProtocol() == Protocol.OFFICE365 && acc.getAuthMethod() != null) {
       accDto.setServiceType("EWS");
       accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
                           + "/EWS/Exchange.asmx");
       accDto.setAuthString1(acc.getUsername());
       accDto.setAuthString2(acc.getPassword());
+    } else if (acc.getProtocol() == Protocol.TEAMWORKPM && "teamwork".equals(appRegs.getPartner())) {
+      accDto.setServiceType("Teamwork");
+      accDto.setServerUrl(acc.getServer());
+      accDto.setAuthString1(acc.getPassword());
+      accDto.setAuthString2(null);
+      // is it OK?
+      accDto.setAuthOrgId(uma.getClientCompany().getExtId());
+      accDto.setAuthUserId(uma.getClientUser().getExtId());
     }
 
     return accDto;
@@ -141,7 +151,7 @@ public class ServiceUtils {
 
     final List<String> scopes = new ArrayList<>();
     if (templ.isScanEmail() || allScopes) {
-      scopes.add(templ.getProtocol() == AbsService.Protocol.GMAIL ? "Mail.All" : "Mail.Read");
+      scopes.add(templ.getProtocol() == Protocol.GMAIL ? "Mail.All" : "Mail.Read");
     }
     if (templ.isImportEvents() || allScopes) {
       scopes.add("Calendar.ReadWrite");
@@ -156,7 +166,7 @@ public class ServiceUtils {
     return scopes;
   }
 
-  private static AurAccountDto fromTemplate(ServiceTemplate templ, ОAuth2ClientRegs appRegs,
+  private static AurAccountDto fromTemplate(ServiceTemplate templ, OAuth2ClientRegs appRegs,
                                             AuthServiceAccess authAccess) throws IOException {
 
     final List<String> scopes = templateScopes(templ);
@@ -173,7 +183,7 @@ public class ServiceUtils {
 //        authObtainedAt;
 //        authExpiresAt;
 
-    if (templ.getProtocol() == AbsService.Protocol.GMAIL) {
+    if (templ.getProtocol() == Protocol.GMAIL) {
       accDto.setServiceType("Google");
       accDto.setServerUrl(templ.getInstUrl());
       accDto.setAuthString2(templ.getPassword());
@@ -196,7 +206,7 @@ public class ServiceUtils {
       } catch (IOException e) {
         throw new IllegalArgumentException("Bad json");
       }
-    } else if (templ.getProtocol() == AbsService.Protocol.OFFICE365) {
+    } else if (templ.getProtocol() == Protocol.OFFICE365) {
       // Migrate only old AuthService accounts
       Validate.notNull(templ.getPassword());
 
@@ -206,7 +216,7 @@ public class ServiceUtils {
       accDto.setOauthClientId(appRegs.getOAuthClientReg("daemon.office365.oauth2.client"));
       accDto.setAuthOrgId(templ.getExtId());
       accDto.setAuthString1(authAccess.getAuthString(Long.parseLong(templ.getPassword())));
-    } else if (templ.getProtocol() == AbsService.Protocol.EWS) {
+    } else if (templ.getProtocol() == Protocol.EWS) {
       accDto.setServiceType("EWS");
       accDto.setServerUrl(templ.getInstUrl() + "/EWS/Exchange.asmx");
       accDto.setAuthOrgId(authDomain);
@@ -218,11 +228,15 @@ public class ServiceUtils {
     return accDto;
   }
 
+  private static boolean protocolSupported(Protocol protocol, String partner) {
+    return protocol.isReadEmail() ||
+           protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner);
+  }
+
   public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma,
-                                            Account acc,
-                                            SyncData sd,
-                                            ОAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
-    if (!acc.getProtocol().isReadEmail() || acc.getEmailAddress() == null) {
+                                            Account acc, SyncData sd,
+                                            OAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
+    if (!protocolSupported(acc.getProtocol(), appRegs.getPartner()) || acc.getEmailAddress() == null) {
       return null;
     }
 
@@ -230,8 +244,7 @@ public class ServiceUtils {
       sd = uma.getSyncData(acc);
     }
 
-    final AurAccountDto
-        aurAcc = fromAccount(acc, uma.getClientUser().getName(), sd, appRegs);
+    final AurAccountDto aurAcc = fromAccount(acc, sd, appRegs, uma);
 
     aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
 
@@ -245,15 +258,12 @@ public class ServiceUtils {
         return null;
       }
 
-      if (acc.getProtocol() == AbsService.Protocol.OFFICE365) {
+      if (acc.getProtocol() == Protocol.OFFICE365) {
         aurAcc.setServiceType(svcTempl.getPassword() != null ? "EWS365" : "Office365");
       }
 
-      try {
-        AurAccount svcAcc = AurinkoService
-            .createWithAccountAuth(svcTempl.getAurinkoToken())
-            .accounts
-            .getMe();
+      try (final var svc = AurinkoService.createWithAccountAuth(svcTempl.getAurinkoToken())) {
+        final var svcAcc = svc.accounts.getMe();
         log.info("Upserting managed account " + acc.getId() + ", " + acc.getName() + ", " + acc
             .getEmailAddress() + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
@@ -288,14 +298,14 @@ public class ServiceUtils {
 
   public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
                                              ServiceTemplate svcTempl,
-                                             ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
+                                             OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
     return syncTemplate(aurinko, clientOrgId, svcTempl, Collections.emptyList(), false, appRegs, authAccess);
   }
 
   public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
                                              ServiceTemplate svcTempl, List<String> withScopes, boolean gmailMode,
-                                             ОAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
+                                             OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
     if (!svcTempl.getProtocol().isReadEmail() || svcTempl.getPassword() == null) {
       return null;
