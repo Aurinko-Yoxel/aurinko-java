@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public final class ОAuth2ClientRegs {
+public final class OAuth2ClientRegs {
 
     private static Map<String, List<AurOAuthClientReg>> appRegs = new HashMap<>();
 
@@ -23,7 +23,7 @@ public final class ОAuth2ClientRegs {
         String getSecret(String alias);
     }
 
-    private ОAuth2ClientRegs(String partner, SecretStoreAccess syncStore) {
+    private OAuth2ClientRegs(String partner, SecretStoreAccess syncStore) {
         this.partner = partner;
         this.syncStore = syncStore;
     }
@@ -33,7 +33,7 @@ public final class ОAuth2ClientRegs {
 
     private SecretStoreAccess syncStore;
 
-    public static synchronized ОAuth2ClientRegs forPartner(AurinkoPartnerToken partnerToken, SecretStoreAccess syncStore) {
+    public static synchronized OAuth2ClientRegs forPartner(AurinkoPartnerToken partnerToken, SecretStoreAccess syncStore) {
         if (partnerToken != null && partnerToken.getAurinkoClientId() != null) {
             List<AurOAuthClientReg> rl = appRegs.get(partnerToken.getSyncPartner());
             if (rl == null) {
@@ -52,7 +52,7 @@ public final class ОAuth2ClientRegs {
             }
         }
 
-        return new ОAuth2ClientRegs(partnerToken == null ? null : partnerToken.getSyncPartner(), syncStore);
+        return new OAuth2ClientRegs(partnerToken == null ? null : partnerToken.getSyncPartner(), syncStore);
     }
 
     public String getOAuthClientReg(String key) {
