@@ -8,6 +8,12 @@ import lombok.Data;
 public class ContactEmailAddress extends GenericJson {
 
     @Key
+    private String id;
+
+    @Key
+    private Boolean deleted;
+
+    @Key
     private String address;
 
     @Key
