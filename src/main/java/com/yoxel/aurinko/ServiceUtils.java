@@ -237,7 +237,7 @@ public class ServiceUtils {
   }
 
   private static boolean protocolSupported(Protocol protocol, String partner) {
-    return protocol.isReadEmail() ||
+    return protocol.isReadEmail() || protocol == Protocol.SALESFLARE ||
            protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner);
   }
 
