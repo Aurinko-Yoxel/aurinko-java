@@ -21,7 +21,13 @@ public class AurEvent extends AurLiveIdEntity {
     private String description;
 
     @Key
+    private String htmlLink;
+
+    @Key
     private String location;
+
+    @Key
+    private String type;
 
     @Key
     private EventDateTime start;
