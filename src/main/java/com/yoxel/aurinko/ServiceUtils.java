@@ -47,17 +47,19 @@ public class ServiceUtils {
       UserModelAccess uma
   ) {
 
+    final boolean rfPartner = "repfabric".equals(appRegs.getPartner());
+
     final List<String> scopes = new ArrayList<>();
     if (acc.isScanEmail()) {
       scopes.add("Mail.Read");
     }
-    if (acc.isImportEvents()) {
+    if (acc.isImportEvents() || rfPartner) {
       scopes.add("Calendar.ReadWrite");
     }
-    if (acc.isImportContacts()) {
+    if (acc.isImportContacts() || rfPartner) {
       scopes.add("Contacts.ReadWrite");
     }
-    if (acc.isImportTasks()) {
+    if (acc.isImportTasks() || rfPartner) {
       scopes.add("Tasks.ReadWrite");
     }
 
