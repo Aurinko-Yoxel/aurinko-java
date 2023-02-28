@@ -142,7 +142,7 @@ public class AurinkoService implements AutoCloseable {
         httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
             .buildRequest(method, new GenericUrl((path.startsWith("https://") ? "" : baseUrl + "/v1") + path), null)
             .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
-            .setNumberOfRetries(5).setConnectTimeout(30 * 1000).setReadTimeout(35 * 1000);
+            .setNumberOfRetries(5).setConnectTimeout(60 * 1000).setReadTimeout(35 * 1000);
 
     httpRequest.getHeaders().setUserAgent("Yoxel Sync (Aurinko)/1.0");
 //        if ("PATCH".equalsIgnoreCase(method))
