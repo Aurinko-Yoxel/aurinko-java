@@ -134,8 +134,14 @@ public class ServiceUtils {
     } else if (acc.getProtocol() == Protocol.TEAMWORKPM && "teamwork".equals(appRegs.getPartner())) {
       accDto.setServiceType("Teamwork");
       accDto.setServerUrl(acc.getServer());
-      accDto.setAuthString1(acc.getPassword());
-      accDto.setAuthString2(null);
+      // Old Basic Auth:
+//      accDto.setAuthString1(acc.getPassword());
+//      accDto.setAuthString2(null);
+
+      // New Bearer auth:
+      accDto.setAuthString1(sd.getAccessToken());
+      accDto.setAuthString2(sd.getRefreshToken());
+
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(uma.getClientUser().getExtId());
@@ -144,6 +150,7 @@ public class ServiceUtils {
       accDto.setServerUrl(acc.getServer());
       accDto.setAuthString1(acc.getPassword());
       accDto.setAuthString2(null);
+      
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(uma.getClientUser().getExtId());
