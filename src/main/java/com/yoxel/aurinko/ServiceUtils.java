@@ -40,12 +40,7 @@ public class ServiceUtils {
     SyncData getSyncData(Account acc);
   }
 
-  private static AurAccountDto fromAccount(
-      Account acc,
-      SyncData sd,
-      OAuth2ClientRegs appRegs,
-      UserModelAccess uma
-  ) {
+  private static AurAccountDto fromAccount(Account acc, SyncData sd, OAuth2ClientRegs appRegs, UserModelAccess uma) {
 
     final boolean rfPartner = "repfabric".equals(appRegs.getPartner());
 
@@ -138,10 +133,6 @@ public class ServiceUtils {
 //      accDto.setAuthString1(acc.getPassword());
 //      accDto.setAuthString2(null);
 
-      // New Bearer auth:
-      accDto.setAuthString1(sd.getAccessToken());
-      accDto.setAuthString2(sd.getRefreshToken());
-
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(uma.getClientUser().getExtId());
@@ -150,7 +141,7 @@ public class ServiceUtils {
       accDto.setServerUrl(acc.getServer());
       accDto.setAuthString1(acc.getPassword());
       accDto.setAuthString2(null);
-      
+
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(uma.getClientUser().getExtId());
@@ -250,8 +241,7 @@ public class ServiceUtils {
            protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner);
   }
 
-  public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma,
-                                            Account acc, SyncData sd,
+  public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc, SyncData sd,
                                             OAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
     if (!protocolSupported(acc.getProtocol(), appRegs.getPartner()) || acc.getEmailAddress() == null) {
       return null;
