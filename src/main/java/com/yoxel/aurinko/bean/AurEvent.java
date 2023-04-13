@@ -73,6 +73,7 @@ public class AurEvent extends AurLiveIdEntity {
   private Map<String, String> nativeProperties;
 
   public boolean isMeeting() {
-    return meetingInfo != null && CollectionUtils.isNotEmpty(meetingInfo.getAttendees());
+    return meetingInfo != null &&
+           (CollectionUtils.isNotEmpty(meetingInfo.getAttendees()) || getOmitted().contains("attendees"));
   }
 }
