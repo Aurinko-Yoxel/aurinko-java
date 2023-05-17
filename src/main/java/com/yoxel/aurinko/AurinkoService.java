@@ -10,6 +10,7 @@ import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
+import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.ExponentialBackOff;
 
@@ -259,6 +260,10 @@ public class AurinkoService implements AutoCloseable {
 
     public AurAccount getMe() throws IOException {
       return httpGet("/account").parseAs(AurAccount.class);
+    }
+
+    public void deleteMe() throws IOException {
+      httpDelete("/account").parseAs(GenericJson.class);
     }
 
     public AurOAuthClientRegsPage getOAuthClientRegs() throws IOException {
