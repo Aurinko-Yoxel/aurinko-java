@@ -8,6 +8,9 @@ import lombok.Data;
 public class AurAccountToken {
 
   @Key
+  private long accountId;
+
+  @Key
   private String accessToken;
 
   @Key
