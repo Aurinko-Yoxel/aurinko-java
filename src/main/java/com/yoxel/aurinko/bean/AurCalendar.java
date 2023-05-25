@@ -24,6 +24,9 @@ public class AurCalendar extends AurLiveIdEntity {
   String color;
 
   @Key
+  String description;
+
+  @Key
   String accessRole;
 
   @Key

@@ -22,4 +22,7 @@ public class MeetingInfo extends GenericJson {
 
   @Key
   private Set<String> attendeePermissions;
+
+  @Key
+  private OnlineMeetingDetails onlineMeetingDetails;
 }
