@@ -6,7 +6,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public final class Attendee extends GenericJson {
+public final class Attendee extends GenericJson implements EventParticipant {
 
   @Key
   private String id;

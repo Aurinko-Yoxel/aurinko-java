@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public class Organizer extends GenericJson {
+public class Organizer extends GenericJson implements EventParticipant {
     @Key
     private String id;
 
