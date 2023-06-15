@@ -39,6 +39,7 @@ import com.yoxel.aurinko.bean.AurPlural;
 import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.bean.AurSubscription;
 import com.yoxel.aurinko.bean.AurSubscriptionsPage;
+import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
@@ -368,6 +369,19 @@ public class AurinkoService implements AutoCloseable {
 
     public CalendarSeriesOccurrences occurrences(String masterId) {
       return new CalendarSeriesOccurrences(calendarId, masterId);
+    }
+
+    public void updateMeetingResponse(String eventId, MeetingResponse response) throws IOException {
+      updateMeetingResponse(eventId, response, true);
+    }
+
+    public void updateMeetingResponse(String eventId, MeetingResponse response, boolean notifyAttendees)
+        throws IOException {
+      httpPut(
+          entityFullPath() + "/" + normalizeId(eventId) + "/response",
+          QueryParams.of("notifyAttendees", notifyAttendees),
+          new JsonHttpContent(Utils.getDefaultJsonFactory(), response)
+      ).ignore();
     }
   }
 
