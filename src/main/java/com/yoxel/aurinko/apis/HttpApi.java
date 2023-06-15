@@ -25,6 +25,14 @@ public interface HttpApi {
     return httpRequestPrepare("POST", path, queryParams).setContent(content);
   }
 
+  default HttpRequest httpPutPrepare(String path, QueryParams queryParams) throws IOException {
+    return httpRequestPrepare("PUT", path, queryParams);
+  }
+
+  default HttpRequest httpPutPrepare(String path, QueryParams queryParams, HttpContent content) throws IOException {
+    return httpRequestPrepare("PUT", path, queryParams).setContent(content);
+  }
+
   default HttpRequest httpPatchPrepare(String path, QueryParams queryParams, HttpContent content) throws IOException {
     return httpRequestPrepare("PATCH", path, queryParams).setContent(content);
   }
@@ -55,6 +63,22 @@ public interface HttpApi {
 
   default HttpResponse httpPost(String path, HttpContent content) throws IOException {
     return httpPost(path, QueryParams.EMPTY, content);
+  }
+
+  default HttpResponse httpPut(String path, QueryParams queryParams) throws IOException {
+    return httpPutPrepare(path, queryParams).execute();
+  }
+
+  default HttpResponse httpPut(String path) throws IOException {
+    return httpPut(path, QueryParams.EMPTY);
+  }
+
+  default HttpResponse httpPut(String path, QueryParams queryParams, HttpContent content) throws IOException {
+    return httpPutPrepare(path, queryParams, content).execute();
+  }
+
+  default HttpResponse httpPut(String path, HttpContent content) throws IOException {
+    return httpPut(path, QueryParams.EMPTY, content);
   }
 
   default HttpResponse httpPatch(String path, QueryParams queryParams, HttpContent content) throws IOException {
