@@ -5,11 +5,13 @@ import com.yoxel.aurinko.bean.sub.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AurContact extends AurLiveIdEntity {
+public class AurContact extends AurLiveIdEntity implements AurNativePropertiesSupport {
     @Key
     private ContactName name;
 
@@ -48,4 +50,7 @@ public class AurContact extends AurLiveIdEntity {
 
     @Key
     private String companyId;
+
+    @Key
+    private Map<String, Object> nativeProperties;
 }
