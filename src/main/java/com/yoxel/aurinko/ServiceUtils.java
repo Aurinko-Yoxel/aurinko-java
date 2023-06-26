@@ -145,6 +145,15 @@ public class ServiceUtils {
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(uma.getClientUser().getExtId());
+    } else if (acc.getProtocol() == Protocol.CLIENTIFY) {
+      accDto.setServiceType("Clientify");
+      accDto.setServerUrl(acc.getServer());
+      accDto.setAuthString1(acc.getPassword());
+      accDto.setAuthString2(null);
+
+      // is it OK?
+      accDto.setAuthOrgId(uma.getClientCompany().getExtId());
+      accDto.setAuthUserId(uma.getClientUser().getExtId());
     }
 
     return accDto;
