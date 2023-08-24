@@ -34,6 +34,9 @@ public class AurContact extends AurLiveIdEntity implements AurNativePropertiesSu
     private String notes;
 
     @Key
+    private boolean hasPhoto;
+
+    @Key
     private List<ContactRelation> relations;
 
     @Key
