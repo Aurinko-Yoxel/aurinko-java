@@ -70,7 +70,7 @@ public class AurEvent extends AurLiveIdEntity {
   private List<String> categories;
 
   @Key
-  private Map<String, String> nativeProperties;
+  private Map<String, Object> nativeProperties;
 
   public boolean isMeeting() {
     return meetingInfo != null && (
