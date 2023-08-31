@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 public class ContactPhoto {
   @Key
-  private final String id;
+  private String id;
   @Key
-  private final String name;
+  private String name;
   @Key
-  private final String mimeType;
+  private String mimeType;
   @Key
-  private final String content;
+  private String content;
 }
