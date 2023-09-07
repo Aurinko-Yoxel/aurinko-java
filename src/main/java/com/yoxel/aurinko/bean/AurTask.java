@@ -21,6 +21,9 @@ public class AurTask extends AurLiveIdEntity {
   private String parentId;
 
   @Key
+  private String previousId;
+
+  @Key
   private String owner;
 
   @Key
@@ -38,15 +41,16 @@ public class AurTask extends AurLiveIdEntity {
   @Key
   private DateTime startDateTime;
 
-  @Key
-  private DateTime due;
+  @Key("due")
+  private DateTime dueDateTime;
 
   @Key
   private DateTime completed;
 
   @Key
-  private List<String> keywords;
+  private List<String> categories;
 
+  @Key
   private List<TaskLink> links;
 
 }
