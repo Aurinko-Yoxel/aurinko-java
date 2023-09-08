@@ -24,6 +24,9 @@ public class AurTask extends AurLiveIdEntity {
   private String previousId;
 
   @Key
+  private String position;
+
+  @Key
   private String owner;
 
   @Key
