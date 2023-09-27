@@ -39,6 +39,11 @@ import com.yoxel.aurinko.bean.AurPlural;
 import com.yoxel.aurinko.bean.AurQueryResult;
 import com.yoxel.aurinko.bean.AurSubscription;
 import com.yoxel.aurinko.bean.AurSubscriptionsPage;
+import com.yoxel.aurinko.bean.AurTask;
+import com.yoxel.aurinko.bean.AurTaskSaveResult;
+import com.yoxel.aurinko.bean.AurTasklist;
+import com.yoxel.aurinko.bean.AurTasklistsPage;
+import com.yoxel.aurinko.bean.AurTasksPage;
 import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
@@ -159,6 +164,7 @@ public class AurinkoService implements AutoCloseable {
   public Auth auth = new Auth();
   public Accounts accounts = new Accounts();
   public Calendars calendars = new Calendars();
+  public TaskLists taskLists = new TaskLists();
   public Emails emails = new Emails();
   public Contacts contacts = new Contacts();
 
@@ -302,6 +308,52 @@ public class AurinkoService implements AutoCloseable {
           QueryParams.of("recycleKeys", "email"),
           new JsonHttpContent(Utils.getDefaultJsonFactory(), acc)
       ).parseAs(AurAccountToken.class);
+    }
+  }
+
+  /**
+   * TaskList API: /tasklists
+   */
+  public class TaskLists extends BasicEntitySupport<AurTasklist, AurTasklistsPage, AurTasklist> {
+
+    TaskLists() {
+      super("/tasklists", "", AurTasklist.class, AurTasklistsPage.class, AurTasklist.class);
+    }
+
+    @Override
+    public String normalizeId(String id) {
+      return id == null ? "default" : id;
+    }
+
+    public TasklistEntries tasklistEntries(String tasklistId) {
+      return new TasklistEntries(normalizeId(tasklistId));
+    }
+  }
+
+  /**
+   * Events API: /calendars/:id/events
+   */
+  public class TasklistEntries
+      extends BasicEntitySupport<AurTask, AurTasksPage, AurTaskSaveResult>
+      implements SyncSupport<AurTask, AurTasksPage> {
+
+    private final String tasklistId;
+
+    TasklistEntries(String tasklistId) {
+      this(tasklistId, "");
+    }
+
+    private TasklistEntries(String tasklistId, String postfix) {
+      super("/tasklists/" + tasklistId,
+            "/tasks" + postfix,
+            AurTask.class, AurTasksPage.class, AurTaskSaveResult.class);
+      this.tasklistId = tasklistId;
+    }
+
+    public XStream<AurTask, IOException> streamTasks()
+        throws IOException {
+
+      return new AurinkoService.TasklistEntries(tasklistId, "").streamPaged();
     }
   }
 
