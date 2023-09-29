@@ -6,7 +6,7 @@
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-service</artifactId>
-	<version>1.5-RECUR-SNAPSHOT</version>
+	<version>1.5.1-RECUR-SNAPSHOT</version>
 
 	<parent>
 		<groupId>com.yoxel</groupId>
