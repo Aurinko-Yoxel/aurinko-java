@@ -13,7 +13,7 @@ public interface AurExtUserInfoProvider {
 
   interface Factory {
 
-    AurExtUserInfoProvider createProvider(AurinkoService aurSvc);
+    AurExtUserInfoProvider createProvider(AurinkoService aurSvc, String extOrgId, String extUserId);
   }
 
   AurExtUser getMyInfo() throws IOException;
