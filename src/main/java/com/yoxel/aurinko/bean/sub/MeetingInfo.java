@@ -12,7 +12,7 @@ import java.util.Set;
 public class MeetingInfo extends GenericJson {
 
   @Key
-  private boolean cancelled;
+  private boolean canceled;
 
   @Key
   private List<Attendee> attendees;
