@@ -198,7 +198,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   @RequiredArgsConstructor
-  abstract class BasicEntitySupport<
+  public abstract class BasicEntitySupport<
       Entity extends AurLiveIdEntity,
       Page extends AurQueryResult<Entity>,
       SaveResult
