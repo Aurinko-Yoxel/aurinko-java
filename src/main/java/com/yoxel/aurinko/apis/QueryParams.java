@@ -96,7 +96,7 @@ public interface QueryParams {
     return addAll(param);
   }
 
-  default QueryParams add(String name, String value) {
+  default QueryParams add(String name, Object value) {
     if (value == null) {
       return this;
     }
