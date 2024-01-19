@@ -1,8 +1,8 @@
 package com.yoxel.aurinko.bean;
 
-import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
+import com.yoxel.aurinko.bean.sub.AurMeta;
 import lombok.Data;
 
 import java.util.List;
@@ -25,4 +25,7 @@ public abstract class AurLiveIdEntity extends AurIdEntity {
 
     @Key
     private List<String> omitted;
+
+    @Key("__meta")
+    private AurMeta meta;
 }
