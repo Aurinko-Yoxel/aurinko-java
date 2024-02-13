@@ -265,12 +265,13 @@ public class ServiceUtils {
     aurAcc.setClientOrgId(uma.getClientCompany().getExtId());
 
     AurAccountToken aurToken = null;
-    if (acc.isTrustServer() && acc.getTemplId() > 0) { // || forceManagedBy != null
 
-      final ServiceTemplate svcTempl = uma.getServiceTemplate(acc.getTemplId());
+    final ServiceTemplate svcTempl = acc.getTemplId() > 0 ? uma.getServiceTemplate(acc.getTemplId()) : null;
+    if ((acc.isTrustServer() || svcTempl.getProtocol() == Protocol.EWS && svcTempl.getPassword() != null)
+        && svcTempl != null) { // || forceManagedBy != null
+
       if (svcTempl.getAurinkoToken() == null) {
-        log.warn(
-            "No Aurinko token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
+        log.warn("No Aurinko token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
         return null;
       }
 
