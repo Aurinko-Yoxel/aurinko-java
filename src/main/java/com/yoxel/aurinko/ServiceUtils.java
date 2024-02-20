@@ -267,8 +267,8 @@ public class ServiceUtils {
     AurAccountToken aurToken = null;
 
     final ServiceTemplate svcTempl = acc.getTemplId() > 0 ? uma.getServiceTemplate(acc.getTemplId()) : null;
-    if ((acc.isTrustServer() || svcTempl.getProtocol() == Protocol.EWS && svcTempl.getPassword() != null)
-        && svcTempl != null) { // || forceManagedBy != null
+    if (svcTempl != null && (acc.isTrustServer() || svcTempl.getProtocol() == Protocol.EWS
+                                                    && svcTempl.getPassword() != null)) { // || forceManagedBy != null
 
       if (svcTempl.getAurinkoToken() == null) {
         log.warn("No Aurinko token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
