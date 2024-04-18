@@ -15,10 +15,15 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class AurSubscription extends GenericJson {
 
-  public AurSubscription(String resource, String notificationUrl) {
+  public AurSubscription(String resource, String notificationUrl, String detailLevel) {
     this.id = 0;
     this.resource = resource;
     this.notificationUrl = notificationUrl;
+    this.detailLevel = detailLevel;
+  }
+
+  public AurSubscription(String resource, String notificationUrl) {
+    this(resource, notificationUrl, null);
   }
 
   @Key
