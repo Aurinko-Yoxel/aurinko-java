@@ -29,4 +29,7 @@ public class AurSubscription extends GenericJson {
 
   @Key
   private String notificationUrl;
+
+  @Key
+  private String detailLevel;
 }
