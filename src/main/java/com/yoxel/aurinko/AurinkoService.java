@@ -52,6 +52,8 @@ import com.yoxel.commons.xstream.XStream;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -390,7 +392,7 @@ public class AurinkoService implements AutoCloseable {
     }
 
     private CalendarEvents(String calendarId, String postfix) {
-      super("/calendars/" + calendarId,
+      super("/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8),
             "/events" + postfix,
             AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
       this.calendarId = calendarId;
