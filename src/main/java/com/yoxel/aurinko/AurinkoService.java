@@ -74,7 +74,7 @@ public class AurinkoService implements AutoCloseable {
 
   private final HttpTransport httpTransport;
 
-  private static final JsonObjectParser JSON_PARSER =
+  public static final JsonObjectParser JSON_PARSER =
       new JsonObjectParser(Utils.getDefaultJsonFactory());
 
   private final HttpRequestInitializer requestInitializer;
