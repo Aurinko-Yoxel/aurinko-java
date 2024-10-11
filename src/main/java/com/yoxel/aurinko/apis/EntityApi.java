@@ -3,17 +3,11 @@ package com.yoxel.aurinko.apis;
 /**
  *
  */
-public interface EntityApi {
+public interface EntityApi<Id> {
 
-  String entityApiRoot(); // for instance, /calendars/primary
+  String entityPath();
 
-  String entityPath(); // for instance /events
-
-  default String entityFullPath() {
-    return entityApiRoot() + entityPath();
-  }
-
-  default String normalizeId(String id) {
+  default Id normalizeId(Id id) {
     return id;
   }
 }

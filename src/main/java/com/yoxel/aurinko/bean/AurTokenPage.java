@@ -5,7 +5,7 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public abstract class AurQueryResult<T extends AurIdEntity> extends GenericJson {
+public abstract class AurTokenPage<T> extends GenericJson {
 
     @Key
     private long length;

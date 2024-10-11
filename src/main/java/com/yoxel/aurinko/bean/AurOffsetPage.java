@@ -5,13 +5,13 @@ import com.google.api.client.util.Key;
 import lombok.Data;
 
 @Data
-public class AurPlural<T extends GenericJson> extends GenericJson {
+public class AurOffsetPage<T> extends GenericJson {
 
     @Key
-    private long offset;
+    private int offset;
 
     @Key
-    private long totalSize;
+    private int totalSize;
 
     @Key
     private boolean done;

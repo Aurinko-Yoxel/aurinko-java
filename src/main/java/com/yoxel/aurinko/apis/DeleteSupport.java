@@ -5,13 +5,13 @@ import java.io.IOException;
 /**
  *
  */
-public interface DeleteSupport extends EntityApi, HttpApi {
+public interface DeleteSupport<Id> extends EntityApi<Id>, HttpApi {
 
-  default void delete(String id, QueryParams params) throws IOException {
-    httpDelete(entityFullPath() + "/" + normalizeId(id), params).ignore();
+  default void delete(Id id, QueryParams params) throws IOException {
+    httpDelete(entityPath() + "/" + normalizeId(id), params).ignore();
   }
 
-  default void delete(String id) throws IOException {
+  default void delete(Id id) throws IOException {
     delete(id, QueryParams.EMPTY);
   }
 

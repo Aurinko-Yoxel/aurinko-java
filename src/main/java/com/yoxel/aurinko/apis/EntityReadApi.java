@@ -5,7 +5,7 @@ import com.yoxel.aurinko.bean.AurLiveIdEntity;
 /**
  *
  */
-public interface EntityReadApi<Entity extends AurLiveIdEntity> extends EntityApi {
+public interface EntityReadApi<Entity, Id> extends EntityApi<Id> {
 
   Class<Entity> entityClass();
 }

@@ -1,11 +1,9 @@
 package com.yoxel.aurinko.apis;
 
-import com.yoxel.aurinko.bean.AurLiveIdEntity;
-
 /**
  *
  */
-public interface EntitySaveApi<Entity extends AurLiveIdEntity, SaveResult> extends EntityApi {
+public interface EntitySaveApi<Id, SaveResult> extends EntityApi<Id> {
 
   Class<SaveResult> entitySaveResultClass();
 }

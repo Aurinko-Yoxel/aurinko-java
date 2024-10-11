@@ -1,4 +1,4 @@
 package com.yoxel.aurinko.bean;
 
-public class AurContactsPage extends AurQueryResult<AurContact> {
+public class AurContactsPage extends AurTokenPage<AurContact> {
 }

@@ -58,4 +58,6 @@ public class AurAccount {
   @Key
   private DateTime authExpiresAt;
 
+  public static class Page extends AurOffsetPage<AurAccount> {
+  }
 }

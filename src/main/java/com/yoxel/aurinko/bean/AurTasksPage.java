@@ -1,5 +1,5 @@
 package com.yoxel.aurinko.bean;
 
-public class AurTasksPage extends AurQueryResult<AurTask> {
+public class AurTasksPage extends AurTokenPage<AurTask> {
 }
 

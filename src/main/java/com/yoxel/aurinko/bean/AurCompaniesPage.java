@@ -3,6 +3,6 @@ package com.yoxel.aurinko.bean;
 /**
  *
  */
-public class AurCompaniesPage extends AurQueryResult<AurCompany> {
+public class AurCompaniesPage extends AurTokenPage<AurCompany> {
 
 }

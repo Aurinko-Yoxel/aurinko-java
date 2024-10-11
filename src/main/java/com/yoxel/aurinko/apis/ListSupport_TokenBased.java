@@ -1,8 +1,6 @@
 package com.yoxel.aurinko.apis;
 
-import com.yoxel.aurinko.bean.AurIdEntity;
-import com.yoxel.aurinko.bean.AurLiveIdEntity;
-import com.yoxel.aurinko.bean.AurQueryResult;
+import com.yoxel.aurinko.bean.AurTokenPage;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
 
@@ -10,10 +8,10 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- *
+ * Support for list API endpoints with token-based pagination.
  */
-public interface ListSupport<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
-    extends EntityListApi<Entity, Page>, HttpApi {
+public interface ListSupport_TokenBased<Entity, Id, Page extends AurTokenPage<Entity>>
+    extends EntityPageApi<Id, Page>, HttpApi {
 
   default Page loadPage() throws IOException {
     return loadPage(QueryParams.EMPTY, null);
@@ -27,7 +25,7 @@ public interface ListSupport<Entity extends AurLiveIdEntity, Page extends AurQue
   default Page loadPage(QueryParams query, String pageToken) throws IOException {
 
     return httpGet(
-        entityFullPath(),
+        entityPath(),
         query.add("pageToken", pageToken)
     ).parseAs(entityPageClass());
   }

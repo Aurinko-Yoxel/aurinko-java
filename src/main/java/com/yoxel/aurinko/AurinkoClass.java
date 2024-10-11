@@ -5,7 +5,7 @@ import com.yoxel.aurinko.bean.AurCompany;
 import com.yoxel.aurinko.bean.AurContact;
 import com.yoxel.aurinko.bean.AurContactsPage;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
-import com.yoxel.aurinko.bean.AurQueryResult;
+import com.yoxel.aurinko.bean.AurTokenPage;
 
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @RequiredArgsConstructor
-public final class AurinkoClass<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>> {
+public final class AurinkoClass<Entity extends AurLiveIdEntity, Page extends AurTokenPage<Entity>> {
 
   public final String name;
   public final Class<Entity> entityClass;

@@ -4,31 +4,29 @@ import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.json.JsonHttpContent;
 
-import com.yoxel.aurinko.bean.AurLiveIdEntity;
-
 import java.io.IOException;
 
 /**
  *
  */
-public interface UpdateSupport<Entity extends AurLiveIdEntity, SaveResult>
-    extends EntitySaveApi<Entity, SaveResult>, HttpApi {
+public interface UpdateSupport<Entity, Id, SaveResult>
+    extends EntitySaveApi<Id, SaveResult>, HttpApi {
 
-  default SaveResult update(String id, Entity entity) throws IOException {
+  default SaveResult update(Id id, Entity entity) throws IOException {
     return update(id, entity, QueryParams.EMPTY, null);
   }
 
-  default SaveResult update(String id, Entity entity, String etag) throws IOException {
+  default SaveResult update(Id id, Entity entity, String etag) throws IOException {
     return update(id, entity, QueryParams.EMPTY, etag);
   }
 
-  default SaveResult update(String id, Entity entity, QueryParams params) throws IOException {
+  default SaveResult update(Id id, Entity entity, QueryParams params) throws IOException {
     return update(id, entity, params, null);
   }
 
-  default SaveResult update(String id, Entity entity, QueryParams params, String etag) throws IOException {
+  default SaveResult update(Id id, Entity entity, QueryParams params, String etag) throws IOException {
     final HttpRequest request = httpPatchPrepare(
-        entityFullPath() + "/" + normalizeId(id),
+        entityPath() + "/" + normalizeId(id),
         params,
         new JsonHttpContent(Utils.getDefaultJsonFactory(), entity)
     );

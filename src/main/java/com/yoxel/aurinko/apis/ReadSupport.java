@@ -1,23 +1,39 @@
 package com.yoxel.aurinko.apis;
 
-import com.yoxel.aurinko.bean.AurLiveIdEntity;
+import com.google.api.client.http.HttpResponseException;
 
 import java.io.IOException;
 
 /**
  *
  */
-public interface ReadSupport<Entity extends AurLiveIdEntity>
-    extends EntityReadApi<Entity>, HttpApi {
+public interface ReadSupport<Entity, Id>
+    extends EntityReadApi<Entity, Id>, HttpApi {
 
-  default Entity read(String id) throws IOException {
+  default Entity read(Id id) throws IOException {
     return read(id, QueryParams.EMPTY);
   }
 
-  default Entity read(String id, QueryParams params) throws IOException {
+  default Entity read(Id id, QueryParams params) throws IOException {
 
-    return httpGet(entityFullPath() + "/" + normalizeId(id), params)
+    return httpGet(entityPath() + "/" + normalizeId(id), params)
         .parseAs(entityClass());
+  }
+
+  default Entity readOpt(Id id, QueryParams params) throws IOException {
+    try {
+      return read(id, params);
+    } catch (HttpResponseException e) {
+      if (e.getStatusCode() == 404) {
+        return null;
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  default Entity readOpt(Id id) throws IOException {
+    return readOpt(id, QueryParams.EMPTY);
   }
 
 }

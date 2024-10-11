@@ -1,7 +1,6 @@
 package com.yoxel.aurinko.apis;
 
-import com.yoxel.aurinko.bean.AurLiveIdEntity;
-import com.yoxel.aurinko.bean.AurQueryResult;
+import com.yoxel.aurinko.bean.AurTokenPage;
 import com.yoxel.aurinko.bean.AurSyncStatus;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
@@ -17,8 +16,8 @@ import static com.yoxel.aurinko.apis.QueryParams.qp;
 /**
  *
  */
-public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQueryResult<Entity>>
-    extends EntityListApi<Entity, Page>, HttpApi {
+public interface SyncSupport<Entity, Page extends AurTokenPage<Entity>>
+    extends EntityPageApi<String, Page>, HttpApi {
 
   @RequiredArgsConstructor
   enum SyncScope {
@@ -27,12 +26,14 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
     private final String path;
   }
 
+  String syncRootPath();
+
   default AurSyncStatus syncStart() throws IOException {
     return syncStart(QueryParams.EMPTY);
   }
 
   default AurSyncStatus syncStart(QueryParams params) throws IOException {
-    return httpPost(entityApiRoot() + "/sync", params).parseAs(AurSyncStatus.class);
+    return httpPost(syncRootPath() + "/sync", params).parseAs(AurSyncStatus.class);
   }
 
   default Page syncPage(
@@ -43,7 +44,7 @@ public interface SyncSupport<Entity extends AurLiveIdEntity, Page extends AurQue
   ) throws IOException {
 
     return httpGet(
-        entityApiRoot() + "/sync/" + scope.path,
+        syncRootPath() + "/sync/" + scope.path,
         queryParams.addAll(
             qp("deltaToken", deltaToken),
             qp("pageToken", pageToken)
