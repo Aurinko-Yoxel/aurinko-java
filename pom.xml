@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.yoxel</groupId>
 			<artifactId>model2</artifactId>
-			<version>4.2.6-SNAPSHOT</version>
+			<version>4.2.7-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yoxel</groupId>
