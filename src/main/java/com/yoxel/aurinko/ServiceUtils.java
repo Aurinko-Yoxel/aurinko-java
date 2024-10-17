@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,10 +61,18 @@ public class ServiceUtils {
 
     final AurAccountDto accDto = new AurAccountDto();
 
-    accDto.setName(uma.getClientUser().getName());
+    final ClientUser clientUser = uma.getClientUser();
+    accDto.setName(clientUser.getName());
     accDto.setActive(!acc.isOffline());
     accDto.setAuthScopes(scopes.toArray(new String[0]));
     accDto.setEmail(acc.getEmailAddress());
+    if (clientUser.getTimeZone() != null) {
+      try {
+        accDto.setTimezone(java.time.ZoneId.of(clientUser.getTimeZone()).getId());
+      } catch (DateTimeException e) {
+        log.warn("Failed to parse user timezone {}: {}", clientUser.getTimeZone(), e.getMessage());
+      }
+    }
 
     if (!StringUtils.isBlank(acc.getUsername()) && !"X".equals(acc.getUsername())) {
       accDto.setLoginString(acc.getUsername());
@@ -135,7 +144,7 @@ public class ServiceUtils {
 
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
-      accDto.setAuthUserId(uma.getClientUser().getExtId());
+      accDto.setAuthUserId(clientUser.getExtId());
     } else if (acc.getProtocol() == Protocol.SALESFLARE) {
       accDto.setServiceType("Salesflare");
       accDto.setServerUrl(acc.getServer());
@@ -144,7 +153,7 @@ public class ServiceUtils {
 
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
-      accDto.setAuthUserId(uma.getClientUser().getExtId());
+      accDto.setAuthUserId(clientUser.getExtId());
     } else if (acc.getProtocol() == Protocol.CLIENTIFY) {
       accDto.setServiceType("Clientify");
       accDto.setServerUrl(acc.getServer());
@@ -153,7 +162,7 @@ public class ServiceUtils {
 
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
-      accDto.setAuthUserId(uma.getClientUser().getExtId());
+      accDto.setAuthUserId(clientUser.getExtId());
     }
 
     return accDto;

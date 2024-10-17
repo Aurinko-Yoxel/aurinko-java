@@ -65,4 +65,6 @@ public class AurAccountDto {
   @Key
   boolean active;
 
+  @Key
+  private String timezone;
 }
