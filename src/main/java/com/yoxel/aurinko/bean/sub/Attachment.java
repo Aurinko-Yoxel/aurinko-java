@@ -14,7 +14,7 @@ public class Attachment extends GenericJson {
     private boolean inline;
 
     @Key
-    private String fileName;
+    private String name;
 
     @Key
     private int size;
