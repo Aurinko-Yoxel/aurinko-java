@@ -309,8 +309,21 @@ public class AurinkoService implements AutoCloseable {
   @NoArgsConstructor(access = AccessLevel.PACKAGE)
   public class Accounts extends HttpApiSupport {
 
+    public AurAccount getMe(
+        boolean pingProvider,
+        boolean includeProviderAuth
+    ) throws IOException {
+      return httpGet(
+          "/account",
+          QueryParams.of(
+              qp("pingProvider", pingProvider),
+              qp("includeProviderAuth", includeProviderAuth)
+          )
+      ).parseAs(AurAccount.class);
+    }
+
     public AurAccount getMe() throws IOException {
-      return httpGet("/account").parseAs(AurAccount.class);
+      return getMe(false, false);
     }
 
     public void deleteMe() throws IOException {
