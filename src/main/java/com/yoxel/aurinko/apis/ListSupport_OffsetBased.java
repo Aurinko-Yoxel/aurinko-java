@@ -28,7 +28,7 @@ public interface ListSupport_OffsetBased<Entity, Id, Page extends AurOffsetPage<
     return IOXStream
         .iterateUntil(
             loadPage(pageSize, 0, queryParams),
-            pg -> loadPage(pg.getOffset() + pageSize, pageSize, queryParams),
+            pg -> loadPage(pageSize, pg.getOffset() + pageSize, queryParams),
             AurOffsetPage::isDone
         )
         .flatMap(pg -> IOXStream.of(pg.getRecords()));
