@@ -11,6 +11,8 @@ public class AurTracking {
   @Key
   private String messageId;
   @Key
+  private String inetMessageId;
+  @Key
   private String threadId;
   @Key
   private com.google.api.client.util.DateTime sendDate;
