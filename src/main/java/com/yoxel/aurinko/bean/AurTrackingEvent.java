@@ -22,6 +22,12 @@ public class AurTrackingEvent {
   @Key
   private long trackingId;
   @Key
+  private String trackingThreadId;
+  @Key
+  private String trackingMessageId;
+  @Key
+  private String trackingInternetMessageId;
+  @Key
   private String context;
   @Key
   private String trackingCode;
