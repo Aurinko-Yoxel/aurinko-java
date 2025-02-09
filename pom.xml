@@ -6,7 +6,7 @@
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-service</artifactId>
-	<version>1.8.1-SNAPSHOT</version>
+	<version>1.8.2-SNAPSHOT</version>
 
 	<parent>
 		<groupId>com.yoxel</groupId>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>com.yoxel</groupId>
 			<artifactId>yoxel-commons</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
