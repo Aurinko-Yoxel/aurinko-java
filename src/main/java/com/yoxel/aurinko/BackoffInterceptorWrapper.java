@@ -32,5 +32,5 @@ public class BackoffInterceptorWrapper implements HttpRequestInitializer {
   }
 
   public static final BackOffRequired ON_RATE_LIMITING =
-      (resp) -> resp.getStatusCode() == 429 || resp.getStatusCode() == 503;
+      (resp) -> resp.getStatusCode() == 429 || resp.getStatusCode() == 408 || resp.getStatusCode() == 503;
 }
