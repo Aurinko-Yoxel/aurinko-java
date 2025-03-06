@@ -63,9 +63,10 @@ public class TeamworkUserInfoProvider implements AurExtUserInfoProvider {
           .getPerson()
           .toAurExtUser();
     } catch (HttpResponseException ex) {
-      if (HttpErrors.isNotFound404(ex)) {
-        return null;
-      }
+//      if (HttpErrors.isNotFound404(ex)) {
+//        return null;
+//      }
+      
       throw ex;
     }
   }
