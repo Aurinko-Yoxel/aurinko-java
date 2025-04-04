@@ -62,7 +62,7 @@ public class ServiceUtils {
     final AurAccountDto accDto = new AurAccountDto();
 
     final ClientUser clientUser = uma.getClientUser();
-    accDto.setName(clientUser.getName());
+    accDto.setName(acc.getFullName() != null ? acc.getFullName() : clientUser.getName());
     accDto.setActive(!acc.isOffline());
     accDto.setAuthScopes(scopes.toArray(new String[0]));
     accDto.setEmail(acc.getEmailAddress());
@@ -163,6 +163,13 @@ public class ServiceUtils {
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
       accDto.setAuthUserId(clientUser.getExtId());
+    } else if (acc.getProtocol() == Protocol.SFORCE) {
+      accDto.setServiceType("Salesforce");
+      accDto.setServerUrl(acc.getServer());
+
+      // is it OK?
+      accDto.setAuthOrgId(uma.getClientCompany().getExtId());
+      accDto.setAuthUserId(clientUser.getExtId());
     }
 
     return accDto;
@@ -255,7 +262,7 @@ public class ServiceUtils {
   }
 
   private static boolean protocolSupported(Protocol protocol, String partner) {
-    return protocol.isReadEmail() || protocol == Protocol.SALESFLARE ||
+    return protocol.isReadEmail() || protocol == Protocol.SALESFLARE || protocol == Protocol.SFORCE ||
            protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner);
   }
 
