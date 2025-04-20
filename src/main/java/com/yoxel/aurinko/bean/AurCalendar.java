@@ -32,6 +32,9 @@ public class AurCalendar extends AurLiveIdEntity {
   @Key
   Boolean primary;
 
+  @Key
+  String groupName;
+
   public boolean isPrimary() {
     return isTrue(primary);
   }
