@@ -35,6 +35,9 @@ public class AurCalendar extends AurLiveIdEntity {
   @Key
   String groupName;
 
+  @Key
+  String groupMail;
+
   public boolean isPrimary() {
     return isTrue(primary);
   }
