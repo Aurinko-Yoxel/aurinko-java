@@ -4,58 +4,59 @@ package com.yoxel.aurinko;
 import com.yoxel.aurinko.bean.AurOAuthClientReg;
 import com.yoxel.model2.AurinkoPartnerToken;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public final class OAuth2ClientRegs {
 
-    private static Map<String, List<AurOAuthClientReg>> appRegs = new HashMap<>();
+  private static Map<String, List<AurOAuthClientReg>> appRegs = new HashMap<>();
 
-    public interface SecretStoreAccess {
+  public interface SecretStoreAccess {
 
-        String getSecret(String alias);
-    }
+    String getSecret(String alias);
+  }
 
-    private OAuth2ClientRegs(String partner, SecretStoreAccess syncStore) {
-        this.partner = partner;
-        this.syncStore = syncStore;
-    }
+  private OAuth2ClientRegs(String partner, SecretStoreAccess syncStore) {
+    this.partner = partner;
+    this.syncStore = syncStore;
+  }
 
-    @Getter
-    private String partner;
+  @Getter
+  private String partner;
 
-    private SecretStoreAccess syncStore;
+  private SecretStoreAccess syncStore;
 
-    public static synchronized OAuth2ClientRegs forPartner(AurinkoPartnerToken partnerToken, SecretStoreAccess syncStore) {
-        if (partnerToken != null && partnerToken.getAurinkoClientId() != null) {
-            List<AurOAuthClientReg> rl = appRegs.get(partnerToken.getSyncPartner());
-            if (rl == null) {
-                try {
-                    appRegs.put(partnerToken.getSyncPartner(),
-                            Arrays.asList(AurinkoService
-                                    .createWithAppAuth(
+  public static synchronized OAuth2ClientRegs forPartner(AurinkoPartnerToken partnerToken,
+                                                         SecretStoreAccess syncStore) {
+    if (partnerToken != null && partnerToken.getAurinkoClientId() != null) {
+      List<AurOAuthClientReg> rl = appRegs.get(partnerToken.getSyncPartner());
+      if (rl == null) {
+        try {
+          appRegs.put(partnerToken.getSyncPartner(),
+                      Arrays.asList(AurinkoService
+                                        .createWithAppAuth(
                                             partnerToken.getAurinkoClientId(),
                                             partnerToken
-                                                    .getAurinkoClientSecret())
-                                    .accounts.getOAuthClientRegs().getRecords()));
-                } catch (IOException e) {
-                    log.error(e.getMessage());
-                    appRegs.put(partnerToken.getSyncPartner(), null);
-                }
-            }
+                                                .getAurinkoClientSecret())
+                                        .accounts.getOAuthClientRegs().getRecords()));
+        } catch (IOException e) {
+          log.error(e.getMessage());
+          appRegs.put(partnerToken.getSyncPartner(), null);
         }
-
-        return new OAuth2ClientRegs(partnerToken == null ? null : partnerToken.getSyncPartner(), syncStore);
+      }
     }
 
-    public String getOAuthClientReg(String key) {
+    return new OAuth2ClientRegs(partnerToken == null ? null : partnerToken.getSyncPartner(), syncStore);
+  }
+
+  public String getOAuthClientReg(String key) {
 //        if (!key.startsWith("daemon.office365.oauth2.")
 //                && (partner == null || "yoxel".equals(partner) || "teamworkpm".equals(partner)
 //                || !key.startsWith("google.oauth2.") && !key.startsWith("office365.oauth2.")
@@ -63,47 +64,49 @@ public final class OAuth2ClientRegs {
 //            return syncStore.getSecret(key);
 //        }
 
-        String value = null;
+    String value = null;
 
-        List<AurOAuthClientReg> rl = appRegs.get(partner == null ? "yoxel" : partner);
-        if (rl != null) {
-            if (key.startsWith("google.oauth2.")) {
+    List<AurOAuthClientReg> rl = appRegs.get(partner == null ? "yoxel" : partner);
+    if (rl != null) {
+      if (key.startsWith("google.oauth2.")) {
 
-                AurOAuthClientReg
-                        reg =
-                        rl.stream().filter(r -> "Google".equalsIgnoreCase(r.getServiceType())).findFirst()
-                                .get();
-
-                if ("google.oauth2.client".equals(key)) {
-                    value = reg.getClientId();
-                } else if ("google.oauth2.secret".equals(key)) {
-                    value = reg.getClientSecret();
-                }
-            } else if (key.startsWith("office365.oauth2.") || key.startsWith("daemon.office365.oauth2.")
-                    || key.startsWith("office.oauth2.") || key.startsWith("daemon.office.oauth2.")) {
-
-                final String svcType = key.contains("office365.oauth2.") ? "EWS365" : "Office365";
-
-                AurOAuthClientReg
-                        reg =
-                        rl.stream().filter(r -> svcType.equalsIgnoreCase(r.getServiceType())
-                                && r.isDaemon() == key.startsWith("daemon.")).findFirst().get();
-
-                if (key.endsWith("oauth2.client")) {
-                    value = reg.getClientId();
-                } else if (key.endsWith("oauth2.secret")) {
-                    value = reg.getClientSecret();
-                }
-            }
+        AurOAuthClientReg
+            reg =
+            rl.stream().filter(r -> "Google".equalsIgnoreCase(r.getServiceType())).findFirst()
+                .orElse(null);
+        if (reg != null) {
+          if ("google.oauth2.client".equals(key)) {
+            value = reg.getClientId();
+          } else if ("google.oauth2.secret".equals(key)) {
+            value = reg.getClientSecret();
+          }
         }
+      } else if (key.startsWith("office365.oauth2.") || key.startsWith("daemon.office365.oauth2.")
+                 || key.startsWith("office.oauth2.") || key.startsWith("daemon.office.oauth2.")) {
 
-        if (value == null) {
-            value = syncStore.getSecret(key);
+        final String svcType = key.contains("office365.oauth2.") ? "EWS365" : "Office365";
+
+        AurOAuthClientReg
+            reg =
+            rl.stream().filter(r -> svcType.equalsIgnoreCase(r.getServiceType())
+                                    && r.isDaemon() == key.startsWith("daemon.")).findFirst().orElse(null);
+        if (reg != null) {
+          if (key.endsWith("oauth2.client")) {
+            value = reg.getClientId();
+          } else if (key.endsWith("oauth2.secret")) {
+            value = reg.getClientSecret();
+          }
         }
+      }
+    }
+
+    if (value == null) {
+      value = syncStore.getSecret(key);
+    }
 
 //        if (value == null)
 //            throw new IllegalArgumentException("partner: " + partner + ", key: " + key);
 
-        return value;
-    }
+    return value;
+  }
 }
