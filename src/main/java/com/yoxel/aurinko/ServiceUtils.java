@@ -272,7 +272,7 @@ public class ServiceUtils {
 
   private static boolean protocolSupported(Protocol protocol, String partner) {
     return protocol.isReadEmail() || protocol == Protocol.SALESFLARE || protocol == Protocol.SFORCE ||
-           protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner);
+           protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner) || protocol == Protocol.AURINKO;
   }
 
   public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc, SyncData sd,
