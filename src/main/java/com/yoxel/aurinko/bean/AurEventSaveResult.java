@@ -2,6 +2,8 @@ package com.yoxel.aurinko.bean;
 
 import com.google.api.client.util.Key;
 
+import com.yoxel.aurinko.bean.sub.OnlineMeetingDetails;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,4 +16,11 @@ public class AurEventSaveResult extends AurSaveResult<AurEvent> {
 
   @Key
   private String globalId;
+
+  @Key
+  private String onlineMeetingProvider;
+
+  @Key
+  private OnlineMeetingDetails onlineMeetingDetails;
+
 }
