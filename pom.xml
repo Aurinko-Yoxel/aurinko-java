@@ -18,14 +18,14 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.yoxel</groupId>
+			<groupId>com.yoxel.model2</groupId>
 			<artifactId>model2</artifactId>
-			<version>4.2.16-SNAPSHOT</version>
+			<version>4.2.19-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yoxel</groupId>
 			<artifactId>oauth-flow</artifactId>
-			<version>1.6.1</version>
+			<version>1.6.2</version>
 		</dependency>
 
 		<dependency>
