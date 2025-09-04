@@ -17,10 +17,16 @@ public class AurAccount {
   private String serviceType;
 
   @Key
+  private String serviceProvider;
+
+  @Key
   private boolean active;
 
   @Key
   private String tokenStatus;
+
+  @Key
+  private String tokenError;
 
   @Key
   private boolean daemon;
@@ -32,13 +38,22 @@ public class AurAccount {
   private String email;
 
   @Key
+  private String email2;
+
+  @Key
   private String name;
 
   @Key
-  private String clientOrgId;
+  private String name2;
 
   @Key
   private String serverUrl;
+
+  @Key
+  private String serverUrl2;
+
+  @Key
+  private String clientOrgId;
 
   @Key
   private String authOrgId;
@@ -47,16 +62,28 @@ public class AurAccount {
   private String authUserId;
 
   @Key
+  private String timezone;
+
+  @Key
   private DateTime tokenIssuedAt;
 
   @Key
   private String[] authScopes;
 
   @Key
+  private String[] authNativeScopes;
+
+  @Key
   private DateTime authObtainedAt;
 
   @Key
   private DateTime authExpiresAt;
+
+  @Key
+  private String userId;
+
+  @Key
+  private DateTime updatedAt;
 
   @Key
   private String providerAccessToken;

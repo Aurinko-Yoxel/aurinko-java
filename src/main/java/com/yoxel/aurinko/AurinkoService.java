@@ -13,6 +13,7 @@ import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.ExponentialBackOff;
+
 import com.yoxel.aurinko.apis.CreateSupport;
 import com.yoxel.aurinko.apis.DeleteSupport;
 import com.yoxel.aurinko.apis.EntityPageApi;
@@ -27,9 +28,11 @@ import com.yoxel.aurinko.bean.*;
 import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.XStream;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -307,7 +310,17 @@ public class AurinkoService implements AutoCloseable {
    * Accounts API
    */
   @NoArgsConstructor(access = AccessLevel.PACKAGE)
-  public class Accounts extends HttpApiSupport {
+  public class Accounts extends HttpApiSupport implements ListSupport_OffsetBased<AurAccount, Long, AurAccount.Page> {
+
+    @Override
+    public Class<AurAccount.Page> entityPageClass() {
+      return AurAccount.Page.class;
+    }
+
+    @Override
+    public String entityPath() {
+      return "/am/accounts";
+    }
 
     public AurAccount getMe(
         boolean pingProvider,
@@ -532,7 +545,7 @@ public class AurinkoService implements AutoCloseable {
   @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
   public class CalendarSeriesOccurrences extends HttpApiSupport
       implements ListSupport_TokenBased<AurEvent, String, AurEventsPage>,
-      ReadSupport<AurEvent, String> {
+                 ReadSupport<AurEvent, String> {
 
     private final String calendarId;
     private final String masterId;
@@ -603,7 +616,7 @@ public class AurinkoService implements AutoCloseable {
 
   public class EmailTracking extends HttpApiSupport
       implements ListSupport_OffsetBased<AurTracking, Long, AurTracking.Page>,
-      ReadSupport<AurTracking, Long> {
+                 ReadSupport<AurTracking, Long> {
 
     @Override
     public Class<AurTracking> entityClass() {
@@ -666,7 +679,8 @@ public class AurinkoService implements AutoCloseable {
     }
   }
 
-  public class Subscriptions extends EntitySupport_OffsetBased<AurSubscription, Long, AurSubscriptionsPage, AurSubscription> {
+  public class Subscriptions
+      extends EntitySupport_OffsetBased<AurSubscription, Long, AurSubscriptionsPage, AurSubscription> {
 
     public Subscriptions() {
       super(
