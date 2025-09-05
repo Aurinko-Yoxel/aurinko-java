@@ -68,6 +68,9 @@ public class AurAccount {
   private DateTime tokenIssuedAt;
 
   @Key
+  private DateTime tokenLastActivity;
+
+  @Key
   private String[] authScopes;
 
   @Key
