@@ -6,6 +6,8 @@ import com.yoxel.aurinko.bean.AurContact;
 import com.yoxel.aurinko.bean.AurContactsPage;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurTokenPage;
+import com.yoxel.aurinko.bean.AurUser;
+import com.yoxel.aurinko.bean.AurUsersPage;
 
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +30,8 @@ public final class AurinkoClass<Entity extends AurLiveIdEntity, Page extends Aur
 
   public static final AurinkoClass<AurContact, AurContactsPage> CONTACT =
       new AurinkoClass<>("contact", AurContact.class, AurContactsPage.class);
+
+  public static final AurinkoClass<AurUser, AurUsersPage> USER =
+      new AurinkoClass<>("user", AurUser.class, AurUsersPage.class);
 
 }
