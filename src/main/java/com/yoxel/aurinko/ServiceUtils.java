@@ -173,8 +173,10 @@ public class ServiceUtils {
     } else if (acc.getProtocol() == Protocol.AURINKO) {
       accDto.setServiceType(acc.getAurSvcType());
       accDto.setServerUrl(acc.getServer());
-      accDto.setAuthString1(acc.getPassword());
-      accDto.setAuthString2(null);
+      if (sd == null || sd.getAccessToken() == null) {
+        accDto.setAuthString1(acc.getPassword());
+        accDto.setAuthString2(null);
+      }
 
       // is it OK?
       accDto.setAuthOrgId(uma.getClientCompany().getExtId());
