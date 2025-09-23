@@ -4,6 +4,8 @@ package com.yoxel.aurinko;
 import com.yoxel.aurinko.bean.AurOAuthClientReg;
 import com.yoxel.model2.AurinkoPartnerToken;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,6 +56,22 @@ public final class OAuth2ClientRegs {
     }
 
     return new OAuth2ClientRegs(partnerToken == null ? null : partnerToken.getSyncPartner(), syncStore);
+  }
+
+  public Pair<String, String> getOAuthClientSecret(String svcType) {
+    List<AurOAuthClientReg> rl = appRegs.get(partner == null ? "yoxel" : partner);
+    if (rl == null) {
+      return null;
+    }
+
+    AurOAuthClientReg reg =
+        rl.stream().filter(r -> svcType.equalsIgnoreCase(r.getServiceType())).findFirst()
+            .orElse(null);
+    if (reg != null) {
+      return Pair.of(reg.getClientId(), reg.getClientSecret());
+    }
+
+    return null;
   }
 
   public String getOAuthClientReg(String key) {
