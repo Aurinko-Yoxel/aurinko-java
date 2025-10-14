@@ -20,6 +20,8 @@ public class AurinkoDynamicDemo {
         "WxKEMe8gTbSxKslz68dWj7UZGkjIuDmIJV5ime9TgNc"
     )) {
 
+      var xx=svc.dynamic(AurinkoClass.EVENT).entityFunctionPath("/xx");
+
       // list
       final var compApi = svc.dynamic(AurinkoClass.COMPANY);
       final var allCompanies = compApi.streamPaged().toList();

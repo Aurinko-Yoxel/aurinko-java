@@ -44,7 +44,6 @@ public interface ListSupport_TokenBased<Entity, Id, Page extends AurTokenPage<En
 
   default XStream<Entity, IOException> streamPaged(QueryParams queryParams, Consumer<? super Page> onPage)
       throws IOException {
-
     if (onPage == null) {
       onPage = v -> {
       };

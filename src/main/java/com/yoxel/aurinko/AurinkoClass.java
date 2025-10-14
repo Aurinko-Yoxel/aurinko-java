@@ -4,6 +4,8 @@ import com.yoxel.aurinko.bean.AurCompaniesPage;
 import com.yoxel.aurinko.bean.AurCompany;
 import com.yoxel.aurinko.bean.AurContact;
 import com.yoxel.aurinko.bean.AurContactsPage;
+import com.yoxel.aurinko.bean.AurDynEvent;
+import com.yoxel.aurinko.bean.AurDynEventsPage;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurTokenPage;
 import com.yoxel.aurinko.bean.AurUser;
@@ -30,6 +32,9 @@ public final class AurinkoClass<Entity extends AurLiveIdEntity, Page extends Aur
 
   public static final AurinkoClass<AurContact, AurContactsPage> CONTACT =
       new AurinkoClass<>("contact", AurContact.class, AurContactsPage.class);
+
+  public static final AurinkoClass<AurDynEvent, AurDynEventsPage> EVENT =
+      new AurinkoClass<>("event", AurDynEvent.class, AurDynEventsPage.class);
 
   public static final AurinkoClass<AurUser, AurUsersPage> USER =
       new AurinkoClass<>("user", AurUser.class, AurUsersPage.class);

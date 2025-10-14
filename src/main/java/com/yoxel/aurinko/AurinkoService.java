@@ -24,15 +24,38 @@ import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.apis.ReadSupport;
 import com.yoxel.aurinko.apis.SyncSupport;
 import com.yoxel.aurinko.apis.UpdateSupport;
-import com.yoxel.aurinko.bean.*;
+import com.yoxel.aurinko.bean.AurAccount;
+import com.yoxel.aurinko.bean.AurAccountToken;
+import com.yoxel.aurinko.bean.AurCalendar;
+import com.yoxel.aurinko.bean.AurCalendarsPage;
+import com.yoxel.aurinko.bean.AurContact;
+import com.yoxel.aurinko.bean.AurContactSaveResult;
+import com.yoxel.aurinko.bean.AurContactsPage;
+import com.yoxel.aurinko.bean.AurContent;
+import com.yoxel.aurinko.bean.AurEmail;
+import com.yoxel.aurinko.bean.AurEmailsPage;
+import com.yoxel.aurinko.bean.AurEvent;
+import com.yoxel.aurinko.bean.AurEventSaveResult;
+import com.yoxel.aurinko.bean.AurEventsPage;
+import com.yoxel.aurinko.bean.AurLiveIdEntity;
+import com.yoxel.aurinko.bean.AurOAuthClientRegsPage;
+import com.yoxel.aurinko.bean.AurOffsetPage;
+import com.yoxel.aurinko.bean.AurSubscription;
+import com.yoxel.aurinko.bean.AurSubscriptionsPage;
+import com.yoxel.aurinko.bean.AurTask;
+import com.yoxel.aurinko.bean.AurTaskSaveResult;
+import com.yoxel.aurinko.bean.AurTasklist;
+import com.yoxel.aurinko.bean.AurTasklistsPage;
+import com.yoxel.aurinko.bean.AurTasksPage;
+import com.yoxel.aurinko.bean.AurTokenPage;
+import com.yoxel.aurinko.bean.AurTracking;
+import com.yoxel.aurinko.bean.AurTrackingEvent;
 import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.dto.AurAccountDto;
+import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -40,7 +63,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import static com.yoxel.aurinko.apis.QueryParams.qp;
 
@@ -224,13 +252,12 @@ public class AurinkoService implements AutoCloseable {
    */
   @RequiredArgsConstructor
   public abstract class FullEntitySupport<Entity, Id, Page, SaveResult>
-      extends HttpApiSupport
-      implements
-      CreateSupport<Entity, Id, SaveResult>,
-      ReadSupport<Entity, Id>,
-      UpdateSupport<Entity, Id, SaveResult>,
-      DeleteSupport<Id>,
-      EntityPageApi<Id, Page> {
+      extends HttpApiSupport implements
+                             CreateSupport<Entity, Id, SaveResult>,
+                             ReadSupport<Entity, Id>,
+                             UpdateSupport<Entity, Id, SaveResult>,
+                             DeleteSupport<Id>,
+                             EntityPageApi<Id, Page> {
 
     private final String entityPath;
     private final Class<Entity> eClass;
@@ -240,7 +267,7 @@ public class AurinkoService implements AutoCloseable {
 
     @Override
     public String entityPath() {
-      return entityPath;
+      return entityPath.replace("{pathFunction}", "");
     }
 
     @Override
@@ -677,6 +704,54 @@ public class AurinkoService implements AutoCloseable {
           "/dynamic/" + (apiConfId == null ? "default" : apiConfId) +
           "/objects/" + aurClass.name, aurClass.entityClass, aurClass.pageClass, aurClass.entityClass);
     }
+
+    public String entityFunctionPath(String pathFunction) {
+      if (StringUtils.isBlank(pathFunction)) {
+        return entityPath();
+      }
+
+      int pos = entityPath().indexOf("/objects/");
+      return entityPath().substring(0, pos) + pathFunction + entityPath().substring(pos);
+    }
+
+    public Page loadFunctionPage(String pathFunction, QueryParams query, String pageToken) throws IOException {
+
+      return httpGet(
+          entityFunctionPath(pathFunction),
+          query.add("pageToken", pageToken)
+      ).parseAs(entityPageClass());
+    }
+
+    public XStream<Entity, IOException> streamFunctionPaged(String pathFunction, QueryParams queryParams)
+        throws IOException {
+      return streamFunctionPaged(pathFunction, queryParams, null);
+    }
+
+    public XStream<Entity, IOException> streamFunctionPaged(String pathFunction, Consumer<? super Page> onPage)
+        throws IOException {
+      return streamFunctionPaged(pathFunction, QueryParams.EMPTY, onPage);
+    }
+
+    public XStream<Entity, IOException> streamFunctionPaged(String pathFunction, QueryParams queryParams,
+                                                            Consumer<? super Page> onPage) throws IOException {
+
+      if (onPage == null) {
+        onPage = v -> {
+        };
+      }
+
+      // query pages, until we get a page with done=true | totalSize=0
+      return IOXStream
+          .iterateUntil(
+              loadFunctionPage(pathFunction, queryParams, null),
+              qr -> loadFunctionPage(pathFunction, queryParams, qr.getNextPageToken()),
+              qr -> qr.getNextPageToken() == null
+          )
+          .peek(onPage)
+          .map(Page::getRecords)
+          .flatMap(IOXStream::of);
+    }
+
   }
 
   public class Subscriptions
