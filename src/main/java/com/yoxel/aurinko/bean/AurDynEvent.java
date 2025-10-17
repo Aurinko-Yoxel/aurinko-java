@@ -41,6 +41,12 @@ public class AurDynEvent extends AurLiveIdEntity implements AurNativePropertiesS
   @Key
   private boolean allDay;
 
+  @Key
+  private String organizerEmail;
+
+  @Key
+  private String organizerName;
+
   @Key("__nativeProperties")
   private Map<String, Object> nativeProperties;
 
