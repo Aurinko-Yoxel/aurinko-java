@@ -711,7 +711,7 @@ public class AurinkoService implements AutoCloseable {
       }
 
       int pos = entityPath().indexOf("/objects/");
-      return entityPath().substring(0, pos) + pathFunction + entityPath().substring(pos);
+      return entityPath().substring(0, pos) + pathFunction + entityPath().substring(pos + 8);
     }
 
     public Page loadFunctionPage(String pathFunction, QueryParams query, String pageToken) throws IOException {
