@@ -6,7 +6,7 @@
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-service</artifactId>
-	<version>1.8.7-SNAPSHOT</version>
+	<version>1.8.8-SNAPSHOT</version>
 
 	<parent>
 		<groupId>com.yoxel</groupId>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.yoxel.model2</groupId>
 			<artifactId>model2</artifactId>
-			<version>4.2.22-SNAPSHOT</version>
+			<version>4.2.23-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yoxel</groupId>

@@ -46,7 +46,9 @@ public class ServiceUtils {
     final boolean rfPartner = "repfabric".equals(appRegs.getPartner());
 
     final List<String> scopes = new ArrayList<>();
-    if (acc.isScanEmail()) {
+    if (acc.isFwdEmail()) {
+      scopes.add("Mail.ReadWrite");
+    } else if (acc.isScanEmail()) {
       scopes.add("Mail.Read");
     }
     if (acc.isImportEvents() || rfPartner) {
@@ -194,7 +196,9 @@ public class ServiceUtils {
         && !templ.isImportTasks();
 
     final List<String> scopes = new ArrayList<>();
-    if (templ.isScanEmail() || allScopes) {
+    if (templ.isFwdEmail()) {
+      scopes.add("Mail.ReadWrite");
+    }else if (templ.isScanEmail() || allScopes) {
       scopes.add(templ.getProtocol() == Protocol.GMAIL ? "Mail.All" : "Mail.Read");
     }
     if (templ.isImportEvents() || allScopes) {
