@@ -45,8 +45,8 @@ public interface HttpApi {
     return httpRequestPrepare("DELETE", path, queryParams);
   }
 
-  default HttpResponse httpGet(String path, QueryParams queryParams, HttpContent content) throws IOException {
-    return httpGetPrepare(path, queryParams, content).execute();
+  default HttpResponse httpGet(String path, HttpContent content) throws IOException {
+    return httpGetPrepare(path, QueryParams.EMPTY, content).execute();
   }
 
   default HttpResponse httpGet(String path, QueryParams queryParams) throws IOException {
