@@ -54,6 +54,9 @@ public class AurDynEvent extends AurLiveIdEntity implements AurNativePropertiesS
   private String location;
 
   @Key
+  private String type;
+
+  @Key
   private DateTime startTime;
 
   @Key
