@@ -1,5 +1,7 @@
 package com.yoxel.aurinko;
 
+import static com.yoxel.aurinko.apis.QueryParams.qp;
+
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.BasicAuthentication;
 import com.google.api.client.http.GenericUrl;
@@ -13,7 +15,6 @@ import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.ExponentialBackOff;
-
 import com.yoxel.aurinko.apis.CreateSupport;
 import com.yoxel.aurinko.apis.DeleteSupport;
 import com.yoxel.aurinko.apis.EntityPageApi;
@@ -32,6 +33,11 @@ import com.yoxel.aurinko.bean.AurContact;
 import com.yoxel.aurinko.bean.AurContactSaveResult;
 import com.yoxel.aurinko.bean.AurContactsPage;
 import com.yoxel.aurinko.bean.AurContent;
+import com.yoxel.aurinko.bean.AurDrive;
+import com.yoxel.aurinko.bean.AurDriveItem;
+import com.yoxel.aurinko.bean.AurDriveItemSaveResult;
+import com.yoxel.aurinko.bean.AurDriveItemsPage;
+import com.yoxel.aurinko.bean.AurDrivesPage;
 import com.yoxel.aurinko.bean.AurEmail;
 import com.yoxel.aurinko.bean.AurEmailsPage;
 import com.yoxel.aurinko.bean.AurEvent;
@@ -54,10 +60,6 @@ import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.commons.xstream.IOXStream;
 import com.yoxel.commons.xstream.XStream;
-
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -65,12 +67,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-
-import static com.yoxel.aurinko.apis.QueryParams.qp;
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 
 public class AurinkoService implements AutoCloseable {
 
@@ -217,6 +218,7 @@ public class AurinkoService implements AutoCloseable {
   public TaskLists taskLists = new TaskLists();
   public Emails emails = new Emails();
   public Contacts contacts = new Contacts();
+  public Drives drives = new Drives();
 
   /**
    * Create a client for /dynamic API, using specific api_configuration ID.
@@ -253,11 +255,11 @@ public class AurinkoService implements AutoCloseable {
   @RequiredArgsConstructor
   public abstract class FullEntitySupport<Entity, Id, Page, SaveResult>
       extends HttpApiSupport implements
-                             CreateSupport<Entity, Id, SaveResult>,
-                             ReadSupport<Entity, Id>,
-                             UpdateSupport<Entity, Id, SaveResult>,
-                             DeleteSupport<Id>,
-                             EntityPageApi<Id, Page> {
+      CreateSupport<Entity, Id, SaveResult>,
+      ReadSupport<Entity, Id>,
+      UpdateSupport<Entity, Id, SaveResult>,
+      DeleteSupport<Id>,
+      EntityPageApi<Id, Page> {
 
     private final String entityPath;
     private final Class<Entity> eClass;
@@ -433,6 +435,55 @@ public class AurinkoService implements AutoCloseable {
   }
 
   /**
+   * Drive API: /drives
+   */
+  public class Drives extends EntitySupport_TokenBased<AurDrive, String, AurDrivesPage, AurDrive> {
+
+    Drives() {
+      super("/drive", AurDrive.class, AurDrivesPage.class, AurDrive.class);
+    }
+
+    @Override
+    public String normalizeId(String id) {
+      return id == null ? "default" : id;
+    }
+
+    public DriveItems driveEntries(String driveId) {
+      return new DriveItems(normalizeId(driveId));
+    }
+  }
+
+  /**
+   * Drive API: /drives/:id/items
+   */
+  public class DriveItems
+      extends EntitySupport_TokenBased<AurDriveItem, String, AurDriveItemsPage, AurDriveItemSaveResult>
+      implements SyncSupport<AurDriveItem, AurDriveItemsPage> {
+
+    private final String driveId;
+
+    DriveItems(String driveId) {
+      this(driveId, "");
+    }
+
+    private DriveItems(String driveId, String postfix) {
+      super("/drives/" + driveId + "/items" + postfix,
+          AurDriveItem.class, AurDriveItemsPage.class, AurDriveItemSaveResult.class);
+      this.driveId = driveId;
+    }
+
+    @Override
+    public String syncRootPath() {
+      return "/drives/" + driveId;
+    }
+
+    public XStream<AurDriveItem, IOException> streamDriveItems() throws IOException {
+
+      return new AurinkoService.DriveItems(driveId, "").streamPaged();
+    }
+  }
+
+  /**
    * TaskList API: /tasklists
    */
   public class TaskLists extends EntitySupport_TokenBased<AurTasklist, String, AurTasklistsPage, AurTasklist> {
@@ -452,7 +503,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   /**
-   * Events API: /calendars/:id/events
+   * Tasks API: /tasklists/:id/tasks
    */
   public class TasklistEntries
       extends EntitySupport_TokenBased<AurTask, String, AurTasksPage, AurTaskSaveResult>
@@ -466,7 +517,7 @@ public class AurinkoService implements AutoCloseable {
 
     private TasklistEntries(String tasklistId, String postfix) {
       super("/tasklists/" + tasklistId + "/tasks" + postfix,
-            AurTask.class, AurTasksPage.class, AurTaskSaveResult.class);
+          AurTask.class, AurTasksPage.class, AurTaskSaveResult.class);
       this.tasklistId = tasklistId;
     }
 
@@ -516,7 +567,7 @@ public class AurinkoService implements AutoCloseable {
 
     private CalendarEvents(String calendarId, String postfix) {
       super("/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8) + "/events" + postfix,
-            AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
+          AurEvent.class, AurEventsPage.class, AurEventSaveResult.class);
       this.calendarId = calendarId;
     }
 
@@ -572,7 +623,7 @@ public class AurinkoService implements AutoCloseable {
   @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
   public class CalendarSeriesOccurrences extends HttpApiSupport
       implements ListSupport_TokenBased<AurEvent, String, AurEventsPage>,
-                 ReadSupport<AurEvent, String> {
+      ReadSupport<AurEvent, String> {
 
     private final String calendarId;
     private final String masterId;
@@ -643,7 +694,7 @@ public class AurinkoService implements AutoCloseable {
 
   public class EmailTracking extends HttpApiSupport
       implements ListSupport_OffsetBased<AurTracking, Long, AurTracking.Page>,
-                 ReadSupport<AurTracking, Long> {
+      ReadSupport<AurTracking, Long> {
 
     @Override
     public Class<AurTracking> entityClass() {
@@ -702,7 +753,7 @@ public class AurinkoService implements AutoCloseable {
     Dynamic(AurinkoClass<Entity, Page> aurClass, Integer apiConfId) {
       super(
           "/dynamic/" + (apiConfId == null ? "default" : apiConfId) +
-          "/objects/" + aurClass.name, aurClass.entityClass, aurClass.pageClass, aurClass.entityClass);
+              "/objects/" + aurClass.name, aurClass.entityClass, aurClass.pageClass, aurClass.entityClass);
     }
 
     public String entityFunctionPath(String pathFunction) {
@@ -733,7 +784,7 @@ public class AurinkoService implements AutoCloseable {
     }
 
     public XStream<Entity, IOException> streamFunctionPaged(String pathFunction, QueryParams queryParams,
-                                                            Consumer<? super Page> onPage) throws IOException {
+        Consumer<? super Page> onPage) throws IOException {
 
       if (onPage == null) {
         onPage = v -> {
