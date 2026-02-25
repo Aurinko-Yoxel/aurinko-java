@@ -12,5 +12,11 @@ import lombok.Data;
 public class OnlineMeetingDetails extends GenericJson {
 
   @Key
+  private String id;
+
+  @Key
   private String url;
+
+  @Key
+  private String infoUrl;
 }
