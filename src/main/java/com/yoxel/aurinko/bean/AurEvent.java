@@ -70,6 +70,12 @@ public class AurEvent extends AurLiveIdEntity {
   private List<String> categories;
 
   @Key
+  private boolean hasAttachments;
+
+  @Key
+  private List<Attachment> attachments;
+
+  @Key
   private Map<String, Object> nativeProperties;
 
   public boolean isMeeting() {
