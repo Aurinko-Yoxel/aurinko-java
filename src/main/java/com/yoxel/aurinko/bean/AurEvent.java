@@ -76,6 +76,9 @@ public class AurEvent extends AurLiveIdEntity {
   private List<Attachment> attachments;
 
   @Key
+  private ReminderSettings reminder;
+
+  @Key
   private Map<String, Object> nativeProperties;
 
   public boolean isMeeting() {
