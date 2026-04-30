@@ -6,12 +6,12 @@
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-service</artifactId>
-	<version>1.8.10-SNAPSHOT</version>
+	<version>1.8.11-SNAPSHOT</version>
 
 	<parent>
 		<groupId>com.yoxel</groupId>
 		<artifactId>parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.7.3-j25-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -22,7 +22,7 @@
 		<dependency>
 			<groupId>com.yoxel.model2</groupId>
 			<artifactId>model2</artifactId>
-			<version>4.2.23-SNAPSHOT</version>
+			<version>4.3.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.yoxel</groupId>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>com.yoxel</groupId>
 			<artifactId>yoxel-commons</artifactId>
-			<version>0.2</version>
+			<version>0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
