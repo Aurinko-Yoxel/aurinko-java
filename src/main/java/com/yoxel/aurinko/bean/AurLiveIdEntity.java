@@ -28,4 +28,7 @@ public abstract class AurLiveIdEntity extends AurIdEntity {
 
     @Key("__meta")
     private AurMeta meta;
+
+  @Key
+  private Boolean deleted;
 }
