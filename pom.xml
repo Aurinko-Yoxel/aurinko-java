@@ -1,58 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-service</artifactId>
-	<version>1.8.12-SNAPSHOT</version>
-
-	<parent>
-		<groupId>com.yoxel</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.7.3-j25-SNAPSHOT</version>
-	</parent>
+	<version>1.8.13-SNAPSHOT</version>
 
 	<properties>
 		<lombok.version>1.18.40</lombok.version>
+
+		<slf4j.version>2.0.13</slf4j.version>
+		<logback.version>1.5.6</logback.version>
+		<commons-lang3.version>3.14.0</commons-lang3.version>
+		<joda-time.version>2.12.7</joda-time.version>
+		<commons-collections4.version>4.4</commons-collections4.version>
+
+		<maven.compiler.release>25</maven.compiler.release>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.yoxel.model2</groupId>
-			<artifactId>model2</artifactId>
-			<version>4.3.4-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.yoxel</groupId>
-			<artifactId>oauth-flow</artifactId>
-			<version>1.6.2</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-apache-v2</artifactId>
 			<version>1.39.2</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.yoxel</groupId>
-			<artifactId>yoxel-commons</artifactId>
-			<version>0.3</version>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.32.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons-lang3.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda-time.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>${commons-collections4.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
+			<version>${logback.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
+			<version>2.2</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -67,6 +89,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
 				<configuration>
 					<annotationProcessorPaths>
 						<path>

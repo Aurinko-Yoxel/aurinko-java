@@ -17,7 +17,7 @@ public class AurinkoDynamicDemo {
 
     try (final var svc = AurinkoService.createWithAccountAuth(
         "http://localhost:9000",
-        "WxKEMe8gTbSxKslz68dWj7UZGkjIuDmIJV5ime9TgNc"
+        "access_token"
     )) {
 
       var xx=svc.dynamic(AurinkoClass.EVENT).entityFunctionPath("/xx");

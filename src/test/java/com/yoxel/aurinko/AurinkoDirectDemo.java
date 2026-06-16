@@ -19,7 +19,7 @@ public class AurinkoDirectDemo {
 
     try (final var svc = AurinkoService.createWithAccountAuth(
         "http://localhost:9000",
-        "xGv3ITUnPw1MjKjmu6PQihPNQ56_vo-TLldRDtVyVos"
+        "access_token"
     )) {
 
       final var soqlQuery = "SELECT Id from Opportunity";
