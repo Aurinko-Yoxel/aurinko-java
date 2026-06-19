@@ -39,13 +39,36 @@ public class AurinkoService implements AutoCloseable {
 
   public enum BodyType {html, text, none}
 
+  public final Api api;
+  public final Direct direct;
+  public final Subscriptions subscriptions;
+  public final Auth auth;
+  public final Accounts accounts;
+  public final Users users;
+  public final Calendars calendars;
+  public final TaskLists taskLists;
+  public final Emails emails;
+  public final Contacts contacts;
+  public final Drives drives;
+
   private AurinkoService(String baseUrl, Map<String, String> headers, HttpRequestInitializer requestInitializer) {
 //    HttpClientBuilder
 //        httpClientBuilder =
 //        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
 
     this.httpTransport = new ApacheHttpTransport();
-    httpImpl = new HttpImpl(httpTransport, requestInitializer, baseUrl, JSON_PARSER, httpIOExceptionHandler, headers);
+    this.httpImpl = new HttpImpl(httpTransport, requestInitializer, baseUrl, JSON_PARSER, httpIOExceptionHandler, headers);
+    this.api = new Api(httpImpl);
+    this.direct = new Direct(httpImpl);
+    this.subscriptions = new Subscriptions(httpImpl);
+    this.auth = new Auth(httpImpl);
+    this.accounts = new Accounts(httpImpl);
+    this.users = new Users(httpImpl);
+    this.calendars = new Calendars(httpImpl);
+    this.taskLists = new TaskLists(httpImpl);
+    this.emails = new Emails(httpImpl);
+    this.contacts = new Contacts(httpImpl);
+    this.drives = new Drives(httpImpl);
   }
 
   public void close() throws IOException {
@@ -125,18 +148,6 @@ public class AurinkoService implements AutoCloseable {
             BackoffInterceptorWrapper.ON_RATE_LIMITING
         ));
   }
-
-  public Api api() { return new Api(httpImpl); }
-  public Direct direct() { return new Direct(httpImpl); }
-  public Subscriptions subscriptions() { return new Subscriptions(httpImpl); }
-  public Auth auth() { return new Auth(httpImpl); };
-  public Accounts accounts() { return new Accounts(httpImpl); };
-  public Users users() { return new Users(httpImpl); }
-  public Calendars calendars() { return new Calendars(httpImpl); }
-  public TaskLists taskLists() { return new TaskLists(httpImpl); }
-  public Emails emails() { return new Emails(httpImpl); }
-  public Contacts contacts() { return new Contacts(httpImpl); }
-  public Drives drives() { return new Drives(httpImpl); }
 
   /**
    * Create a client for /dynamic API, using specific api_configuration ID.

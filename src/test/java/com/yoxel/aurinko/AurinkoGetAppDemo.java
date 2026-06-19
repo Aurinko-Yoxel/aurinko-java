@@ -16,7 +16,7 @@ public class AurinkoGetAppDemo {
         "client_id",
         "client_secret"
     )) {
-      final var app = svc.api().httpGet("/am/application").parseAs(AurApplication.class);
+      final var app = svc.api.httpGet("/am/application").parseAs(AurApplication.class);
 
       System.out.println(app);
     }

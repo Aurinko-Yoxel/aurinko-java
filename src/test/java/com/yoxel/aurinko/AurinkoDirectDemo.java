@@ -24,14 +24,14 @@ public class AurinkoDirectDemo {
 
       final var soqlQuery = "SELECT Id from Opportunity";
 
-      final var response1 = svc.direct()
+      final var response1 = svc.direct
           .httpGet("/services/data/v53.0/query", QueryParams.of("q", soqlQuery))
           .parseAs(SForcePage.class);
       System.out.println(response1);
 
       // or:
 
-      final var response2 = svc.direct()
+      final var response2 = svc.direct
           .httpGetPrepare("/services/data/v53.0/query", QueryParams.of("q", soqlQuery))
           .execute()
           .parseAs(SForcePage.class);
