@@ -54,7 +54,7 @@ import java.io.IOException;
 /**
  *
  */
-public class AurinkoGetAppDemo {
+public class AurinkoGetMeDemo {
 
     public static void main(String[] args) throws IOException {
 
@@ -65,6 +65,42 @@ public class AurinkoGetAppDemo {
             final var accountInfo = svc.accounts.getMe();
 
             System.out.println(accountInfo);
+        }
+    }
+}
+```
+
+The following example demonstrates how to initialize an incremental contact's data synchronization:
+
+```java
+
+public class AurinkoRunSyncDemo {
+
+    public static void main(String[] args) throws IOException {
+
+        try (final var service = AurinkoService.createWithAccountAuth(
+                "http://localhost:9000",
+                "access_token"
+        )) {
+            final SyncTokensPair initialToken = SyncTokensPair.EMPTY;
+
+            final AurinkoSyncRunner<AurContact, AurContactsPage> syncRunner =
+                    new AurinkoSyncRunner<>(
+                            service.contacts,
+                            SyncSupport.SyncScope.UPDATED,
+                            initialToken
+                    );
+
+            try {
+                syncRunner.forEach(contact ->
+                        System.out.println("Contact " + contact)
+                );
+
+                System.out.println("Next token " + syncRunner.getNext());
+
+            } catch (AurinkoSyncRunner.AurSyncException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
