@@ -12,7 +12,7 @@ This SDK simplifies authentication, connection management, and data parsing.
 
 ## Requirements
 
-* Java 25 or higher
+* Java 17 or higher
 * **Aurinko.io Platform Access**: A valid account, instance URL, and appropriate credentials (such as an Access Token, App Auth credentials, or session identifiers depending on your authentication flow).
 
 ## Installation
