@@ -3,20 +3,16 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.Key;
-import com.yoxel.aurinko.bean.AurContact;
 import com.yoxel.aurinko.bean.AurNativePropertiesSupport;
 import lombok.Getter;
 import lombok.Setter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  *
@@ -43,15 +39,17 @@ public class ContactNativePropsTest {
     final var parsed =
         JSON_PARSER.parseAndClose(new ByteArrayInputStream(rawJson.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8, TestObject.class);
 
-    assertThat(parsed.getNativeProperty(String.class, "stringProp"), equalTo("stringValue"));
-    assertThat(parsed.getNativeProperty(String.class, "stringPropEmpty"), equalTo(""));
-    assertThat(parsed.getNativeProperty(Integer.class, "intProp"), equalTo(123));
-    assertThat(parsed.getNativeProperty(String.class, "nullProp"), nullValue());
-    assertThat(parsed.getNativeProperty(Boolean.class, "boolProp"), equalTo(false));
+    assertThat(parsed.getNativeProperty(String.class, "stringProp"))
+            .isEqualTo("stringValue");
+    assertThat(parsed.getNativeProperty(String.class, "stringProp")).isEqualTo("stringValue");
+    assertThat(parsed.getNativeProperty(String.class, "stringPropEmpty")).isEqualTo("");
+    assertThat(parsed.getNativeProperty(Integer.class, "intProp")).isEqualTo(123);
+    assertThat(parsed.getNativeProperty(String.class, "nullProp")).isNull();
+    assertThat(parsed.getNativeProperty(Boolean.class, "boolProp")).isFalse();
 
-    assertThat(parsed.getNativePropertyObject("objProp").get("f1"), equalTo("v1"));
-    assertThat(parsed.getNativePropertyObject("objProp").get("f2"), equalTo("v2"));
-    assertThat(parsed.getNativePropertyObject("objPropNonEx"), nullValue());
+    assertThat(parsed.getNativePropertyObject("objProp").get("f1")).isEqualTo("v1");
+    assertThat(parsed.getNativePropertyObject("objProp").get("f2")).isEqualTo("v2");
+    assertThat(parsed.getNativePropertyObject("objPropNonEx")).isNull();
   }
 
   public static class TestObject implements AurNativePropertiesSupport {

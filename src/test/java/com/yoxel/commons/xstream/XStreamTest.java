@@ -1,21 +1,15 @@
 package com.yoxel.commons.xstream;
 
-
-import org.junit.Test;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author leopold
@@ -100,12 +94,12 @@ public class XStreamTest {
         .distinctBy(w -> w.value)
         .toList();
 
-    assertThat(
-        result.stream().map(w -> w.value).collect(Collectors.toList()),
-        is(equalTo(asList(1, 2, 3, 4)))
-    );
+    assertThat(result)
+            .extracting(w -> w.value)
+            .containsExactly(1, 2, 3, 4);
 
-    assertThat(result.get(0), is(sameInstance(w11)));
+    assertThat(result.getFirst())
+            .isSameAs(w11);
   }
 
   @Test

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class AurOAuthClientReg extends GenericJson {
 
+    @Deprecated
     @Key
     private String name;
 
@@ -27,4 +28,13 @@ public class AurOAuthClientReg extends GenericJson {
 
     @Key
     private String clientSecret2;
+
+    @Key
+    private String clientSecret3;
+
+    @Key
+    private String topicName;
+
+    @Key
+    private String intermediateCallbackUrl;
 }
