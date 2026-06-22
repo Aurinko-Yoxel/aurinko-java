@@ -29,6 +29,9 @@ public class AurAccount {
   private String tokenError;
 
   @Key
+  private String type;
+
+  @Key
   private boolean daemon;
 
   @Key
@@ -39,6 +42,9 @@ public class AurAccount {
 
   @Key
   private String email2;
+
+  @Key
+  private String mailboxAddress;
 
   @Key
   private String name;
@@ -84,6 +90,15 @@ public class AurAccount {
 
   @Key
   private String userId;
+
+  @Key
+  private Boolean copyToSent;
+
+  @Key
+  private Boolean trustServer;
+
+  @Key
+  private DateTime createdAt;
 
   @Key
   private DateTime updatedAt;
