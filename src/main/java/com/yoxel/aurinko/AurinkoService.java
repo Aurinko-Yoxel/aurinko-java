@@ -19,6 +19,7 @@ public class AurinkoService implements AutoCloseable {
   };
 
   private static final String DEFAULT_BASE_URL = "https://aurinko.yoxel.com";
+  private static final String DEFAULT_USER_AGENT = "Aurinko-Client-Library/1.0";
 
   private final HttpTransport httpTransport;
 
@@ -27,8 +28,6 @@ public class AurinkoService implements AutoCloseable {
 
   private final HttpIOExceptionHandler httpIOExceptionHandler = (request, supportsRetry) -> {
     if (supportsRetry) {
-//      log.warn("Handling IOException for {} {}", request.getRequestMethod(),
-//               request.getUrl().toString());
       request.setReadTimeout(request.getReadTimeout() + 60000);
     }
 
@@ -51,13 +50,9 @@ public class AurinkoService implements AutoCloseable {
   public final Contacts contacts;
   public final Drives drives;
 
-  private AurinkoService(String baseUrl, Map<String, String> headers, HttpRequestInitializer requestInitializer) {
-//    HttpClientBuilder
-//        httpClientBuilder =
-//        ApacheHttpTransport.newDefaultHttpClientBuilder().setMaxConnPerRoute(10);
-
+  private AurinkoService(String baseUrl, Map<String, String> headers, HttpRequestInitializer requestInitializer, String userAgent) {
     this.httpTransport = new ApacheHttpTransport();
-    this.httpImpl = new HttpImpl(httpTransport, requestInitializer, baseUrl, JSON_PARSER, httpIOExceptionHandler, headers);
+    this.httpImpl = new HttpImpl(httpTransport, requestInitializer, baseUrl, JSON_PARSER, httpIOExceptionHandler, headers, userAgent);
     this.api = new Api(httpImpl);
     this.direct = new Direct(httpImpl);
     this.subscriptions = new Subscriptions(httpImpl);
@@ -80,7 +75,7 @@ public class AurinkoService implements AutoCloseable {
       String clientId,
       String clientSecret
   ) {
-    return create(baseUrl, new BasicAuthentication(clientId, clientSecret));
+    return create(baseUrl, new BasicAuthentication(clientId, clientSecret), DEFAULT_USER_AGENT);
   }
 
   public static AurinkoService createWithAppAuth(
@@ -98,9 +93,10 @@ public class AurinkoService implements AutoCloseable {
       long accountId
   ) {
     return create(
-        baseUrl,
-        new BasicAuthentication(clientId, clientSecret),
-        Map.of("X-Aurinko-Account-Id", String.valueOf(accountId))
+            baseUrl,
+            new BasicAuthentication(clientId, clientSecret),
+            Map.of("X-Aurinko-Account-Id", String.valueOf(accountId)),
+            DEFAULT_USER_AGENT
     );
   }
 
@@ -109,7 +105,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public static AurinkoService createWithAccountAuth(String baseUrl, String accessToken) {
-    return create(baseUrl, new BearerAuthorization(accessToken));
+    return create(baseUrl, new BearerAuthorization(accessToken), DEFAULT_USER_AGENT);
   }
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
@@ -117,36 +113,39 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public static AurinkoService create(HttpExecuteInterceptor httpInterceptor) {
-    return create(DEFAULT_BASE_URL, httpInterceptor);
+    return create(DEFAULT_BASE_URL, httpInterceptor, DEFAULT_USER_AGENT);
   }
 
   public static AurinkoService create(String baseUrl) {
-    return create(baseUrl, EMPTY_INTERCEPTOR);
+    return create(baseUrl, EMPTY_INTERCEPTOR, DEFAULT_USER_AGENT);
   }
 
   public static AurinkoService create() {
-    return create(DEFAULT_BASE_URL, EMPTY_INTERCEPTOR);
+    return create(DEFAULT_BASE_URL, EMPTY_INTERCEPTOR, DEFAULT_USER_AGENT);
   }
 
-  public static AurinkoService create(String baseUrl, HttpExecuteInterceptor httpInterceptor) {
-    return create(baseUrl, httpInterceptor, Map.of());
+  public static AurinkoService create(String baseUrl, HttpExecuteInterceptor httpInterceptor, String userAgent) {
+    return create(baseUrl, httpInterceptor, Map.of(), userAgent);
   }
 
   public static AurinkoService create(
       String baseUrl,
       HttpExecuteInterceptor httpInterceptor,
-      Map<String, String> headers
+      Map<String, String> headers,
+      String userAgent
   ) {
     return new AurinkoService(
-        baseUrl,
-        headers,
-        new BackoffInterceptorWrapper(
-            httpInterceptor,
-            new ExponentialBackOff.Builder()
-                .setMultiplier(2.0)
-                .build(),
-            BackoffInterceptorWrapper.ON_RATE_LIMITING
-        ));
+            baseUrl,
+            headers,
+            new BackoffInterceptorWrapper(
+                    httpInterceptor,
+                    new ExponentialBackOff.Builder()
+                            .setMultiplier(2.0)
+                            .build(),
+                    BackoffInterceptorWrapper.ON_RATE_LIMITING
+            ),
+            userAgent
+    );
   }
 
   /**
