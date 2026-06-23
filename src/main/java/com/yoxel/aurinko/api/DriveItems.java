@@ -38,4 +38,9 @@ public class DriveItems
 
         return new DriveItems(driveId, "", httpImpl).streamPaged();
     }
+
+    public XStream<AurDriveItem, IOException> streamDriveItemChildren(String itemId) throws IOException {
+
+        return new DriveItems(driveId, "/" + itemId + "/children", httpImpl).streamPaged();
+    }
 }
