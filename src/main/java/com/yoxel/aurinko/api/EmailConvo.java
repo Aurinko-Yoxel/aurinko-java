@@ -1,10 +1,14 @@
 package com.yoxel.aurinko.api;
 
 import com.yoxel.aurinko.apis.ListSupport_TokenBased;
+import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.bean.AurEmail;
 import com.yoxel.aurinko.bean.AurEmailsPage;
+import com.yoxel.aurinko.bean.AurEmailConvoFollowupStatus;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
+
+import java.io.IOException;
 
 /**
  * Email conversations API: /email/conversations/:id
@@ -27,5 +31,10 @@ public class EmailConvo extends HttpApiSupport implements ListSupport_TokenBased
     @Override
     public Class<AurEmailsPage> entityPageClass() {
         return AurEmailsPage.class;
+    }
+
+    public AurEmailConvoFollowupStatus followupStatus(QueryParams params) throws IOException {
+        return httpGet(entityPath() + "/followup", params)
+                .parseAs(AurEmailConvoFollowupStatus.class);
     }
 }
