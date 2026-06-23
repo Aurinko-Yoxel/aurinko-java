@@ -15,7 +15,30 @@ public class Auth extends HttpApiSupport {
         super(httpImpl);
     }
 
+    @Override
+    protected String basePath() {
+        return "/auth";
+    }
+
+    /**
+     * Exchanges an authorization code for an account token.
+     * <p>
+     * This operation requires application-level authentication.
+     *
+     * @deprecated This method is deprecated because it uses an older OAuth flow.
+     * Use {@link #exchangeCode(String code)} instead.
+     */
+    @Deprecated
     public AurAccountToken getToken(String code) throws IOException {
-        return httpGet("/auth/token/" + code).parseAs(AurAccountToken.class);
+        return httpGet("/token/" + code).parseAs(AurAccountToken.class);
+    }
+
+    /**
+     * Exchanges an authorization code for an account token.
+     * <p>
+     * This operation requires application-level authentication.
+     */
+    public AurAccountToken exchangeCode(String code) throws IOException {
+        return httpPost("/token/" + code).parseAs(AurAccountToken.class);
     }
 }

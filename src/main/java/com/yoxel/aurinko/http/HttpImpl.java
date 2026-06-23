@@ -16,6 +16,7 @@ public class HttpImpl {
     private final JsonObjectParser JSON_PARSER;
     private final HttpIOExceptionHandler httpIOExceptionHandler;
     private final Map<String, String> headers;
+    private final String userAgent;
 
     public HttpRequest createRequest(String method, String path) throws IOException {
         HttpRequest
@@ -25,7 +26,7 @@ public class HttpImpl {
                         .setParser(JSON_PARSER).setIOExceptionHandler(httpIOExceptionHandler)
                         .setNumberOfRetries(5).setConnectTimeout(60 * 1000).setReadTimeout(35 * 1000);
 
-        httpRequest.getHeaders().setUserAgent("Yoxel Sync (Aurinko)/1.0");
+        httpRequest.getHeaders().setUserAgent(userAgent);
         headers.forEach((k, v) -> httpRequest.getHeaders().set(k, v));
 //        if ("PATCH".equalsIgnoreCase(method))
 //            httpRequest.getHeaders().set("X-HTTP-Method-Override", method);
