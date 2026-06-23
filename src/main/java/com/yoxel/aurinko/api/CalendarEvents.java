@@ -8,6 +8,7 @@ import com.yoxel.aurinko.apis.SyncSupport;
 import com.yoxel.aurinko.bean.AurEvent;
 import com.yoxel.aurinko.bean.AurEventSaveResult;
 import com.yoxel.aurinko.bean.AurEventsPage;
+import com.yoxel.aurinko.bean.AurSeriesInfo;
 import com.yoxel.aurinko.bean.sub.MeetingResponse;
 import com.yoxel.aurinko.http.HttpImpl;
 import com.yoxel.commons.xstream.XStream;
@@ -36,15 +37,19 @@ public class CalendarEvents
     }
 
     private CalendarEvents(String calendarId, String postfix, HttpImpl httpImpl) {
-        super("/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8) + "/events" + postfix,
+        super(calendarPath(calendarId) + "/events" + postfix,
                 AurEvent.class, AurEventsPage.class, AurEventSaveResult.class, httpImpl);
         this.calendarId = calendarId;
         this.httpImpl = httpImpl;
     }
 
+    private static String calendarPath(String calendarId) {
+       return "/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8);
+    }
+
     @Override
     public String syncRootPath() {
-        return "/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8);
+        return calendarPath(calendarId);
     }
 
     public XStream<AurEvent, IOException> streamRange(DateTime timeMin, DateTime timeMax)
@@ -68,6 +73,14 @@ public class CalendarEvents
                                 .collect(Collectors.toList())
                 )
         );
+    }
+
+    /**
+     * Retrieves a series description by masterId
+     */
+    public AurSeriesInfo series(String masterId) throws IOException {
+        return httpGet(calendarPath(calendarId) + "/events/" + masterId + "/series")
+                .parseAs(AurSeriesInfo.class);
     }
 
     public CalendarSeriesOccurrences occurrences(String masterId) {

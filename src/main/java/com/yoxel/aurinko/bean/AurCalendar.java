@@ -1,9 +1,11 @@
 package com.yoxel.aurinko.bean;
 
-
 import com.google.api.client.util.Key;
 
+import com.yoxel.aurinko.bean.sub.ReminderOverride;
 import lombok.Data;
+
+import java.util.List;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
@@ -37,6 +39,12 @@ public class AurCalendar extends AurLiveIdEntity {
 
   @Key
   String groupMail;
+
+  @Key
+  Boolean multipleRemindersSupported;
+
+  @Key
+  List<ReminderOverride> defaultReminders;
 
   public boolean isPrimary() {
     return isTrue(primary);
