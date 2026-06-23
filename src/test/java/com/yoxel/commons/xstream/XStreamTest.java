@@ -98,7 +98,7 @@ public class XStreamTest {
             .extracting(w -> w.value)
             .containsExactly(1, 2, 3, 4);
 
-    assertThat(result.getFirst())
+    assertThat(result.get(0))
             .isSameAs(w11);
   }
 
