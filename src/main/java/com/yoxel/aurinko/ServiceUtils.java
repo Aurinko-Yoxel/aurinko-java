@@ -3,7 +3,6 @@ package com.yoxel.aurinko;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.DateTime;
-
 import com.yoxel.aurinko.bean.AurAccountToken;
 import com.yoxel.aurinko.dto.AurAccountDto;
 import com.yoxel.model2.ClientCompany;
@@ -14,18 +13,15 @@ import com.yoxel.model2.user.Account;
 import com.yoxel.model2.user.SyncData;
 import com.yoxel.oauth.common.SecurityUtils;
 import com.yoxel.persist.util.Strings;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-
 import java.io.IOException;
 import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 @Slf4j
 public class ServiceUtils {
@@ -118,25 +114,26 @@ public class ServiceUtils {
         }
       }
     } else if (acc.getProtocol() == Protocol.OFFICE365 && acc.getAuthMethod() == null) {
-      if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix())
-          && !"crm.me".equals(appRegs.getPartner())) {
+      if (sd != null && "office.oauth2".equals(sd.getAppKeyPrefix()) && !"crm.me".equals(appRegs.getPartner())) {
         accDto.setServiceType("Office365");
         accDto.setServerUrl(acc.getServer() == null ? acc.getProxyServer() : acc.getServer());
       } else {
         accDto.setServiceType("EWS365");
         accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
-                            + "/EWS/Exchange.asmx");
+            + "/EWS/Exchange.asmx");
         if (sd == null || sd.getAppKeyPrefix() == null) {
           accDto.setOauthClientId(appRegs.getOAuthClientReg("office365.oauth2.client"));
         }
       }
     } else if (acc.getProtocol() == Protocol.EWS
-               || acc.getProtocol() == Protocol.OFFICE365 && acc.getAuthMethod() != null) {
+        || acc.getProtocol() == Protocol.OFFICE365 && acc.getAuthMethod() != null) {
       accDto.setServiceType("EWS");
       accDto.setServerUrl((acc.getServer() == null ? acc.getProxyServer() : acc.getServer())
-                          + "/EWS/Exchange.asmx");
-      accDto.setAuthString1(acc.getUsername());
-      accDto.setAuthString2(acc.getPassword());
+          + "/EWS/Exchange.asmx");
+      if (acc.getPassword() != null) {
+        accDto.setAuthString1(acc.getUsername());
+        accDto.setAuthString2(acc.getPassword());
+      }
     } else if (acc.getProtocol() == Protocol.TEAMWORKPM && "teamwork".equals(appRegs.getPartner())) {
       accDto.setServiceType("Teamwork");
       accDto.setServerUrl(acc.getServer());
@@ -193,12 +190,12 @@ public class ServiceUtils {
     final boolean
         allScopes =
         !templ.isScanEmail() && !templ.isImportEvents() && !templ.isImportContacts()
-        && !templ.isImportTasks();
+            && !templ.isImportTasks();
 
     final List<String> scopes = new ArrayList<>();
     if (templ.isFwdEmail()) {
       scopes.add("Mail.ReadWrite");
-    }else if (templ.isScanEmail() || allScopes) {
+    } else if (templ.isScanEmail() || allScopes) {
       scopes.add(templ.getProtocol() == Protocol.GMAIL ? "Mail.All" : "Mail.Read");
     }
     if (templ.isImportEvents() || allScopes) {
@@ -215,7 +212,7 @@ public class ServiceUtils {
   }
 
   private static AurAccountDto fromTemplate(ServiceTemplate templ, OAuth2ClientRegs appRegs,
-                                            AuthServiceAccess authAccess) throws IOException {
+      AuthServiceAccess authAccess) throws IOException {
 
     final List<String> scopes = templateScopes(templ);
 
@@ -278,11 +275,11 @@ public class ServiceUtils {
 
   private static boolean protocolSupported(Protocol protocol, String partner) {
     return protocol.isReadEmail() || protocol == Protocol.SALESFLARE || protocol == Protocol.SFORCE ||
-           protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner) || protocol == Protocol.AURINKO;
+        protocol == Protocol.TEAMWORKPM && "teamwork".equals(partner) || protocol == Protocol.AURINKO;
   }
 
   public static AurAccountToken syncAccount(AurinkoService aurinko, UserModelAccess uma, Account acc, SyncData sd,
-                                            OAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
+      OAuth2ClientRegs appRegs) { // ServiceTemplate forceManagedBy
     if (!protocolSupported(acc.getProtocol(), appRegs.getPartner()) || acc.getEmailAddress() == null) {
       return null;
     }
@@ -299,7 +296,7 @@ public class ServiceUtils {
 
     final ServiceTemplate svcTempl = acc.getTemplId() > 0 ? uma.getServiceTemplate(acc.getTemplId()) : null;
     if (svcTempl != null && (acc.isTrustServer() || svcTempl.getProtocol() == Protocol.EWS
-                                                    && svcTempl.getPassword() != null)) { // || forceManagedBy != null
+        && svcTempl.getPassword() != null)) { // || forceManagedBy != null
 
       if (svcTempl.getAurinkoToken() == null) {
         log.warn("No Aurinko token for the template " + svcTempl.getId() + ", " + svcTempl.getName());
@@ -327,10 +324,11 @@ public class ServiceUtils {
 
       log.info(
           "Upserting account " + acc.getId() + ", " + acc.getName() + ", " + acc.getEmailAddress()
-          + ", clientOrgId: " + uma.getClientCompany().getExtId());
+              + ", clientOrgId: " + uma.getClientCompany().getExtId());
 
       try {
         aurToken = aurinko.accounts.upsertPersonal(aurAcc);
+        aurToken.setAccServiceType(aurAcc.getServiceType());
       } catch (IOException e) {
         log.warn("Failed to upsert Aurinko account " + e.getMessage());
       }
@@ -345,15 +343,15 @@ public class ServiceUtils {
   }
 
   public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
-                                             ServiceTemplate svcTempl,
-                                             OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
+      ServiceTemplate svcTempl,
+      OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
     return syncTemplate(aurinko, clientOrgId, svcTempl, Collections.emptyList(), false, appRegs, authAccess);
   }
 
   public static AurAccountToken syncTemplate(AurinkoService aurinko, String clientOrgId,
-                                             ServiceTemplate svcTempl, List<String> withScopes, boolean gmailMode,
-                                             OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
+      ServiceTemplate svcTempl, List<String> withScopes, boolean gmailMode,
+      OAuth2ClientRegs appRegs, AuthServiceAccess authAccess)
       throws IOException {
     if (!svcTempl.getProtocol().isReadEmail() || svcTempl.getPassword() == null) {
       return null;
@@ -376,7 +374,7 @@ public class ServiceUtils {
 
     log.info(
         "Upserting service account " + svcTempl.getId() + ", " + svcTempl.getName()
-        + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
+            + ", clientOrgId: " + clientOrgId + "/" + svcTempl.getGroupId());
 
     AurAccountToken aurToken = null;
     try {
