@@ -379,7 +379,7 @@ public class AurinkoService implements AutoCloseable {
     public AurAccountToken upsertPersonal(AurAccountDto acc) throws IOException {
       return httpPost(
           "/am/accounts",
-          QueryParams.of("recycleKeys", "email,clientOrgId"),
+          QueryParams.of(qp("recycleKeys", "email,clientOrgId"), qp("ensureAccess", true)),
           new JsonHttpContent(Utils.getDefaultJsonFactory(), acc)
       ).parseAs(AurAccountToken.class);
     }
