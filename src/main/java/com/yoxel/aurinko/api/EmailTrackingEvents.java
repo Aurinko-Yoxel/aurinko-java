@@ -1,15 +1,20 @@
 package com.yoxel.aurinko.api;
 
 import com.yoxel.aurinko.apis.ListSupport_OffsetBased;
+import com.yoxel.aurinko.apis.ReadSupport;
 import com.yoxel.aurinko.bean.AurTrackingEvent;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
 public class EmailTrackingEvents extends HttpApiSupport
-        implements ListSupport_OffsetBased<AurTrackingEvent, Long, AurTrackingEvent.Page> {
+        implements ListSupport_OffsetBased<AurTrackingEvent, Long, AurTrackingEvent.Page>,
+        ReadSupport<AurTrackingEvent, Long> {
 
-    EmailTrackingEvents(HttpImpl httpImpl) {
+    private final String trackingId;
+
+    EmailTrackingEvents(String trackingId, HttpImpl httpImpl) {
         super(httpImpl);
+        this.trackingId = trackingId;
     }
 
     @Override
@@ -19,6 +24,11 @@ public class EmailTrackingEvents extends HttpApiSupport
 
     @Override
     public String entityPath() {
-        return "/email/tracking/events";
+        return "/email/tracking/" + trackingId + "/events";
+    }
+
+    @Override
+    public Class<AurTrackingEvent> entityClass() {
+        return AurTrackingEvent.class;
     }
 }
