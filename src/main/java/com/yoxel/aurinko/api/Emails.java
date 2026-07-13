@@ -16,10 +16,12 @@ public class Emails extends EntitySupport_TokenBased<AurEmail, String, AurEmails
         implements SyncSupport<AurEmail, AurEmailsPage> {
 
     private final HttpImpl httpImpl;
+    public final EmailFolders emailFolders;
 
     public Emails(HttpImpl httpImpl) {
         super("/email/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class, httpImpl);
         this.httpImpl = httpImpl;
+        this.emailFolders = new EmailFolders(httpImpl);
     }
 
     public AurContent getAttachment(String msgId, String attachmentId) throws IOException {
