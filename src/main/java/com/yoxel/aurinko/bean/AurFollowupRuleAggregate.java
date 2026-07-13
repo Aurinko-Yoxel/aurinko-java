@@ -23,4 +23,7 @@ public class AurFollowupRuleAggregate extends AurIdEntity {
 
     @Key
     List<AurFollowupRuleAction> actions;
+
+    public static class Page extends AurOffsetPage<AurFollowupRuleAggregate> {
+    }
 }

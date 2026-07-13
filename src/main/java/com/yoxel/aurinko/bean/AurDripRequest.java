@@ -10,43 +10,23 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class AurConvoDripStatus extends GenericJson {
-    @Key
-    String convoId;
-
-    @Key
-    String subject;
+public class AurDripRequest extends GenericJson {
 
     @Key
     String status;
 
     @Key
-    AurFollowupRuleAggregate rule;
+    Long ruleId;
 
     @Key
     List<AurFollowupRuleAction> actionOverrides;
 
     @Key
-    DateTime dripStartedAt;
-
-    @Key
-    Integer dripLastNum;
-
-    @Key
-    String dripError;
-
-    @Key
-    DateTime dripEndedAt;
-
-    @Key
-    Map<String, String> actionVars;
+    DateTime dripAfter;
 
     @Key
     List<String> targets;
 
     @Key
-    String dripResponder;
-
-    public static class Page extends AurOffsetPage<AurConvoDripStatus> {
-    }
+    Map<String, String> actionVars;
 }

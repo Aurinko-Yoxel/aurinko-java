@@ -49,6 +49,7 @@ public class AurinkoService implements AutoCloseable {
   public final Emails emails;
   public final Contacts contacts;
   public final Drives drives;
+  public final Followups followups;
 
   private AurinkoService(String baseUrl, Map<String, String> headers, HttpRequestInitializer requestInitializer, String userAgent) {
     this.httpTransport = new ApacheHttpTransport();
@@ -64,6 +65,7 @@ public class AurinkoService implements AutoCloseable {
     this.emails = new Emails(httpImpl);
     this.contacts = new Contacts(httpImpl);
     this.drives = new Drives(httpImpl);
+    this.followups = new Followups(httpImpl);
   }
 
   public void close() throws IOException {
