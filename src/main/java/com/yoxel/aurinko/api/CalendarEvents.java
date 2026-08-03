@@ -2,6 +2,7 @@ package com.yoxel.aurinko.api;
 
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.json.JsonHttpContent;
+import com.google.api.client.util.escape.CharEscapers;
 import com.yoxel.aurinko.apis.EntitySupport_TokenBased;
 import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.apis.SyncSupport;
@@ -15,8 +16,6 @@ import com.yoxel.commons.xstream.XStream;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +43,7 @@ public class CalendarEvents
     }
 
     private static String calendarPath(String calendarId) {
-       return "/calendars/" + URLEncoder.encode(calendarId, StandardCharsets.UTF_8);
+       return "/calendars/" + CharEscapers.escapeUriQuery(calendarId);
     }
 
     @Override

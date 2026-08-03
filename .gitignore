@@ -3,3 +3,4 @@ lib
 .idea
 *.iml
 /target
+.java-version
