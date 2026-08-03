@@ -17,11 +17,13 @@ public class Emails extends EntitySupport_TokenBased<AurEmail, String, AurEmails
 
     private final HttpImpl httpImpl;
     public final EmailFolders emailFolders;
+    public final EmailDrafts emailDrafts;
 
     public Emails(HttpImpl httpImpl) {
         super("/email/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class, httpImpl);
         this.httpImpl = httpImpl;
         this.emailFolders = new EmailFolders(httpImpl);
+        this.emailDrafts = new EmailDrafts(httpImpl);
     }
 
     public AurContent getAttachment(String msgId, String attachmentId) throws IOException {

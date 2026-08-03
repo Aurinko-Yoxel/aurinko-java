@@ -52,7 +52,8 @@ interface FakeHttpImpl {
                 "https://api.aurinko.io",
                 parser,
                 exceptionHandler,
-                customHeaders
+                customHeaders,
+                "Test Agent"
         );
     }
 

@@ -6,10 +6,7 @@ import com.yoxel.aurinko.bean.sub.AurOutEmailTrack;
 import lombok.Data;
 
 @Data
-public class AurRewriteHtml extends GenericJson {
-
-    @Key
-    String htmlText;
+public class AurDraftSendDetails extends GenericJson {
 
     @Key
     AurOutEmailTrack tracking;
