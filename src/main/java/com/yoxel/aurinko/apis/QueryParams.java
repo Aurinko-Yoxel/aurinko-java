@@ -1,9 +1,8 @@
 package com.yoxel.aurinko.apis;
 
+import com.google.api.client.util.escape.CharEscapers;
 import com.google.common.collect.ImmutableList;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -115,8 +114,8 @@ public interface QueryParams {
 
     public String toString() {
       return params.stream()
-          .map(qp -> URLEncoder.encode(qp.name, StandardCharsets.UTF_8) + "=" +
-                     URLEncoder.encode(qp.value.toString(), StandardCharsets.UTF_8))
+          .map(qp -> CharEscapers.escapeUriQuery(qp.name) + "=" +
+                  CharEscapers.escapeUriQuery(qp.value.toString()))
           .collect(Collectors.joining("&"));
     }
   }
