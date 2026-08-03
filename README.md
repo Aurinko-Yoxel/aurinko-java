@@ -30,12 +30,12 @@ Add the JitPack repository to your pom.xml:
 </repositories>
 ```
 
-Add the dependency (replace Tag with a specific release tag or commit hash):
+Add the dependency (replace `Tag` with a specific release tag or commit hash):
 ```xml
 <dependencies>
     <dependency>
-        <groupId>com.github.YourGithubUsername</groupId>
-        <artifactId>aurinko-java-sdk</artifactId>
+        <groupId>com.github.Aurinko-Yoxel</groupId>
+        <artifactId>aurinko-java</artifactId>
         <version>Tag</version>
     </dependency>
 </dependencies>
@@ -43,57 +43,45 @@ Add the dependency (replace Tag with a specific release tag or commit hash):
 
 ## Usage Example
 
-The following example demonstrates how to initialize the service using account authentication,
-retrieve information about account via the Aurinko API, and automatically manage resources.
+The following example demonstrates how to initialize an incremental email data synchronization:
 
 ```java
 
-import com.yoxel.aurinko.bean.AurApplication;
+import com.yoxel.aurinko.AurinkoService;
+import com.yoxel.aurinko.apis.SyncSupport;
+import com.yoxel.aurinko.bean.AurEmail;
+import com.yoxel.aurinko.bean.AurEmailsPage;
+import com.yoxel.aurinko.bean.AurSyncStatus;
+import com.yoxel.aurinko.bean.AurinkoSyncRunner;
+import com.yoxel.aurinko.bean.SyncTokensPair;
 import java.io.IOException;
 
-/**
- *
- */
-public class AurinkoGetMeDemo {
-
-    public static void main(String[] args) throws IOException {
-
-        try (final var svc = AurinkoService.createWithAccountAuth(
-                "http://localhost:9000",
-                "access_token"
-        )) {
-            final var accountInfo = svc.accounts.getMe();
-
-            System.out.println(accountInfo);
-        }
-    }
-}
-```
-
-The following example demonstrates how to initialize an incremental contact's data synchronization:
-
-```java
-
-public class AurinkoRunSyncDemo {
+public class AurinkoEmailSyncDemo {
 
     public static void main(String[] args) throws IOException {
 
         try (final var service = AurinkoService.createWithAccountAuth(
-                "http://localhost:9000",
+                "https://api.aurinko.io",
                 "access_token"
         )) {
-            final SyncTokensPair initialToken = SyncTokensPair.EMPTY;
+            final AurSyncStatus status = service.emails.syncStart();
+            final SyncTokensPair initialToken =
+                    SyncTokensPair.parse(status.getSyncUpdatedToken());
 
-            final AurinkoSyncRunner<AurContact, AurContactsPage> syncRunner =
+            if (!initialToken.hasNextToken()) {
+                return;
+            }
+
+            final AurinkoSyncRunner<AurEmail, AurEmailsPage> syncRunner =
                     new AurinkoSyncRunner<>(
-                            service.contacts,
+                            service.emails,
                             SyncSupport.SyncScope.UPDATED,
                             initialToken
                     );
 
             try {
-                syncRunner.forEach(contact ->
-                        System.out.println("Contact " + contact)
+                syncRunner.forEach(email ->
+                        System.out.println("Email " + email)
                 );
 
                 System.out.println("Next token " + syncRunner.getNext());
@@ -101,6 +89,30 @@ public class AurinkoRunSyncDemo {
             } catch (AurinkoSyncRunner.AurSyncException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+}
+```
+
+The following example demonstrates how to initialize the service using account authentication,
+retrieve information about account via the Aurinko API, and automatically manage resources.
+
+```java
+
+import com.yoxel.aurinko.AurinkoService;
+import java.io.IOException;
+
+public class AurinkoGetMeDemo {
+
+    public static void main(String[] args) throws IOException {
+
+        try (final var svc = AurinkoService.createWithAccountAuth(
+                "https://api.aurinko.io",
+                "access_token"
+        )) {
+            final var accountInfo = svc.accounts.getMe();
+
+            System.out.println(accountInfo);
         }
     }
 }
