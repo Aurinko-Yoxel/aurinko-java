@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.yoxel.aurinko</groupId>
-	<artifactId>aurinko-service</artifactId>
-	<version>1.8.13-SNAPSHOT</version>
+	<artifactId>aurinko-java</artifactId>
+	<version>1.8.14-SNAPSHOT</version>
 
 	<properties>
 		<lombok.version>1.18.40</lombok.version>

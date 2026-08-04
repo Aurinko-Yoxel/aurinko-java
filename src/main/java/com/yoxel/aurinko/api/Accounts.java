@@ -71,7 +71,7 @@ public class Accounts
     public AurAccountToken upsertPersonal(AurAccountDto acc) throws IOException {
         return create(
                 acc,
-                QueryParams.of("recycleKeys", "email,clientOrgId")
+                QueryParams.of(qp("recycleKeys", "email,clientOrgId"), qp("ensureAccess", true))
         );
     }
 

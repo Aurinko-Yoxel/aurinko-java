@@ -19,4 +19,6 @@ public class AurAccountToken {
   @Key
   private String userSession;
 
+  private String accServiceType;
+
 }
