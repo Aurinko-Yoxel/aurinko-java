@@ -35,6 +35,6 @@ public interface UpdateSupport<Entity, Id, SaveResult>
       request.getHeaders().setIfMatch(etag);
     }
 
-    return request.execute().parseAs(entitySaveResultClass());
+    return httpExecute(request).parseAs(entitySaveResultClass());
   }
 }
