@@ -3,11 +3,10 @@ name: Maven CI/CD Pipeline
 on:
   push:
     branches: [ "main", "master", "ci-cd" ]
-  pull_request:
-    branches: [ "main", "master" ]
-  push:
     tags:
       - 'v*' # versions v1.0.0
+  pull_request:
+    branches: [ "main", "master" ]
 
 permissions:
   contents: write # For GitHub Release creation
