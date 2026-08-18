@@ -7,12 +7,14 @@ import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.bean.AurBookingInDto;
 import com.yoxel.aurinko.bean.AurBookingOutDto;
 import com.yoxel.aurinko.bean.AurBookingUpdateDto;
+import com.yoxel.aurinko.bean.AurBookingTimesOutDto;
 import com.yoxel.aurinko.bean.AurStatus;
 import com.yoxel.aurinko.bean.AurWeekWorkScheduleResponse;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityInterval;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityIntervals;
 import com.yoxel.aurinko.bean.sub.AurDayWorkSchedule;
 import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
+import com.yoxel.aurinko.bean.sub.AurBookingMeetingInterval;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -213,5 +215,68 @@ public class BookingTest implements FakeHttpImpl {
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
                 .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/" + id);
+    }
+
+    @Test
+    void loadMeetingPage() throws IOException {
+        Long profileId = 1L;
+        String data = """
+                {
+                  "items": [
+                    {
+                      "start": "1970-01-01T00:00:00Z",
+                      "end": "1970-01-01T01:00:00Z",
+                      "groupXids": ["g1"],
+                      "accountIds": [10]
+                    }
+                  ],
+                  "startTime": "1970-01-01T00:00:00Z",
+                  "endTime": "1970-01-02T00:00:00Z",
+                  "timeAvailableFor": "time",
+                  "durationMinutes": 60,
+                  "availabilityStep": 15,
+                  "subject": "s",
+                  "primaryColor": 1,
+                  "secondaryColor": 2,
+                  "nextPageToken": "next",
+                  "limit": 10,
+                  "offset": 0,
+                  "done": false,
+                  "totalSize": 1,
+                  "nextFromDate": "1970-01-02"
+                }
+                """;
+
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurBookingTimesOutDto page = new Bookings(buildFakeHttp(mockTransport)).account.profiles.meeting(profileId).loadPage(com.yoxel.aurinko.apis.QueryParams.EMPTY, "token123");
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/1/meeting?pageToken=token123");
+
+        assertThat(page).isNotNull();
+        assertThat(page.getStartTime()).isEqualTo(DateTime.parseRfc3339("1970-01-01T00:00:00Z"));
+        assertThat(page.getEndTime()).isEqualTo(DateTime.parseRfc3339("1970-01-02T00:00:00Z"));
+        assertThat(page.getTimeAvailableFor()).isEqualTo("time");
+        assertThat(page.getDurationMinutes()).isEqualTo(60);
+        assertThat(page.getAvailabilityStep()).isEqualTo(15);
+        assertThat(page.getSubject()).isEqualTo("s");
+        assertThat(page.getPrimaryColor()).isEqualTo(1);
+        assertThat(page.getSecondaryColor()).isEqualTo(2);
+        assertThat(page.getNextPageToken()).isEqualTo("next");
+        assertThat(page.getLimit()).isEqualTo(10);
+        assertThat(page.getOffset()).isEqualTo(0);
+        assertThat(page.getDone()).isEqualTo(false);
+        assertThat(page.getTotalSize()).isEqualTo(1L);
+        assertThat(page.getNextFromDate()).isEqualTo("1970-01-02");
+
+        assertThat(page.getItems()).isNotNull();
+        assertThat(page.getItems().size()).isEqualTo(1);
+        AurBookingMeetingInterval item = page.getItems().get(0);
+        assertThat(item.getStart()).isEqualTo(DateTime.parseRfc3339("1970-01-01T00:00:00Z"));
+        assertThat(item.getEnd()).isEqualTo(DateTime.parseRfc3339("1970-01-01T01:00:00Z"));
+        assertThat(item.getGroupXids()).isEqualTo(List.of("g1"));
+        assertThat(item.getAccountIds()).isEqualTo(List.of(10L));
     }
 }
