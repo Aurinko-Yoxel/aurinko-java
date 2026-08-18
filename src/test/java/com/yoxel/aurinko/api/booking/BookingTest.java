@@ -133,4 +133,47 @@ public class BookingTest implements FakeHttpImpl {
         assertThat(r.getId()).isEqualTo(2);
         assertThat(r.getName()).isEqualTo("name");
     }
+
+    @Test
+    void listBookingProfilesPage() throws IOException {
+        String data = """
+                {
+                  "offset": 0,
+                  "totalSize": 2,
+                  "done": false,
+                  "records": [
+                    {
+                      "id": 1,
+                      "name": "n1"
+                    },
+                    {
+                      "id": 2,
+                      "name": "n2"
+                    }
+                  ]
+                }
+                """;
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        var page = new Bookings(buildFakeHttp(mockTransport)).account.profiles.loadPage(10, 0, com.yoxel.aurinko.apis.QueryParams.EMPTY);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/account/profiles?limit=10&offset=0");
+
+        assertThat(page).isNotNull();
+        assertThat(page.getOffset()).isEqualTo(0);
+        assertThat(page.getTotalSize()).isEqualTo(2);
+        assertThat(page.isDone()).isEqualTo(false);
+
+        AurBookingOutDto[] records = page.getRecords();
+        assertThat(records).isNotNull();
+        assertThat(records.length).isEqualTo(2);
+
+        assertThat(records[0].getId()).isEqualTo(1L);
+        assertThat(records[0].getName()).isEqualTo("n1");
+
+        assertThat(records[1].getId()).isEqualTo(2L);
+        assertThat(records[1].getName()).isEqualTo("n2");
+    }
 }
