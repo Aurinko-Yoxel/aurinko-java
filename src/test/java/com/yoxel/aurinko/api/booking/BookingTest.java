@@ -5,12 +5,7 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.apis.QueryParams;
-import com.yoxel.aurinko.bean.AurBookingInDto;
-import com.yoxel.aurinko.bean.AurBookingOutDto;
-import com.yoxel.aurinko.bean.AurBookingUpdateDto;
-import com.yoxel.aurinko.bean.AurBookingTimesOutDto;
-import com.yoxel.aurinko.bean.AurStatus;
-import com.yoxel.aurinko.bean.AurWeekWorkScheduleResponse;
+import com.yoxel.aurinko.bean.*;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityInterval;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityIntervals;
 import com.yoxel.aurinko.bean.sub.AurDayWorkSchedule;
@@ -280,5 +275,43 @@ public class BookingTest implements FakeHttpImpl {
         assertThat(item.getEnd()).isEqualTo(DateTime.parseRfc3339("1970-01-01T01:00:00Z"));
         assertThat(item.getGroupXids()).isEqualTo(List.of("g1"));
         assertThat(item.getAccountIds()).isEqualTo(List.of(10L));
+    }
+
+    @Test
+    void createMeetingForProfile() throws IOException {
+        Long profileId = 1L;
+        String data = """
+                {
+                  "created": true,
+                  "id": "m1",
+                  "reservationId": 123,
+                  "groupXid": "g1",
+                  "rescheduleToken": "rt"
+                }
+                """;
+
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurCreateMeetingDto dto = new AurCreateMeetingDto();
+        dto.setName("Scheduler");
+        dto.setEmail("scheduler@example.com");
+        dto.setAccountIds(List.of(10L));
+
+        AurCreateMeetingResponse resp = new Bookings(buildFakeHttp(mockTransport))
+                .account.profiles.meeting(profileId)
+                .create(dto);
+
+        // verify endpoint and method
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/" + profileId + "/meeting");
+
+        // verify parsed response
+        assertThat(resp).isNotNull();
+        assertThat(resp.getCreated()).isTrue();
+        assertThat(resp.getId()).isEqualTo("m1");
+        assertThat(resp.getReservationId()).isEqualTo(123L);
+        assertThat(resp.getGroupXid()).isEqualTo("g1");
+        assertThat(resp.getRescheduleToken()).isEqualTo("rt");
     }
 }
