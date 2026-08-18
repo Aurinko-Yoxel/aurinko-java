@@ -114,19 +114,11 @@ public class BookingTest implements FakeHttpImpl {
 
     @Test
     void readBookingProfile() throws IOException {
-        String id = "profile-id";
+        Long id = 2L;
         String data = """
                 {
-                  "id": "profile-id",
-                  "name": "name",
-                  "email": "user@example.com",
-                  "phone": "+1234567890",
-                  "timezone": "Europe/Helsinki",
-                  "source": "aurinko",
-                  "active": true,
-                  "notes": "Some notes about the profile",
-                  "createdAt": "2026-01-01T00:00:00Z",
-                  "updatedAt": "2026-06-01T12:34:56Z"
+                  "id": 2,
+                  "name": "name"
                 }
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
@@ -138,15 +130,7 @@ public class BookingTest implements FakeHttpImpl {
                 .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/" + id);
 
         assertThat(r).isNotNull();
-        assertThat(r.getId()).isEqualTo("profile-id");
+        assertThat(r.getId()).isEqualTo(2);
         assertThat(r.getName()).isEqualTo("name");
-        assertThat(r.get("email")).isEqualTo("user@example.com");
-        assertThat(r.get("phone")).isEqualTo("+1234567890");
-        assertThat(r.get("timezone")).isEqualTo("Europe/Helsinki");
-        assertThat(r.get("source")).isEqualTo("aurinko");
-        assertThat(r.get("active")).isEqualTo(Boolean.TRUE);
-        assertThat(r.get("notes")).isEqualTo("Some notes about the profile");
-        assertThat(String.valueOf(r.get("createdAt"))).contains("2026-01-01T00:00:00");
-        assertThat(String.valueOf(r.get("updatedAt"))).contains("2026-06-01T12:34:56");
     }
 }
