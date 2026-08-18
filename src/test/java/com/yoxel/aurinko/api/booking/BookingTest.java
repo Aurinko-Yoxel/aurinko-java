@@ -6,6 +6,8 @@ import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.bean.AurBookingInDto;
 import com.yoxel.aurinko.bean.AurBookingOutDto;
+import com.yoxel.aurinko.bean.AurBookingUpdateDto;
+import com.yoxel.aurinko.bean.AurStatus;
 import com.yoxel.aurinko.bean.AurWeekWorkScheduleResponse;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityInterval;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityIntervals;
@@ -69,7 +71,7 @@ public class BookingTest implements FakeHttpImpl {
                   },
                   "context": "c",
                   "startConference": true,
-                  "openMeetingUrl": u,
+                  "openMeetingUrl": "u",
                   "clientOrgId": "oi"
                 }
                 """;
@@ -175,5 +177,29 @@ public class BookingTest implements FakeHttpImpl {
 
         assertThat(records[1].getId()).isEqualTo(2L);
         assertThat(records[1].getName()).isEqualTo("n2");
+    }
+
+    @Test
+    void updateBookingProfile() throws IOException {
+        Long id = 3L;
+        String data = """
+                {
+                  "status": "ok"
+                }
+                """;
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurBookingUpdateDto dto = new AurBookingUpdateDto();
+        dto.setName("updated name");
+        dto.setDescription("updated desc");
+
+        AurStatus status = new Bookings(buildFakeHttp(mockTransport)).account.profiles.update(id, dto, com.yoxel.aurinko.apis.QueryParams.EMPTY);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/" + id);
+
+        assertThat(status).isNotNull();
+        assertThat(status.getStatus()).isEqualTo("ok");
     }
 }
