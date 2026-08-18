@@ -3,7 +3,6 @@ package com.yoxel.aurinko.api.booking;
 import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.Key;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.bean.AurBookingInDto;
 import com.yoxel.aurinko.bean.AurBookingOutDto;
@@ -15,8 +14,6 @@ import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.Period;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -52,7 +49,28 @@ public class BookingTest implements FakeHttpImpl {
     void createBookingProfile() throws IOException {
         String data = """
                 {
-                  "name": "name"
+                  "name": "name",
+                  "durationMinutes": 1,
+                  "bufferBetweenMinutes": 1,
+                  "availabilityStep": 1,
+                  "startAfterMinutes": 1,
+                  "startTime": "1970-01-01T03:00:01.235+03:00",
+                  "endTime": "1970-01-02T03:00:01.235+03:00",
+                  "timeAvailableFor": "time",
+                  "subject": "s",
+                  "description": "d",
+                  "location": "l",
+                  "workHours": {"timezone":"America/New_York"},
+                  "availabilityIntervals": {
+                    "intervals": [{ 
+                      "dateStartInclusive": "1970-01-01",
+                      "dateEndInclusive": "1970-01-02"
+                    }]
+                  },
+                  "context": "c",
+                  "startConference": true,
+                  "openMeetingUrl": u,
+                  "clientOrgId": "oi"
                 }
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
@@ -68,6 +86,30 @@ public class BookingTest implements FakeHttpImpl {
 
         assertThat(r).isNotNull();
         assertThat(r.getName()).isEqualTo("name");
+        assertThat(r.getDurationMinutes()).isEqualTo(1);
+        assertThat(r.getBufferBetweenMinutes()).isEqualTo(1);
+        assertThat(r.getAvailabilityStep()).isEqualTo(1);
+        assertThat(r.getStartAfterMinutes()).isEqualTo(1);
+        assertThat(r.getStartTime()).isEqualTo(DateTime.parseRfc3339("1970-01-01T03:00:01.235+03:00"));
+        assertThat(r.getEndTime()).isEqualTo(DateTime.parseRfc3339("1970-01-02T03:00:01.235+03:00"));
+        assertThat(r.getTimeAvailableFor()).isEqualTo("time");
+        assertThat(r.getSubject()).isEqualTo("s");
+        assertThat(r.getDescription()).isEqualTo("d");
+        assertThat(r.getLocation()).isEqualTo("l");
+        AurWeekWorkSchedule wsc = new AurWeekWorkSchedule();
+        wsc.setTimezone("America/New_York");
+        assertThat(r.getWorkHours()).isEqualTo(wsc);
+
+        AurAvailabilityIntervals ais = new AurAvailabilityIntervals();
+        AurAvailabilityInterval ai = new AurAvailabilityInterval();
+        ai.setDateStartInclusive("1970-01-01");
+        ai.setDateEndInclusive("1970-01-02");
+        ais.setIntervals(List.of(ai));
+        assertThat(r.getAvailabilityIntervals()).isEqualTo(ais);
+        assertThat(r.getContext()).isEqualTo("c");
+        assertThat(r.getStartConference()).isEqualTo(true);
+        assertThat(r.getOpenMeetingUrl()).isEqualTo("u");
+        assertThat(r.getClientOrgId()).isEqualTo("oi");
     }
 
     @Test
