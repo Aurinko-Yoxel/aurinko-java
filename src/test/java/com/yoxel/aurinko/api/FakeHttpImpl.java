@@ -22,6 +22,11 @@ public interface FakeHttpImpl {
                 .setContent(body);
     }
 
+    default MockLowLevelHttpResponse emptySuccess() {
+        return new MockLowLevelHttpResponse()
+                .setStatusCode(200);
+    }
+
     default HttpImpl buildFakeHttp(MockLowLevelHttpResponse response) {
         MockHttpTransport transport = new MockHttpTransport.Builder()
                 .setLowLevelHttpResponse(response)

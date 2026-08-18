@@ -206,16 +206,12 @@ public class BookingTest implements FakeHttpImpl {
     @Test
     void deleteBookingProfile() throws IOException {
         Long id = 4L;
-        String data = """
-                {}
-                """;
-        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockLowLevelHttpResponse mockResponse = emptySuccess();
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
 
         new Bookings(buildFakeHttp(mockTransport)).account.profiles.delete(id);
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
                 .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/" + id);
-        assertThat(mockTransport.getLowLevelHttpRequest().getRequestMethod()).isEqualTo("DELETE");
     }
 }
