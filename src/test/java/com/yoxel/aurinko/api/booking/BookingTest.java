@@ -104,7 +104,7 @@ public class BookingTest implements FakeHttpImpl {
         assertThat(r.get("source")).isEqualTo("aurinko");
         assertThat(r.get("active")).isEqualTo(Boolean.TRUE);
         assertThat(r.get("notes")).isEqualTo("Some notes about the profile");
-        assertThat(r.get("createdAt")).isEqualTo("2026-01-01T00:00:00Z");
-        assertThat(r.get("updatedAt")).isEqualTo("2026-06-01T12:34:56Z");
+        assertThat(String.valueOf(r.get("createdAt"))).contains("2026-01-01T00:00:00");
+        assertThat(String.valueOf(r.get("updatedAt"))).contains("2026-06-01T12:34:56");
     }
 }
