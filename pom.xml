@@ -8,6 +8,10 @@
 	<artifactId>aurinko-java</artifactId>
 	<version>1.8.14-SNAPSHOT</version>
 
+	<scm>
+		<developerConnection>scm:git:https://github.com/Aurinko-Yoxel/aurinko-java.git</developerConnection>
+	</scm>
+
 	<properties>
 		<lombok.version>1.18.40</lombok.version>
 
