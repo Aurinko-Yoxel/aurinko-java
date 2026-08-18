@@ -62,7 +62,7 @@ public class BookingTest implements FakeHttpImpl {
                   "location": "l",
                   "workHours": {"timezone":"America/New_York"},
                   "availabilityIntervals": {
-                    "intervals": [{ 
+                    "intervals": [{
                       "dateStartInclusive": "1970-01-01",
                       "dateEndInclusive": "1970-01-02"
                     }]
