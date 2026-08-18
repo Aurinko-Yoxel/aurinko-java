@@ -1,16 +1,15 @@
 package com.yoxel.aurinko.bean.sub;
 
 import com.google.api.client.json.GenericJson;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import lombok.Data;
-
-import java.time.Instant;
 
 @Data
 public class AurSelectedMeetingTime extends GenericJson {
     @Key
-    Instant start;
+    DateTime start;
 
     @Key
-    Instant end;
+    DateTime end;
 }

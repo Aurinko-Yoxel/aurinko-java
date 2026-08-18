@@ -1,17 +1,14 @@
 package com.yoxel.aurinko.bean;
 
 import com.google.api.client.json.GenericJson;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.AurAdditionalField;
 import com.yoxel.aurinko.bean.sub.AurBookingMeetingInterval;
 import com.yoxel.aurinko.bean.sub.AurEventScheduleDetailsOutDto;
 import lombok.Data;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class AurBookingTimesOutDto extends GenericJson {
@@ -20,13 +17,13 @@ public class AurBookingTimesOutDto extends GenericJson {
     List<AurBookingMeetingInterval> items;
 
     @Key
-    Instant startTime;
+    DateTime startTime;
 
     @Key
-    Instant endTime;
+    DateTime endTime;
 
     @Key
-    Period timeAvailableFor;
+    String timeAvailableFor;
 
     @Key
     Integer durationMinutes;
@@ -44,7 +41,7 @@ public class AurBookingTimesOutDto extends GenericJson {
     Integer secondaryColor;
 
     @Key
-    Set<AurAdditionalField> additionalFields;
+    List<AurAdditionalField> additionalFields;
 
     @Key
     String nextPageToken;
@@ -62,7 +59,7 @@ public class AurBookingTimesOutDto extends GenericJson {
     Long totalSize;
 
     @Key
-    LocalDate nextFromDate;
+    String nextFromDate;
 
     @Key
     AurEventScheduleDetailsOutDto existingMeeting;

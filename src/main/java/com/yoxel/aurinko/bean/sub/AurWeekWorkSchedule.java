@@ -4,7 +4,6 @@ import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.Key;
 import lombok.Data;
 
-import java.time.ZoneId;
 import java.util.List;
 
 @Data
@@ -14,5 +13,5 @@ public class AurWeekWorkSchedule extends GenericJson {
     List<AurDayWorkSchedule> daySchedules;
 
     @Key
-    ZoneId timezone;
+    String timezone;
 }

@@ -5,7 +5,6 @@ import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.AurDayWorkSchedule;
 import lombok.Data;
 
-import java.time.ZoneId;
 import java.util.List;
 
 @Data
@@ -14,7 +13,7 @@ public class AurWeekWorkScheduleResponse extends GenericJson {
     List<AurDayWorkSchedule> daySchedules;
 
     @Key
-    ZoneId timezone;
+    String timezone;
 
     @Key
     String source;

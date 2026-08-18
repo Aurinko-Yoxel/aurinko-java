@@ -10,10 +10,10 @@ import java.util.List;
 @Data
 public class AurAvailabilityInterval extends GenericJson {
     @Key
-    LocalDate dateStartInclusive;
+    String dateStartInclusive;
 
     @Key
-    LocalDate dateEndInclusive;
+    String dateEndInclusive;
 
     @Key
     List<AurWorkingInterval> hours;

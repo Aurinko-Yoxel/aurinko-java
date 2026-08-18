@@ -1,13 +1,11 @@
 package com.yoxel.aurinko.bean;
 
 import com.google.api.client.json.GenericJson;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.AurAvailabilityIntervals;
 import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
 import lombok.Data;
-
-import java.time.Instant;
-import java.time.Period;
 
 @Data
 public class AurBookingInDto extends GenericJson {
@@ -27,13 +25,13 @@ public class AurBookingInDto extends GenericJson {
     Integer startAfterMinutes;
 
     @Key
-    Instant startTime;
+    DateTime startTime;
 
     @Key
-    Instant endTime;
+    DateTime endTime;
 
     @Key
-    Period timeAvailableFor;
+    String timeAvailableFor;
 
     @Key
     String subject;

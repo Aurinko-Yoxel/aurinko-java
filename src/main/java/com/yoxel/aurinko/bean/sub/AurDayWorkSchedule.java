@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class AurDayWorkSchedule extends GenericJson {
     @Key
-    DayOfWeek dayOfWeek;
+    String dayOfWeek;
 
     @Key
     List<AurWorkingInterval> workingIntervals;

@@ -1,20 +1,19 @@
 package com.yoxel.aurinko.bean.sub;
 
 import com.google.api.client.json.GenericJson;
+import com.google.api.client.util.DateTime;
 import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.AurCreateMeetingDto;
 import lombok.Data;
-
-import java.time.Instant;
 
 @Data
 public class AurEventScheduleDetailsOutDto extends GenericJson {
 
     @Key
-    Instant startTime;
+    DateTime startTime;
 
     @Key
-    Instant endTime;
+    DateTime endTime;
 
     @Key
     AurCreateMeetingDto meetingDto;
