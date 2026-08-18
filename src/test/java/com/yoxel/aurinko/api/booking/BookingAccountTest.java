@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class BookingTest implements FakeHttpImpl {
+public class BookingAccountTest implements FakeHttpImpl {
     @Test
     void accountWorkHours() throws IOException {
         String data = """
