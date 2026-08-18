@@ -9,7 +9,7 @@
 	<version>1.8.14-SNAPSHOT</version>
 
 	<scm>
-		<developerConnection>scm:git:https://github.com/Aurinko-Yoxel/aurinko-java.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:Aurinko-Yoxel/aurinko-java.git</developerConnection>
 	</scm>
 
 	<properties>
