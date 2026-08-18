@@ -4,8 +4,10 @@ import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.api.FakeHttpImpl;
+import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.bean.AurBookingAvailableProfilesInDto;
 import com.yoxel.aurinko.bean.AurBookingAvailableProfilesOutDto;
+import com.yoxel.aurinko.bean.AurBookingTimesOutDto;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,4 +43,60 @@ public class BookingGroupTest implements FakeHttpImpl {
         assertThat(out).isNotNull();
         assertThat(out.getProfileIds()).isEqualTo(List.of(1L, 2L));
     }
+
+    @Test
+    void groupProfilesMeetingLoadPage() throws IOException {
+        String data = """
+                {
+                  "items": [{
+                    "start": "1970-01-01T00:00:00Z",
+                    "end": "1970-01-01T01:00:00Z",
+                    "groupXids": ["g1"],
+                    "accountIds": [10]
+                  }],
+                  "startTime": "1970-01-01T00:00:00Z",
+                  "endTime": "1970-01-02T00:00:00Z",
+                  "timeAvailableFor": "time",
+                  "durationMinutes": 60,
+                  "availabilityStep": 15,
+                  "subject": "s",
+                  "primaryColor": 123,
+                  "secondaryColor": 456,
+                  "nextPageToken": "nxt",
+                  "limit": 10,
+                  "offset": 0,
+                  "done": true,
+                  "totalSize": 1,
+                  "nextFromDate": "1970-01-02"
+                }
+                """;
+
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurBookingTimesOutDto out = new Bookings(buildFakeHttp(mockTransport))
+                .group
+                .profiles
+                .meeting(1L)
+                .loadPage(QueryParams.EMPTY, "pt");
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/group/profiles/1/meeting?pageToken=pt");
+
+        assertThat(out).isNotNull();
+
+        com.yoxel.aurinko.bean.sub.AurBookingMeetingInterval interval = new com.yoxel.aurinko.bean.sub.AurBookingMeetingInterval();
+        interval.setStart(DateTime.parseRfc3339("1970-01-01T00:00:00Z"));
+        interval.setEnd(DateTime.parseRfc3339("1970-01-01T01:00:00Z"));
+        interval.setGroupXids(List.of("g1"));
+        interval.setAccountIds(List.of(10L));
+
+        assertThat(out.getItems()).isEqualTo(List.of(interval));
+        assertThat(out.getStartTime()).isEqualTo(DateTime.parseRfc3339("1970-01-01T00:00:00Z"));
+        assertThat(out.getEndTime()).isEqualTo(DateTime.parseRfc3339("1970-01-02T00:00:00Z"));
+        assertThat(out.getNextPageToken()).isEqualTo("nxt");
+        assertThat(out.getDone()).isEqualTo(true);
+        assertThat(out.getTotalSize()).isEqualTo(1L);
+    }
+
 }

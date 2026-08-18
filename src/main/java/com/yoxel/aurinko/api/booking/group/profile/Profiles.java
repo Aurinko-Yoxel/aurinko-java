@@ -98,7 +98,7 @@ public class Profiles extends HttpApiSupport implements
     }
 
     public Meeting meeting(Long id) {
-        return new Meeting(httpImpl, entityPathId(id));
+        return new Meeting(httpImpl, basePath() + entityPathId(id));
     }
 }
 
