@@ -4,6 +4,7 @@ import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.api.FakeHttpImpl;
+import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.bean.AurBookingInDto;
 import com.yoxel.aurinko.bean.AurBookingOutDto;
 import com.yoxel.aurinko.bean.AurBookingUpdateDto;
@@ -250,7 +251,8 @@ public class BookingTest implements FakeHttpImpl {
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
 
-        AurBookingTimesOutDto page = new Bookings(buildFakeHttp(mockTransport)).account.profiles.meeting(profileId).loadPage(com.yoxel.aurinko.apis.QueryParams.EMPTY, "token123");
+        AurBookingTimesOutDto page = new Bookings(buildFakeHttp(mockTransport)).account.profiles.meeting(profileId)
+                .loadPage(QueryParams.EMPTY, "token123");
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
                 .isEqualTo("https://api.aurinko.io/v1/book/account/profiles/1/meeting?pageToken=token123");
