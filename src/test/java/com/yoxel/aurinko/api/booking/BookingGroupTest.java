@@ -5,9 +5,7 @@ import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.google.api.client.util.DateTime;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.apis.QueryParams;
-import com.yoxel.aurinko.bean.AurBookingAvailableProfilesInDto;
-import com.yoxel.aurinko.bean.AurBookingAvailableProfilesOutDto;
-import com.yoxel.aurinko.bean.AurBookingTimesOutDto;
+import com.yoxel.aurinko.bean.*;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -99,4 +97,41 @@ public class BookingGroupTest implements FakeHttpImpl {
         assertThat(out.getTotalSize()).isEqualTo(1L);
     }
 
+    @Test
+    void groupCreateMeeting() throws IOException {
+        Long profileId = 1L;
+        String data = """
+                {
+                  "created": true,
+                  "id": "m1",
+                  "reservationId": 123,
+                  "groupXid": "g1",
+                  "rescheduleToken": "rt"
+                }
+                """;
+
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurCreateMeetingDto dto = new AurCreateMeetingDto();
+        dto.setName("Scheduler");
+        dto.setEmail("scheduler@example.com");
+        dto.setAccountIds(List.of(10L));
+
+        AurCreateMeetingResponse resp = new Bookings(buildFakeHttp(mockTransport))
+                .group
+                .profiles
+                .meeting(profileId)
+                .create(dto);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/group/profiles/" + profileId + "/meeting");
+
+        assertThat(resp).isNotNull();
+        assertThat(resp.getCreated()).isTrue();
+        assertThat(resp.getId()).isEqualTo("m1");
+        assertThat(resp.getReservationId()).isEqualTo(123L);
+        assertThat(resp.getGroupXid()).isEqualTo("g1");
+        assertThat(resp.getRescheduleToken()).isEqualTo("rt");
+    }
 }
