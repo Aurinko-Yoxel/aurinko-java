@@ -477,4 +477,16 @@ public class BookingGroupTest implements FakeHttpImpl {
         assertThat(out).isNotNull();
         assertThat(out.getId()).isEqualTo("res-1");
     }
+
+    @Test
+    void groupDeleteReservation() throws IOException {
+        Long id = 6L;
+        MockLowLevelHttpResponse mockResponse = emptySuccess();
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        new Bookings(buildFakeHttp(mockTransport)).group.reservations.delete(id);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/group/reservations/" + id);
+    }
 }
