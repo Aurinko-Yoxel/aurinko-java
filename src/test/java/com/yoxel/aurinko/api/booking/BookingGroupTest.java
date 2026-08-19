@@ -391,4 +391,42 @@ public class BookingGroupTest implements FakeHttpImpl {
         assertThat(status).isNotNull();
         assertThat(status.getStatus()).isEqualTo("ok");
     }
+
+    @Test
+    void groupProfilesAttachAccountsLoadPage() throws IOException {
+        Long profileId = 5L;
+        String data = """
+                {
+                  "offset": 0,
+                  "totalSize": 1,
+                  "done": true,
+                  "records": [
+                    {
+                      "accountIds": [100]
+                    }
+                  ]
+                }
+                """;
+
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurBookingAttachedAccountsDto.Page page = new Bookings(buildFakeHttp(mockTransport))
+                .group
+                .profiles
+                .attachAccounts(profileId)
+                .loadPage(10, 0, com.yoxel.aurinko.apis.QueryParams.EMPTY);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/group/profiles/" + profileId + "/attachAccounts?limit=10&offset=0");
+
+        assertThat(page).isNotNull();
+        assertThat(page.getOffset()).isEqualTo(0);
+        assertThat(page.getTotalSize()).isEqualTo(1);
+        assertThat(page.isDone()).isTrue();
+
+        AurBookingAttachedAccountsDto rec = page.getRecords()[0];
+        assertThat(rec).isNotNull();
+        assertThat(rec.getAccountIds()).isEqualTo(List.of(100L));
+    }
 }
