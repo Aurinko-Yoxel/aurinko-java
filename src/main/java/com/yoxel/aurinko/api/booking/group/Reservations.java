@@ -27,9 +27,8 @@ public class Reservations extends HttpApiSupport implements
         return "/reservations";
     }
 
-    public AurConfirmReservationOutDto confirm() throws IOException {
-        return httpPost(
-                entityPath() + "/confirm"
-        ).parseAs(AurConfirmReservationOutDto.class);
+    public AurConfirmReservationOutDto confirm(Long id) throws IOException {
+        return httpPost(entityPath() + "/" + normalizeId(id) + "/confirm")
+                .parseAs(AurConfirmReservationOutDto.class);
     }
 }
