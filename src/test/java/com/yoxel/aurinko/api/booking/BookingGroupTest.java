@@ -429,4 +429,31 @@ public class BookingGroupTest implements FakeHttpImpl {
         assertThat(rec).isNotNull();
         assertThat(rec.getAccountIds()).isEqualTo(List.of(100L));
     }
+
+
+    @Test
+    void groupProfilesDetachAccounts() throws IOException {
+        Long profileId = 4L;
+        String data = """
+                {
+                  "status": "ok"
+                }
+                """;
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+
+        AurBookingDetachGroupAccountsDto dto = new AurBookingDetachGroupAccountsDto();
+        dto.setAccountIds(List.of(100L));
+
+        AurStatus status = new Bookings(buildFakeHttp(mockTransport))
+                .group
+                .profiles
+                .detachAccounts(profileId, dto);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/book/group/profiles/" + profileId + "/detachAccounts");
+
+        assertThat(status).isNotNull();
+        assertThat(status.getStatus()).isEqualTo("ok");
+    }
 }
