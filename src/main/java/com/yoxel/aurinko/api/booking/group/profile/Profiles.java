@@ -65,7 +65,7 @@ public class Profiles extends HttpApiSupport implements
     }
 
     public AttachGroups attachGroups(Long id) {
-        return new AttachGroups(httpImpl, entityPathId(id));
+        return new AttachGroups(httpImpl, basePath() + entityPathId(id));
     }
 
     public AurStatus detachGroups(Long id, AurBookingDetachGroupsDto entity) throws IOException {
