@@ -77,7 +77,7 @@ public class Profiles extends HttpApiSupport implements
     }
 
     public AttachAccounts attachAccounts(Long id) {
-        return new AttachAccounts(httpImpl, entityPathId(id));
+        return new AttachAccounts(httpImpl, basePath() + entityPathId(id));
     }
 
     public AurStatus detachAccounts(Long id, AurBookingDetachGroupAccountsDto entity) throws IOException {
