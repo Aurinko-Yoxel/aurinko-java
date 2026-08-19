@@ -13,13 +13,18 @@ import com.yoxel.aurinko.http.HttpImpl;
 import java.io.IOException;
 import java.util.Map;
 
-interface FakeHttpImpl {
+public interface FakeHttpImpl {
 
     default MockLowLevelHttpResponse successJsonResponse(String body) {
         return new MockLowLevelHttpResponse()
                 .setStatusCode(200)
                 .setContentType("application/json")
                 .setContent(body);
+    }
+
+    default MockLowLevelHttpResponse emptySuccess() {
+        return new MockLowLevelHttpResponse()
+                .setStatusCode(200);
     }
 
     default HttpImpl buildFakeHttp(MockLowLevelHttpResponse response) {
