@@ -6,10 +6,7 @@ import com.yoxel.aurinko.apis.CreateSupport;
 import com.yoxel.aurinko.apis.DeleteSupport;
 import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.apis.ReadSupport;
-import com.yoxel.aurinko.bean.AurDraftSendDetails;
-import com.yoxel.aurinko.bean.AurEmail;
-import com.yoxel.aurinko.bean.AurEmailDraftResponse;
-import com.yoxel.aurinko.bean.EmailDraftSendResponse;
+import com.yoxel.aurinko.bean.*;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
@@ -17,7 +14,7 @@ import java.io.IOException;
 
 public class EmailDrafts extends HttpApiSupport
         implements CreateSupport<AurEmail, String, AurEmailDraftResponse>,
-        ReadSupport<AurEmail, String>,
+        ReadSupport<AurEmailDraft, String>,
         DeleteSupport<String> {
 
     public EmailDrafts(HttpImpl httpImpl) {
@@ -25,8 +22,8 @@ public class EmailDrafts extends HttpApiSupport
     }
 
     @Override
-    public Class<AurEmail> entityClass() {
-        return AurEmail.class;
+    public Class<AurEmailDraft> entityClass() {
+        return AurEmailDraft.class;
     }
 
     @Override

@@ -35,6 +35,9 @@ public class AurEmail extends AurLiveIdEntity {
     private List<String> sysLabels;
 
     @Key
+    private List<String> keywords;
+
+    @Key
     private List<String> sysClassifications;
 
     @Key
@@ -81,4 +84,7 @@ public class AurEmail extends AurLiveIdEntity {
 
     @Key
     private Map<String, String> nativeProperties;
+    
+    @Key
+    private String folderId;
 }
