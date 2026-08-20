@@ -16,10 +16,14 @@ import java.util.Map;
 public interface FakeHttpImpl {
 
     default MockLowLevelHttpResponse successJsonResponse(String body) {
+        return successBodyResponse("application/json", body);
+    }
+
+    default MockLowLevelHttpResponse successBodyResponse(String contentType, String content) {
         return new MockLowLevelHttpResponse()
                 .setStatusCode(200)
-                .setContentType("application/json")
-                .setContent(body);
+                .setContentType(contentType)
+                .setContent(content);
     }
 
     default MockLowLevelHttpResponse emptySuccess() {

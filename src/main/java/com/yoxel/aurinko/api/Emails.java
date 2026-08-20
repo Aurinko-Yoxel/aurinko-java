@@ -2,9 +2,9 @@ package com.yoxel.aurinko.api;
 
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.json.JsonHttpContent;
-import com.yoxel.aurinko.apis.EntitySupport_TokenBased;
-import com.yoxel.aurinko.apis.SyncSupport;
+import com.yoxel.aurinko.apis.*;
 import com.yoxel.aurinko.bean.*;
+import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
 import java.io.IOException;
@@ -12,28 +12,52 @@ import java.io.IOException;
 /**
  * Email API: /email/messages
  */
-public class Emails extends EntitySupport_TokenBased<AurEmail, String, AurEmailsPage, AurEmail>
-        implements SyncSupport<AurEmail, AurEmailsPage> {
+public class Emails extends HttpApiSupport
+        implements CreateSupport<AurEmail, String, AurEmailSendResponse>,
+        ReadSupport<AurEmail, String>,
+        DeleteSupport<String>,
+        ListSupport_TokenBased<AurEmail, String, AurEmailsPage>,
+        SyncSupport<AurEmail, AurEmailsPage> {
 
     private final HttpImpl httpImpl;
     public final EmailFolders emailFolders;
     public final EmailDrafts emailDrafts;
 
     public Emails(HttpImpl httpImpl) {
-        super("/email/messages", AurEmail.class, AurEmailsPage.class, AurEmail.class, httpImpl);
+        super(httpImpl);
         this.httpImpl = httpImpl;
         this.emailFolders = new EmailFolders(httpImpl);
         this.emailDrafts = new EmailDrafts(httpImpl);
     }
 
-    public AurContent getAttachment(String msgId, String attachmentId) throws IOException {
-        return httpGet("/email/messages/" + msgId + "/attachments/" + attachmentId)
-                .parseAs(AurContent.class);
+    @Override
+    public String entityPath() {
+        return "/email/messages";
+    }
+
+    @Override
+    public Class<AurEmailSendResponse> entitySaveResultClass() {
+        return AurEmailSendResponse.class;
+    }
+
+    @Override
+    public Class<AurEmailsPage> entityPageClass() {
+        return AurEmailsPage.class;
+    }
+
+    @Override
+    public Class<AurEmail> entityClass() {
+        return AurEmail.class;
     }
 
     @Override
     public String syncRootPath() {
         return "/email";
+    }
+
+    public AurContent getAttachment(String msgId, String attachmentId) throws IOException {
+        return httpGet(entityPath() + "/" + normalizeId(msgId) + "/attachments/" + normalizeId(attachmentId))
+                .parseAs(AurContent.class);
     }
 
     public String rawMessage(String id) throws IOException {
