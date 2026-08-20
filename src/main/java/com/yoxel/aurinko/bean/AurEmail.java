@@ -84,4 +84,7 @@ public class AurEmail extends AurLiveIdEntity {
 
     @Key
     private Map<String, String> nativeProperties;
+    
+    @Key
+    private String folderId;
 }
