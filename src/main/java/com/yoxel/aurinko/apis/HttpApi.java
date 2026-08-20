@@ -8,13 +8,17 @@ import com.google.api.client.http.HttpResponseException;
 import com.yoxel.aurinko.AurinkoHttpException;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Support for http methods
  */
 public interface HttpApi {
 
-  HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams) throws IOException;
+  HttpRequest httpRequestPrepare(String method,
+                                 String path,
+                                 QueryParams queryParams,
+                                 Map<String, String> headers) throws IOException;
 
   default HttpResponse httpExecute(HttpRequest request) throws IOException {
     try {
@@ -25,31 +29,37 @@ public interface HttpApi {
   }
 
   default HttpRequest httpGetPrepare(String path, QueryParams queryParams) throws IOException {
-    return httpRequestPrepare("GET", path, queryParams);
+    return httpRequestPrepare("GET", path, queryParams, Map.of());
   }
 
   default HttpRequest httpPostPrepare(String path, QueryParams queryParams) throws IOException {
-    return httpRequestPrepare("POST", path, queryParams);
+    return httpRequestPrepare("POST", path, queryParams, Map.of());
+  }
+
+  default HttpRequest httpPostPrepare(String path,
+                                      QueryParams queryParams,
+                                      Map<String, String> headers) throws IOException {
+    return httpRequestPrepare("POST", path, queryParams, headers);
   }
 
   default HttpRequest httpPostPrepare(String path, QueryParams queryParams, HttpContent content) throws IOException {
-    return httpRequestPrepare("POST", path, queryParams).setContent(content);
+    return httpRequestPrepare("POST", path, queryParams, Map.of()).setContent(content);
   }
 
   default HttpRequest httpPutPrepare(String path, QueryParams queryParams) throws IOException {
-    return httpRequestPrepare("PUT", path, queryParams);
+    return httpRequestPrepare("PUT", path, queryParams, Map.of());
   }
 
   default HttpRequest httpPutPrepare(String path, QueryParams queryParams, HttpContent content) throws IOException {
-    return httpRequestPrepare("PUT", path, queryParams).setContent(content);
+    return httpRequestPrepare("PUT", path, queryParams, Map.of()).setContent(content);
   }
 
   default HttpRequest httpPatchPrepare(String path, QueryParams queryParams, HttpContent content) throws IOException {
-    return httpRequestPrepare("PATCH", path, queryParams).setContent(content);
+    return httpRequestPrepare("PATCH", path, queryParams, Map.of()).setContent(content);
   }
 
   default HttpRequest httpDeletePrepare(String path, QueryParams queryParams) throws IOException {
-    return httpRequestPrepare("DELETE", path, queryParams);
+    return httpRequestPrepare("DELETE", path, queryParams, Map.of());
   }
 
   default HttpResponse httpGet(String path, QueryParams queryParams) throws IOException {
@@ -62,6 +72,10 @@ public interface HttpApi {
 
   default HttpResponse httpPost(String path, QueryParams queryParams) throws IOException {
     return httpExecute(httpPostPrepare(path, queryParams));
+  }
+
+  default HttpResponse httpPost(String path, QueryParams queryParams, Map<String, String> headers) throws IOException {
+    return httpExecute(httpPostPrepare(path, queryParams, headers));
   }
 
   default HttpResponse httpPost(String path) throws IOException {

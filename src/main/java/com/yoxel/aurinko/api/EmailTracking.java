@@ -1,5 +1,6 @@
 package com.yoxel.aurinko.api;
 
+import com.google.api.client.http.HttpRequest;
 import com.yoxel.aurinko.apis.ListSupport_OffsetBased;
 import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.apis.ReadSupport;
@@ -9,6 +10,7 @@ import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class EmailTracking extends HttpApiSupport
         implements ListSupport_OffsetBased<AurTracking, Long, AurTracking.Page>,
@@ -44,15 +46,18 @@ public class EmailTracking extends HttpApiSupport
         return new EmailTrackingEventsAll(httpImpl);
     }
 
-    public EmailTrackingEvents events(String trackingId) {
+    public EmailTrackingEvents events(Long trackingId) {
         return new EmailTrackingEvents(trackingId, httpImpl);
     }
 
-    public AurStatus purgeTracking(QueryParams params) throws IOException {
-        return httpPost(
+    public AurStatus purgeTracking(QueryParams params, String userAgent) throws IOException {
+        HttpRequest req = httpPostPrepare(
                 entityPath() + "/purgeMyTracking",
-                params
-        ).parseAs(AurStatus.class);
+                params,
+                Map.of("User-Agent", userAgent)
+        ).setSuppressUserAgentSuffix(true);
+
+        return httpExecute(req).parseAs(AurStatus.class);
     }
 
     public AurStatus ignoreOpenClicks(QueryParams params) throws IOException {

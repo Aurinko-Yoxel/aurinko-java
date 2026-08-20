@@ -18,7 +18,9 @@ public class HttpImpl {
     private final Map<String, String> headers;
     private final String userAgent;
 
-    public HttpRequest createRequest(String method, String path) throws IOException {
+    public HttpRequest createRequest(String method,
+                                     String path,
+                                     Map<String, String> reqHeaders) throws IOException {
         HttpRequest
                 httpRequest =
                 httpTransport.createRequestFactory(requestInitializer) // Utils.getDefaultTransport()
@@ -28,6 +30,7 @@ public class HttpImpl {
 
         httpRequest.getHeaders().setUserAgent(userAgent);
         headers.forEach((k, v) -> httpRequest.getHeaders().set(k, v));
+        reqHeaders.forEach((k, v) -> httpRequest.getHeaders().set(k, v));
 //        if ("PATCH".equalsIgnoreCase(method))
 //            httpRequest.getHeaders().set("X-HTTP-Method-Override", method);
 
