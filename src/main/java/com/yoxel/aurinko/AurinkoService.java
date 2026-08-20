@@ -6,6 +6,7 @@ import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.ExponentialBackOff;
 import com.yoxel.aurinko.api.*;
+import com.yoxel.aurinko.api.booking.Bookings;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurTokenPage;
 import com.yoxel.aurinko.http.HttpImpl;
@@ -39,6 +40,7 @@ public class AurinkoService implements AutoCloseable {
   public enum BodyType {html, text, none}
 
   public final Api api;
+  public final Bookings book;
   public final Direct direct;
   public final Subscriptions subscriptions;
   public final Auth auth;
@@ -55,6 +57,7 @@ public class AurinkoService implements AutoCloseable {
     this.httpTransport = new ApacheHttpTransport();
     this.httpImpl = new HttpImpl(httpTransport, requestInitializer, baseUrl, JSON_PARSER, httpIOExceptionHandler, headers, userAgent);
     this.api = new Api(httpImpl);
+    this.book = new Bookings(httpImpl);
     this.direct = new Direct(httpImpl);
     this.subscriptions = new Subscriptions(httpImpl);
     this.auth = new Auth(httpImpl);
