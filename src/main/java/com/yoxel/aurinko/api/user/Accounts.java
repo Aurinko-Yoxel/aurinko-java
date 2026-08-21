@@ -45,7 +45,7 @@ public class Accounts extends HttpApiSupport
 
     public AurEndUserAccountDto makeManaged(Long id, QueryParams query) throws IOException {
         return httpPost(
-                basePath() + entityPath() + "/" + id + "/managed",
+                entityPath() + "/" + id + "/managed",
                 query
         ).parseAs(AurEndUserAccountDto.class);
     }

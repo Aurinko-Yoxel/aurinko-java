@@ -3,6 +3,8 @@ package com.yoxel.aurinko.api.user;
 import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.yoxel.aurinko.api.FakeHttpImpl;
+import com.yoxel.aurinko.apis.QueryParams;
+import com.yoxel.aurinko.bean.AurAccount;
 import com.yoxel.aurinko.bean.AurEndUserAccountDto;
 import org.junit.jupiter.api.Test;
 
@@ -78,5 +80,28 @@ public class AccountsTest implements FakeHttpImpl {
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
                 .isEqualTo("https://api.aurinko.io/v1/user/accounts/" + id);
+    }
+
+    @Test
+    void makeManaged() throws IOException {
+        Long id = 1L;
+        String data = """
+                {
+                  "id": 2,
+                  "parentId": 123
+                }
+                """;
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+        AurEndUserAccountDto r = new User(buildFakeHttp(mockTransport))
+                .accounts
+                .makeManaged(id, QueryParams.EMPTY);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/user/accounts/" + id + "/managed");
+
+        assertThat(r).isNotNull();
+        assertThat(r.getId()).isEqualTo(2);
+        assertThat(r.getParentId()).isEqualTo(123);
     }
 }
