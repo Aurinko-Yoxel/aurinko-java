@@ -4,6 +4,7 @@ import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.bean.AurEndUserDto;
+import com.yoxel.aurinko.bean.AurEndUserSettingsDto;
 import com.yoxel.aurinko.bean.AurStatus;
 import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
 import org.junit.jupiter.api.Test;
@@ -39,8 +40,10 @@ public class UserTest implements FakeHttpImpl {
 
     @Test
     void changeSettings() throws IOException {
-        AurWeekWorkSchedule dto = new AurWeekWorkSchedule();
-        dto.setTimezone("America/New_York");
+        AurEndUserSettingsDto dto = new AurEndUserSettingsDto();
+        AurWeekWorkSchedule sh = new AurWeekWorkSchedule();
+        sh.setTimezone("America/New_York");
+        dto.setWorkHours(sh);
         String data = """
                 {
                   "id": "i",
