@@ -35,10 +35,10 @@ public class AurBookingTimesOutDto extends GenericJson {
     String subject;
 
     @Key
-    Integer primaryColor;
+    String primaryColor;
 
     @Key
-    Integer secondaryColor;
+    String secondaryColor;
 
     @Key
     List<AurAdditionalField> additionalFields;
