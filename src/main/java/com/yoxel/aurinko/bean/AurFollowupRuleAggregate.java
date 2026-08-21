@@ -1,5 +1,6 @@
 package com.yoxel.aurinko.bean;
 
+import com.google.api.client.json.GenericJson;
 import com.google.api.client.util.Key;
 import com.yoxel.aurinko.bean.sub.AurFollowupRuleAction;
 import lombok.Data;
@@ -7,22 +8,25 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AurFollowupRuleAggregate extends AurIdEntity {
+public class AurFollowupRuleAggregate extends GenericJson {
 
     @Key
-    String name;
+    private Long id;
 
     @Key
-    Boolean expectThreadResponse;
+    private String name;
 
     @Key
-    String templateBody;
+    private Boolean expectThreadResponse;
 
     @Key
-    String templateSubject;
+    private String templateBody;
 
     @Key
-    List<AurFollowupRuleAction> actions;
+    private String templateSubject;
+
+    @Key
+    private List<AurFollowupRuleAction> actions;
 
     public static class Page extends AurOffsetPage<AurFollowupRuleAggregate> {
     }
