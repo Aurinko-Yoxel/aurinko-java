@@ -7,6 +7,7 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.util.ExponentialBackOff;
 import com.yoxel.aurinko.api.*;
 import com.yoxel.aurinko.api.booking.Bookings;
+import com.yoxel.aurinko.api.user.User;
 import com.yoxel.aurinko.bean.AurLiveIdEntity;
 import com.yoxel.aurinko.bean.AurTokenPage;
 import com.yoxel.aurinko.http.HttpImpl;
@@ -46,6 +47,7 @@ public class AurinkoService implements AutoCloseable {
   public final Auth auth;
   public final Accounts accounts;
   public final Users users;
+  public final User user;
   public final Calendars calendars;
   public final TaskLists taskLists;
   public final Emails emails;
@@ -63,6 +65,7 @@ public class AurinkoService implements AutoCloseable {
     this.auth = new Auth(httpImpl);
     this.accounts = new Accounts(httpImpl);
     this.users = new Users(httpImpl);
+    this.user = new User(httpImpl);
     this.calendars = new Calendars(httpImpl);
     this.taskLists = new TaskLists(httpImpl);
     this.emails = new Emails(httpImpl);
@@ -115,6 +118,14 @@ public class AurinkoService implements AutoCloseable {
 
   public static AurinkoService createWithAccountAuth(String accessToken) {
     return createWithAccountAuth(DEFAULT_BASE_URL, accessToken);
+  }
+
+  public static AurinkoService createWithEndUserSessionAuth(String baseUrl, String session) {
+    return create(baseUrl, new EndUserSessionAuthorization(session), DEFAULT_USER_AGENT);
+  }
+
+  public static AurinkoService createWithEndUserSessionAuth(String session) {
+    return createWithEndUserSessionAuth(DEFAULT_BASE_URL, session);
   }
 
   public static AurinkoService create(HttpExecuteInterceptor httpInterceptor) {
