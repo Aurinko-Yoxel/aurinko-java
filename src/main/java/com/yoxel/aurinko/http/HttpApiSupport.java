@@ -6,6 +6,7 @@ import com.yoxel.aurinko.apis.QueryParams;
 import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public abstract class HttpApiSupport implements HttpApi {
@@ -17,8 +18,14 @@ public abstract class HttpApiSupport implements HttpApi {
     }
 
     @Override
-    public HttpRequest httpRequestPrepare(String method, String path, QueryParams queryParams)
+    public HttpRequest httpRequestPrepare(String method,
+                                          String path,
+                                          QueryParams queryParams,
+                                          Map<String, String> headers)
             throws IOException {
-        return httpImpl.createRequest(method, basePath() + path + queryParams.toUrlString());
+        return httpImpl.createRequest(
+                method,
+                basePath() + path + queryParams.toUrlString(),
+                headers);
     }
 }

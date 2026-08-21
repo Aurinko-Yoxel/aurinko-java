@@ -10,9 +10,9 @@ public class EmailTrackingEvents extends HttpApiSupport
         implements ListSupport_OffsetBased<AurTrackingEvent, Long, AurTrackingEvent.Page>,
         ReadSupport<AurTrackingEvent, Long> {
 
-    private final String trackingId;
+    private final Long trackingId;
 
-    EmailTrackingEvents(String trackingId, HttpImpl httpImpl) {
+    EmailTrackingEvents(Long trackingId, HttpImpl httpImpl) {
         super(httpImpl);
         this.trackingId = trackingId;
     }
