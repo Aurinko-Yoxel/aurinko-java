@@ -68,11 +68,11 @@ public class EmailFolders extends HttpApiSupport
     private static class EmailMessages extends HttpApiSupport implements
             ListSupport_TokenBased<AurEmail, String, AurEmailsPage> {
 
-        private final String folderId;
+        private final String parentBasePath;
 
-        EmailMessages(HttpImpl httpImpl, String folderId) {
+        EmailMessages(HttpImpl httpImpl, String parentBasePath) {
             super(httpImpl);
-            this.folderId = folderId;
+            this.parentBasePath = parentBasePath;
         }
 
         @Override
@@ -82,12 +82,12 @@ public class EmailFolders extends HttpApiSupport
 
         @Override
         public String entityPath() {
-            return entityPath() + "/" + folderId + "/messages";
+            return parentBasePath + "/messages";
         }
     }
 
     public XStream<AurEmail, IOException> messages(String id, QueryParams params) throws IOException {
-        return new EmailMessages(httpImpl, id)
+        return new EmailMessages(httpImpl, entityPath() + "/" + id)
                 .streamPaged(params);
     }
 }
