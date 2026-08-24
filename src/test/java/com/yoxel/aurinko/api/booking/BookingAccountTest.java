@@ -232,8 +232,8 @@ public class BookingAccountTest implements FakeHttpImpl {
                   "durationMinutes": 60,
                   "availabilityStep": 15,
                   "subject": "s",
-                  "primaryColor": 1,
-                  "secondaryColor": 2,
+                  "primaryColor": "1",
+                  "secondaryColor": "2",
                   "nextPageToken": "next",
                   "limit": 10,
                   "offset": 0,
@@ -259,8 +259,8 @@ public class BookingAccountTest implements FakeHttpImpl {
         assertThat(page.getDurationMinutes()).isEqualTo(60);
         assertThat(page.getAvailabilityStep()).isEqualTo(15);
         assertThat(page.getSubject()).isEqualTo("s");
-        assertThat(page.getPrimaryColor()).isEqualTo(1);
-        assertThat(page.getSecondaryColor()).isEqualTo(2);
+        assertThat(page.getPrimaryColor()).isEqualTo("1");
+        assertThat(page.getSecondaryColor()).isEqualTo("2");
         assertThat(page.getNextPageToken()).isEqualTo("next");
         assertThat(page.getLimit()).isEqualTo(10);
         assertThat(page.getOffset()).isEqualTo(0);

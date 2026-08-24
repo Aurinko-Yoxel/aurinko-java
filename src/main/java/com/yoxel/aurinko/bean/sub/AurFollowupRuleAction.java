@@ -11,5 +11,5 @@ public class AurFollowupRuleAction extends GenericJson {
     Integer intervalDays;
 
     @Key
-    Integer message;
+    String message;
 }

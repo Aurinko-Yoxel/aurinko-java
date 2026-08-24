@@ -17,7 +17,7 @@ public class AurEmailSendResponse extends AurIdEntity {
     String threadId;
 
     @Key
-    String trackingId;
+    Long trackingId;
 
     @Key
     String processingStatus;

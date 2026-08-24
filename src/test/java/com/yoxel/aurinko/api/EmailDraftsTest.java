@@ -6,7 +6,7 @@ import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.bean.AurEmail;
 import com.yoxel.aurinko.bean.AurEmailDraft;
 import com.yoxel.aurinko.bean.AurEmailDraftResponse;
-import com.yoxel.aurinko.bean.EmailDraftSendResponse;
+import com.yoxel.aurinko.bean.AurEmailDraftSendResponse;
 import com.yoxel.aurinko.bean.sub.EmailAddress;
 import org.junit.jupiter.api.Test;
 
@@ -125,7 +125,7 @@ public class EmailDraftsTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        EmailDraftSendResponse r = new EmailDrafts(buildFakeHttp(mockTransport))
+        AurEmailDraftSendResponse r = new EmailDrafts(buildFakeHttp(mockTransport))
                 .send(id, QueryParams.of("returnIds", "true"));
 
 
