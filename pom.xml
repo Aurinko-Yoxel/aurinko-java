@@ -5,11 +5,11 @@
 
 	<groupId>com.yoxel.aurinko</groupId>
 	<artifactId>aurinko-java</artifactId>
-	<version>1.8.16-SNAPSHOT</version>
+	<version>1.8.16</version>
 
 	<scm>
 		<developerConnection>scm:git:git@github.com:Aurinko-Yoxel/aurinko-java.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>1.8.16</tag>
   </scm>
 
 	<properties>
