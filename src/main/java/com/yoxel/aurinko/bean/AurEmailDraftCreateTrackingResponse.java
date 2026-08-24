@@ -23,5 +23,5 @@ public class AurEmailDraftCreateTrackingResponse extends GenericJson {
     String context;
 
     @Key
-    String trackingId;
+    Long trackingId;
 }

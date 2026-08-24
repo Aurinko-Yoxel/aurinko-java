@@ -53,16 +53,16 @@ public class EmailDrafts extends HttpApiSupport
         return entityPath(id) + "/send";
     }
 
-    public EmailDraftSendResponse send(String id, QueryParams params) throws IOException {
+    public AurEmailDraftSendResponse send(String id, QueryParams params) throws IOException {
         return httpPost(sendPath(id), params)
-                .parseAs(EmailDraftSendResponse.class);
+                .parseAs(AurEmailDraftSendResponse.class);
     }
 
-    public EmailDraftSendResponse send(String id, QueryParams params, AurDraftSendDetails body) throws IOException {
+    public AurEmailDraftSendResponse send(String id, QueryParams params, AurDraftSendDetails body) throws IOException {
         return httpPost(
                 sendPath(id),
                 params,
                 new JsonHttpContent(Utils.getDefaultJsonFactory(), body)
-        ).parseAs(EmailDraftSendResponse.class);
+        ).parseAs(AurEmailDraftSendResponse.class);
     }
 }

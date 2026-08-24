@@ -5,7 +5,7 @@ import com.yoxel.aurinko.bean.sub.AurEmailSendError;
 import lombok.Data;
 
 @Data
-public class EmailDraftSendResponse extends AurIdEntity {
+public class AurEmailDraftSendResponse extends AurIdEntity {
 
     @Key
     String status;
@@ -17,7 +17,7 @@ public class EmailDraftSendResponse extends AurIdEntity {
     String threadId;
 
     @Key
-    String trackingId;
+    Long trackingId;
 
     @Key
     String processingStatus;
