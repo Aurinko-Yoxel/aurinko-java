@@ -39,4 +39,7 @@ public class AurEndUserDto extends AurIdEntity {
 
     @Key
     private List<AurEndUserAccountDto> accounts;
+
+    public static class Page extends AurOffsetPage<AurEndUserDto> {
+    }
 }
