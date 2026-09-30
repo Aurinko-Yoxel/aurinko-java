@@ -121,7 +121,7 @@ public class AurinkoService implements AutoCloseable {
   }
 
   public static AurinkoService createWithEndUserSessionAuth(String baseUrl, String session) {
-    return create(baseUrl, new EndUserSessionAuthorization(session), DEFAULT_USER_AGENT);
+    return create(baseUrl, new AurUserSessionAuthorization(session), DEFAULT_USER_AGENT);
   }
 
   public static AurinkoService createWithEndUserSessionAuth(String session) {

@@ -1,12 +1,12 @@
 package com.yoxel.aurinko.api;
 
 import com.yoxel.aurinko.apis.ListSupport_OffsetBased;
-import com.yoxel.aurinko.bean.AurEndUserDto;
+import com.yoxel.aurinko.bean.AurUserSession;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
 public class Users extends HttpApiSupport
-        implements ListSupport_OffsetBased<AurEndUserDto, String, AurEndUserDto.Page> {
+        implements ListSupport_OffsetBased<AurUserSession, String, AurUserSession.Page> {
 
     private final String basePath = "/users";
     private final HttpImpl httpImpl;
@@ -27,8 +27,8 @@ public class Users extends HttpApiSupport
     }
 
     @Override
-    public Class<AurEndUserDto.Page> entityPageClass() {
-        return AurEndUserDto.Page.class;
+    public Class<AurUserSession.Page> entityPageClass() {
+        return AurUserSession.Page.class;
     }
 
     public UserAccounts accounts(String userId) {

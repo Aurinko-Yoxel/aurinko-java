@@ -6,7 +6,7 @@ import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
 import lombok.Data;
 
 @Data
-public class AurEndUserSettingsDto extends GenericJson {
+public class AurUserSessionSettingsDto extends GenericJson {
 
     @Key
     private AurWeekWorkSchedule workHours;
