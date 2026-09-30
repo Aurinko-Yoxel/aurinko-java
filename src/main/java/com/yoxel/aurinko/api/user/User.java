@@ -3,7 +3,7 @@ package com.yoxel.aurinko.api.user;
 import com.google.api.client.googleapis.util.Utils;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.yoxel.aurinko.bean.AurUserSession;
-import com.yoxel.aurinko.bean.AurUserSessionSettingsDto;
+import com.yoxel.aurinko.bean.AurUserSessionSettings;
 import com.yoxel.aurinko.bean.AurStatus;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
@@ -28,7 +28,7 @@ public class User extends HttpApiSupport {
                 .parseAs(AurUserSession.class);
     }
 
-    public AurUserSession changeSettings(AurUserSessionSettingsDto entity) throws IOException {
+    public AurUserSession changeSettings(AurUserSessionSettings entity) throws IOException {
         return httpPatch("/settings", new JsonHttpContent(Utils.getDefaultJsonFactory(), entity))
                 .parseAs(AurUserSession.class);
     }
