@@ -38,7 +38,7 @@ public class AurUserSession extends AurIdEntity {
     private AurWeekWorkSchedule workHours;
 
     @Key
-    private List<AurUserSessionAccountDto> accounts;
+    private List<AurUserSessionAccount> accounts;
 
     public static class Page extends AurOffsetPage<AurUserSession> {
     }

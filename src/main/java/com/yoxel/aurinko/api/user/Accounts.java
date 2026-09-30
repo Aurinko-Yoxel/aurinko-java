@@ -4,7 +4,7 @@ import com.yoxel.aurinko.apis.DeleteSupport;
 import com.yoxel.aurinko.apis.ListSupport_TokenBased;
 import com.yoxel.aurinko.apis.QueryParams;
 import com.yoxel.aurinko.apis.ReadSupport;
-import com.yoxel.aurinko.bean.AurUserSessionAccountDto;
+import com.yoxel.aurinko.bean.AurUserSessionAccount;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
@@ -12,9 +12,9 @@ import java.io.IOException;
 
 public class Accounts extends HttpApiSupport
         implements
-        ReadSupport<AurUserSessionAccountDto, Long>,
+        ReadSupport<AurUserSessionAccount, Long>,
         DeleteSupport<Long>,
-        ListSupport_TokenBased<AurUserSessionAccountDto, Long, AurUserSessionAccountDto.Page> {
+        ListSupport_TokenBased<AurUserSessionAccount, Long, AurUserSessionAccount.Page> {
 
     private final String parentBasePath;
 
@@ -34,19 +34,19 @@ public class Accounts extends HttpApiSupport
     }
 
     @Override
-    public Class<AurUserSessionAccountDto.Page> entityPageClass() {
-        return AurUserSessionAccountDto.Page.class;
+    public Class<AurUserSessionAccount.Page> entityPageClass() {
+        return AurUserSessionAccount.Page.class;
     }
 
     @Override
-    public Class<AurUserSessionAccountDto> entityClass() {
-        return AurUserSessionAccountDto.class;
+    public Class<AurUserSessionAccount> entityClass() {
+        return AurUserSessionAccount.class;
     }
 
-    public AurUserSessionAccountDto makeManaged(Long id, QueryParams query) throws IOException {
+    public AurUserSessionAccount makeManaged(Long id, QueryParams query) throws IOException {
         return httpPost(
                 entityPath() + "/" + id + "/managed",
                 query
-        ).parseAs(AurUserSessionAccountDto.class);
+        ).parseAs(AurUserSessionAccount.class);
     }
 }

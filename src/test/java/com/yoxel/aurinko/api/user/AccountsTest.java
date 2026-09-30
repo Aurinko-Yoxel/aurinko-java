@@ -4,7 +4,7 @@ import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.yoxel.aurinko.api.FakeHttpImpl;
 import com.yoxel.aurinko.apis.QueryParams;
-import com.yoxel.aurinko.bean.AurUserSessionAccountDto;
+import com.yoxel.aurinko.bean.AurUserSessionAccount;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class AccountsTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        AurUserSessionAccountDto.Page r = new User(buildFakeHttp(mockTransport))
+        AurUserSessionAccount.Page r = new User(buildFakeHttp(mockTransport))
                 .accounts
                 .loadPage();
 
@@ -51,7 +51,7 @@ public class AccountsTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        AurUserSessionAccountDto r = new User(buildFakeHttp(mockTransport))
+        AurUserSessionAccount r = new User(buildFakeHttp(mockTransport))
                 .accounts
                 .read(id);
 
@@ -92,7 +92,7 @@ public class AccountsTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        AurUserSessionAccountDto r = new User(buildFakeHttp(mockTransport))
+        AurUserSessionAccount r = new User(buildFakeHttp(mockTransport))
                 .accounts
                 .makeManaged(id, QueryParams.EMPTY);
 

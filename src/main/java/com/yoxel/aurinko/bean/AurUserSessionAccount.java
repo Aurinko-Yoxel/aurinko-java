@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AurUserSessionAccountDto extends GenericJson {
+public class AurUserSessionAccount extends GenericJson {
 
     @Key
     private Long id;
@@ -95,7 +95,7 @@ public class AurUserSessionAccountDto extends GenericJson {
     @Key
     private DateTime updatedAt;
 
-    public static class Page extends AurTokenPage<AurUserSessionAccountDto> {
+    public static class Page extends AurTokenPage<AurUserSessionAccount> {
 
     }
 }
