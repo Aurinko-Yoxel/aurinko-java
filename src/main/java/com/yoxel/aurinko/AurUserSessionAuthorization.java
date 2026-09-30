@@ -7,13 +7,13 @@ import com.google.api.client.util.Preconditions;
 
 import java.io.IOException;
 
-public class EndUserSessionAuthorization implements
+public class AurUserSessionAuthorization implements
         HttpExecuteInterceptor,
         HttpRequestInitializer {
 
     private final String session;
 
-    public EndUserSessionAuthorization(String session) {
+    public AurUserSessionAuthorization(String session) {
         this.session = Preconditions.checkNotNull(session);
     }
 

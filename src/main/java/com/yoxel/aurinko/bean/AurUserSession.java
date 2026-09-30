@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AurEndUserDto extends AurIdEntity {
+public class AurUserSession extends AurIdEntity {
 
     @Key
     private Long appId;
@@ -38,8 +38,8 @@ public class AurEndUserDto extends AurIdEntity {
     private AurWeekWorkSchedule workHours;
 
     @Key
-    private List<AurEndUserAccountDto> accounts;
+    private List<AurUserSessionAccount> accounts;
 
-    public static class Page extends AurOffsetPage<AurEndUserDto> {
+    public static class Page extends AurOffsetPage<AurUserSession> {
     }
 }

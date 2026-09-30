@@ -3,8 +3,8 @@ package com.yoxel.aurinko.api.user;
 import com.google.api.client.testing.http.MockHttpTransport;
 import com.google.api.client.testing.http.MockLowLevelHttpResponse;
 import com.yoxel.aurinko.api.FakeHttpImpl;
-import com.yoxel.aurinko.bean.AurEndUserDto;
-import com.yoxel.aurinko.bean.AurEndUserSettingsDto;
+import com.yoxel.aurinko.bean.AurUserSession;
+import com.yoxel.aurinko.bean.AurUserSessionSettings;
 import com.yoxel.aurinko.bean.AurStatus;
 import com.yoxel.aurinko.bean.sub.AurWeekWorkSchedule;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ public class UserTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        AurEndUserDto r = new User(buildFakeHttp(mockTransport))
+        AurUserSession r = new User(buildFakeHttp(mockTransport))
                 .getInfo();
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
@@ -40,7 +40,7 @@ public class UserTest implements FakeHttpImpl {
 
     @Test
     void changeSettings() throws IOException {
-        AurEndUserSettingsDto dto = new AurEndUserSettingsDto();
+        AurUserSessionSettings dto = new AurUserSessionSettings();
         AurWeekWorkSchedule sh = new AurWeekWorkSchedule();
         sh.setTimezone("America/New_York");
         dto.setWorkHours(sh);
@@ -53,7 +53,7 @@ public class UserTest implements FakeHttpImpl {
                 """;
         MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
         MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
-        AurEndUserDto r = new User(buildFakeHttp(mockTransport))
+        AurUserSession r = new User(buildFakeHttp(mockTransport))
                 .changeSettings(dto);
 
         assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
