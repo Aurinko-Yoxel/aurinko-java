@@ -1,12 +1,14 @@
 package com.yoxel.aurinko.api;
 
+import com.yoxel.aurinko.apis.DeleteSupport;
 import com.yoxel.aurinko.apis.ListSupport_OffsetBased;
 import com.yoxel.aurinko.bean.AurUserSession;
 import com.yoxel.aurinko.http.HttpApiSupport;
 import com.yoxel.aurinko.http.HttpImpl;
 
 public class Users extends HttpApiSupport
-        implements ListSupport_OffsetBased<AurUserSession, String, AurUserSession.Page> {
+        implements ListSupport_OffsetBased<AurUserSession, String, AurUserSession.Page>,
+        DeleteSupport<String> {
 
     private final String basePath = "/users";
     private final HttpImpl httpImpl;

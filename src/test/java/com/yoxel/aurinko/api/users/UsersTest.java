@@ -38,4 +38,21 @@ public class UsersTest implements FakeHttpImpl {
         assertThat(r.getRecords().length).isEqualTo(1);
         assertThat(r.getRecords()[0].getId()).isEqualTo("id");
     }
+
+    @Test
+    void delete() throws IOException {
+        String id = "user_id";
+        String data = """
+                {
+                  "status": "ok"
+                }
+                """;
+        MockLowLevelHttpResponse mockResponse = successJsonResponse(data);
+        MockHttpTransport mockTransport = buildFakeTransport(mockResponse);
+        new Users(buildFakeHttp(mockTransport))
+                .delete(id);
+
+        assertThat(mockTransport.getLowLevelHttpRequest().getUrl())
+                .isEqualTo("https://api.aurinko.io/v1/users/" + id);
+    }
 }
