@@ -104,6 +104,18 @@ public class AurAccount {
   private DateTime updatedAt;
 
   @Key
+  private DateTime lastActivityTime;
+
+  @Key
+  private DateTime lastApiActivityTime;
+
+  @Key
+  private DateTime lastErrorTime;
+
+  @Key
+  private DateTime lastApiErrorTime;
+
+  @Key
   private String providerAccessToken;
 
   public static class Page extends AurOffsetPage<AurAccount> {
